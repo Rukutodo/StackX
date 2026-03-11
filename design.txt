@@ -1,0 +1,670 @@
+================================================================================
+                     STACKX WEBSITE — COMPLETE DESIGN DOCUMENT
+================================================================================
+
+Last Updated : February 2026
+Tech Stack   : Next.js 15 (App Router) · React 19 · Tailwind CSS 4 · Framer Motion
+Fonts        : Inter (body) · Poppins (headings)
+Theme        : Dark-mode only
+Deployment   : Vercel-ready
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. COLOR PALETTE & DESIGN TOKENS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+All colors are defined as CSS custom properties in globals.css under @theme inline
+and consumed via Tailwind's utility classes (e.g., bg-background, text-primary).
+
+┌────────────────────┬────────────┬──────────────────────────────────────────────┐
+│ Token              │ Value      │ Usage                                        │
+├────────────────────┼────────────┼──────────────────────────────────────────────┤
+│ --color-background │ #0a0a0f    │ Page background (deep dark navy-black)       │
+│ --color-foreground │ #ededed    │ Primary text color (near-white)              │
+│ --color-primary    │ #8B5CF6    │ Brand purple — buttons, accents, hover       │
+│ --color-primary-   │ #A78BFA    │ Lighter purple for links, badges, labels     │
+│   light            │            │                                              │
+│ --color-primary-   │ #6D28D9    │ Deeper purple for gradient endpoints         │
+│   deep             │            │                                              │
+│ --color-accent     │ #06B6D4    │ Cyan accent — secondary gradients, icons     │
+│ --color-accent-    │ #0891B2    │ Darker cyan for gradient endpoints           │
+│   dark             │            │                                              │
+│ --color-surface    │ #13131a    │ Card backgrounds, scrollbar track, nav bg    │
+│ --color-surface-   │ #1a1a25    │ Slightly lighter surface for hover states    │
+│   light            │            │                                              │
+│ --color-surface-   │ rgba(139,  │ Subtle purple-tinted borders on cards        │
+│   border           │ 92,246,    │                                              │
+│                    │ 0.15)      │                                              │
+│ --color-muted      │ #9ca3af    │ Secondary/muted text (descriptions, labels)  │
+│ --color-success    │ #10B981    │ Success states (form confirmation badges)    │
+│ --color-error      │ #EF4444    │ Error states (validation errors)             │
+│ --color-warning    │ #F59E0B    │ Warning states and star ratings              │
+└────────────────────┴────────────┴──────────────────────────────────────────────┘
+
+Gradient Patterns:
+  • Primary CTA gradient    : from-primary (#8B5CF6) to primary-deep (#6D28D9)
+  • Accent gradient         : from-accent (#06B6D4) to accent-dark (#0891B2)
+  • Mixed gradient          : from-primary-light (#A78BFA) to accent (#06B6D4)
+  • Gradient text           : linear-gradient(135deg, primary-light, accent)
+  • Gradient border         : linear-gradient(135deg, primary, accent) via mask
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. TYPOGRAPHY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Font Family               Token               Weights Loaded
+  ─────────────────────────────────────────────────────────────
+  Inter (Google Fonts)      --font-body          Variable (400–700)
+  Poppins (Google Fonts)    --font-heading       400, 500, 600, 700, 800
+
+Loading Strategy:
+  • Both fonts use `display: "swap"` for fast rendering.
+  • CSS variables (--font-inter, --font-poppins) are set via Next.js font API.
+  • Body defaults to Inter via font-family on <body>.
+  • Headings use Poppins via inline style overrides on <h1>–<h4> elements.
+
+Typography Scale (Tailwind):
+  • Hero headline     : text-4xl → sm:text-5xl → md:text-6xl → lg:text-7xl
+  • Section titles    : text-3xl → sm:text-4xl → lg:text-5xl
+  • Card headings     : text-lg → text-xl
+  • Body text         : text-base → sm:text-lg
+  • Small/labels      : text-sm, text-xs
+  • Spacing           : leading-tight (headings), leading-relaxed (body)
+  • Tracking          : tracking-tight (hero), tracking-wider/widest (badges)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. LAYOUT SYSTEM & SPACING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Container:
+  • max-w-7xl (80rem / 1280px) centered with mx-auto
+  • Horizontal padding: px-4 → sm:px-6 → lg:px-8
+
+Section Spacing:
+  • Vertical padding: py-16 → py-20 (consistent across all sections)
+  • First page content starts at pt-24 (to clear fixed navbar)
+  • Bottom padding: pb-20
+
+Grid System (Tailwind):
+  • Hero CTAs          : flex, flex-col → sm:flex-row
+  • Stats              : grid-cols-2 → lg:grid-cols-4
+  • Services           : responsive stacking (single → two → three columns)
+  • Portfolio grid     : sm:grid-cols-2 → lg:grid-cols-3
+  • Testimonials       : sm:grid-cols-2 → lg:grid-cols-3
+  • Footer             : grid-cols-1 → md:grid-cols-2 → lg:grid-cols-4
+  • About Story        : lg:grid-cols-2 with items-center
+  • About Values       : sm:grid-cols-2 → lg:grid-cols-4
+  • Career benefits    : sm:grid-cols-2 → lg:grid-cols-4
+  • Contact layout     : lg:grid-cols-5 (2 cols info + 3 cols form)
+
+Responsive Breakpoints (Tailwind defaults):
+  • sm  : 640px
+  • md  : 768px
+  • lg  : 1024px
+  • xl  : 1280px
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. COMPONENT LIBRARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+All reusable UI components live in src/components/ui/index.tsx.
+
+4.1 SectionHeading
+──────────────────
+  Props: badge? (string), title (string), subtitle? (string), center? (bool)
+  
+  Design:
+    • Badge: rounded-full pill, bg-primary/10, text-primary-light, 
+      border-primary/20, uppercase, xs tracking-wider
+    • Title: font-heading (Poppins), font-bold, responsive text scale
+    • Subtitle: text-muted, max-w-2xl, mx-auto, leading-relaxed
+    • Enters with fade-up animation (opacity:0,y:30 → opacity:1,y:0)
+
+4.2 GlassCard
+──────────────
+  Props: children (ReactNode), className? (string), hover? (bool, default true)
+  
+  Design (Glassmorphism):
+    • Background: rgba(19, 19, 26, 0.6) — translucent dark surface
+    • Backdrop filter: blur(20px)
+    • Border: 1px solid rgba(139, 92, 246, 0.12) — subtle purple tint
+    • Border radius: 1rem (16px)
+    • Hover effect: border brightens to rgba(139,92,246,0.35),
+      box-shadow: 0 0 30px rgba(139,92,246,0.08)
+    • Padding: p-6 → sm:p-8
+    • Enter animation: fade-up (y:30)
+
+  Usage: Used as the primary card container across all pages — services,
+         portfolio, testimonials, careers, about (values, milestones,
+         mission/vision), contact (info panel).
+
+4.3 Button
+──────────
+  Props: children, variant (primary|secondary|outline), href?, className?,
+         type?, onClick?
+
+  Variants:
+    • primary   : bg-gradient from-primary to-primary-deep, text-white,
+                  hover:shadow-lg shadow-primary/25, hover:-translate-y-0.5
+    • secondary : bg-white/5, text-white, border-white/10,
+                  hover:bg-white/10, hover:border-primary/30
+    • outline   : border-primary/30, text-primary-light,
+                  hover:bg-primary/10, hover:border-primary/50
+
+  Base styles: rounded-xl, px-6 py-3, text-sm font-medium,
+               transition-all duration-300, cursor-pointer
+  Renders as <a> if href provided, <button> otherwise.
+
+4.4 AnimatedCounter
+───────────────────
+  Props: end (number), suffix?, prefix?, label (string), duration? (default 2s)
+  
+  Design:
+    • Counter value uses gradient-text class (purple-to-cyan gradient)
+    • Animates from 0 to target value at 60fps when scrolled into view
+    • Label underneath: text-sm text-muted uppercase tracking-wider
+    • Enters with scale animation (0.8 → 1.0)
+
+4.5 TestimonialCard
+───────────────────
+  Props: name, company, feedback, rating (0-5), projectType, image?
+  
+  Design:
+    • Wraps in GlassCard, flex-col with h-full for equal-height grids
+    • Star rating row: 5 SVG stars, star-filled (#F59E0B) or star-empty (#374151)
+    • Feedback text: text-muted text-sm with curly quotes (ldquo/rdquo)
+    • Bottom divider: border-t border-surface-border
+    • Author name: text-sm font-medium text-white
+    • Company: text-xs text-muted
+    • Project type badge: rounded-full, bg-primary/10, text-primary-light,
+      border-primary/20
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. CUSTOM CURSOR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+File: src/components/ui/CustomCursor.tsx
+
+  • Two-element cursor: a small dot + a larger ring that follows with spring delay
+  • Dot: 8×8px, bg-primary (#8B5CF6), rounded-full, mix-blend-difference
+  • Ring: 40×40px, border-primary/50, follows with spring (damping:25, stiffness:200)
+  • On hover over interactive elements (a, button, input, etc.):
+    – Ring expands to scale(1.5) and opacity reduces
+    – Dot shrinks slightly
+  • On click: scales down for a "press" effect
+  • Disabled on touch devices (detects ontouchstart / maxTouchPoints)
+  • Hidden when cursor leaves the viewport
+  • The system cursor is hidden globally (`cursor: none` on body)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6. ANIMATIONS & MICRO-INTERACTIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+6.1 Framer Motion (component-level)
+────────────────────────────────────
+  • Fade-up entrance: initial={{ opacity:0, y:30 }}, whileInView={{ opacity:1, y:0 }}
+    – Used on: SectionHeading, GlassCard, hero elements, grid items
+    – viewport={{ once: true, margin: "-50px" }}
+    – duration: 0.4–0.6s, staggered with delay (i * 0.08)
+  
+  • Scale entrance: initial={{ opacity:0, scale:0.8 }}, whileInView={{ opacity:1, scale:1 }}
+    – Used on: AnimatedCounter, average rating section
+
+  • Slide-in: initial={{ opacity:0, x:±30 }}, whileInView={{ opacity:1, x:0 }}
+    – Used on: About page two-column layout (story left, stats right)
+
+  • Mobile menu: AnimatePresence with height:0→auto, opacity:0→1
+
+  • Testimonial carousel: AnimatePresence with opacity/x transitions,
+    auto-advances every 5 seconds
+
+6.2 CSS Keyframe Animations (globals.css)
+─────────────────────────────────────────
+  • float         : translateY(0) → translateY(-20px) rotate(5deg), 6s ease-in-out infinite
+  • floatReverse  : translateY(0) → translateY(20px) rotate(-5deg), 7s ease-in-out infinite
+    – Applied to decorative floating shapes on the hero section
+  
+  • marquee       : translateX(0) → translateX(-50%), 30s linear infinite
+    – Applied to the client logos ticker (infinite horizontal scroll)
+  
+  • pulseGlow     : box-shadow oscillates between 20px and 40px spread, 3s infinite
+    – Applied to the primary CTA button ("Get Free Consultation")
+
+6.3 Transition utilities
+────────────────────────
+  • transition-all duration-300 : default for interactive elements
+  • transition-all duration-500 : navbar background on scroll
+  • transition-colors           : nav links, footer links
+  • transition-transform        : value icons on hover (group-hover:scale-110)
+  • hover:-translate-y-0.5      : subtle lift on CTA buttons
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+7. NAVIGATION (Navbar)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+File: src/components/layout/Navbar.tsx
+
+Position: fixed top-0 left-0 right-0 z-50
+
+Two states (controlled by scroll position > 20px):
+  ┌─────────────────┬────────────────────────────────────────────────────┐
+  │ State           │ Styles                                             │
+  ├─────────────────┼────────────────────────────────────────────────────┤
+  │ Not scrolled    │ bg-transparent, py-2                               │
+  │ Scrolled        │ bg-surface/85, backdrop-blur-2xl, border-b         │
+  │                 │ border-surface-border, shadow-lg shadow-primary/5, │
+  │                 │ py-1 (slightly smaller)                            │
+  └─────────────────┴────────────────────────────────────────────────────┘
+
+Links: 7 items (Home, Services, About, Portfolio, Careers, Testimonials, Contact)
+  • Desktop: horizontal, centered, text-[13px] uppercase tracking-wide
+  • Mobile: vertical list in animated dropdown (AnimatePresence)
+
+CTA Button: "Get Free Consultation →"
+  • bg-gradient from-primary to-primary-deep, text-white, rounded-xl
+  • Hover: shadow-lg shadow-primary/25, -translate-y-0.5
+  • Border: border-white/10 (subtle glass edge)
+
+Mobile Menu:
+  • Triggered by HiMenuAlt3 / HiX hamburger icon
+  • bg-surface/95 backdrop-blur-xl
+  • Links stack vertically with hover:bg-white/5
+  • CTA button at bottom, full-width
+
+Logo: /stackx.svg — 160×56 rendered at h-11 w-auto
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+8. FOOTER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+File: src/components/layout/Footer.tsx
+
+Structure:
+  • Top gradient accent line: h-px, bg-gradient from-transparent via-primary
+  • Border-t border-surface-border, bg-surface/50
+  • 4-column grid (responsive):
+    1. Brand: logo, tagline, social icons (Twitter, LinkedIn, GitHub, Instagram)
+    2. Company links: About, Careers, Testimonials, Contact
+    3. Services links: Web Dev, Automation, Ad Tech, Case Studies
+    4. Contact info: email, phone, location (with HiMail, HiPhone, HiLocationMarker icons)
+  • Bottom bar: copyright © + Privacy Policy / Terms of Service
+
+Social icons: 
+  • w-9 h-9, rounded-lg, bg-white/5, text-muted
+  • Hover: text-primary, bg-white/10
+
+Links: text-sm text-muted hover:text-primary-light
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+9. PAGE-BY-PAGE DESIGN BREAKDOWN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+9.1 HOMEPAGE (src/app/page.tsx)
+───────────────────────────────
+
+Sections (top to bottom):
+
+  a) HERO
+     • Full viewport height (min-h-screen), centered text
+     • Background effects:
+       – Two hero-glow orbs: purple (top-left) + cyan (bottom-right)
+         600×600px, border-radius:50%, blur(120px), opacity:0.15
+       – Radial gradient overlay: rgba(139,92,246,0.08) fading to transparent
+       – Three decorative floating shapes (rounded squares/circles)
+         with animate-float / animate-float-reverse (only visible on lg+)
+     • Content:
+       – Pill badge: "🚀 Software Development Agency"
+       – H1: "Professional Web Development at Unbeatable Costs"
+         with "Unbeatable Costs" in gradient-text
+       – Subtitle: text-lg → sm:text-xl, text-muted
+       – Two CTAs: "Get Free Consultation" (primary + animate-pulse-glow)
+                    "View Our Work" (secondary)
+     • Bottom gradient fade to background color
+
+  b) STATS SECTION
+     • 4 animated counters: 150+ Projects, 80+ Clients, 99.9% Uptime, 40% Savings
+     • Grid: 2 cols → 4 cols on desktop
+     • Numbers use gradient-text, labels in text-muted uppercase
+
+  c) CLIENT LOGOS MARQUEE
+     • Auto-scrolling horizontal ticker (CSS marquee animation, 30s infinite)
+     • Logos are text-based in muted color (brand names)
+     • Container: bg-white/[0.03] border-white/[0.05], rounded-lg
+     • Bordered section: border-y, bg-surface/30
+
+  d) SERVICES PREVIEW
+     • SectionHeading: "What We Build"
+     • 3 service cards, each with:
+       – Gradient icon container (10×10 rounded-xl) with white icon
+       – Service title and description
+     • "Explore All Services" CTA (outline variant)
+
+  e) WHY STACKX
+     • SectionHeading: "Why StackX?"
+     • 4 benefit cards with icons, titles, descriptions
+     • grid sm:2 → lg:4
+
+  f) LEADERSHIP PREVIEW
+     • SectionHeading: "Meet Our Leadership"
+     • Team member cards with photos (from /team/ directory)
+     • Real team photos: nuraj.png, roshan.jpeg, venu.jpeg
+     • Name, role, bio in GlassCards
+     • "Meet the Full Team" CTA
+
+  g) TESTIMONIALS CAROUSEL
+     • SectionHeading: "What Our Clients Say"
+     • Single testimonial displayed at a time with AnimatePresence
+     • Auto-rotates every 5 seconds
+     • Manual navigation: prev/next buttons + dot indicators
+     • Uses TestimonialCard component
+     • Navigation buttons: w-10, h-10, rounded-full, bg-white/5
+     • Active dot: bg-primary w-6, inactive: bg-white/20 w-2
+
+  h) FINAL CTA
+     • Call to action section for consultation
+     • Gradient overlay background
+     • Two buttons: primary & secondary
+
+
+9.2 SERVICES PAGE (src/app/services/page.tsx)
+──────────────────────────────────────────────
+
+  • 3 service categories with full detail:
+    1. Web Development (purple gradient)
+    2. Business Automation (cyan gradient)
+    3. Ad Tech Solutions (mixed gradient)
+
+  • Each category card includes:
+    – Icon in gradient circle
+    – Title, tagline
+    – Starting price (e.g., "$3,000")
+    – Expandable accordion items (title + description) with HiChevronDown
+    – Tech stack badges: bg-white/5, border-white/10, rounded-full
+    – Case study link: HiArrowRight
+
+  • Accordion component:
+    – Toggle open/close with AnimatePresence for content height
+    – Chevron rotates 180° when open
+    – Content fades in with motion
+
+
+9.3 ABOUT PAGE (src/app/about/page.tsx)
+───────────────────────────────────────
+
+  Sections:
+    a) Hero: radial gradient (cyan), SectionHeading
+    b) Our Story: 2-column — narrative text left, 2×2 stats grid right
+       – Stats in GlassCards with gradient-text values
+    c) Mission & Vision: 2 GlassCards side by side
+       – Vision icon: gradient purple, HiEye white
+       – Mission icon: gradient cyan, HiGlobe white
+    d) Core Values: 4 cards (sm:2 → lg:4)
+       – Each with icon in gradient bg circle, title, description
+    e) Milestones Timeline: year · title · description
+    f) Leadership Team: team member cards with real photos
+       – Name, role badge (gradient pill), bio
+    g) CTA Section
+
+
+9.4 PORTFOLIO PAGE (src/app/portfolio/page.tsx)
+───────────────────────────────────────────────
+
+  • Category filter bar: "All", "Web Development", "Automation", "Ad Tech"
+    – Active: bg-primary text-white border-primary
+    – Inactive: bg-white/5 text-muted border-white/10
+  
+  • Project cards (GlassCard):
+    – Large watermark number (text-4xl text-white/10)
+    – "Featured" badge on featured projects (bg-primary text-white)
+    – Project title, description
+    – Tech stack pills: bg-white/5, text-[10px], rounded
+    – Result metric (text-success)
+    – "View Case Study" or "Details Coming Soon" link
+
+  • Communize VIZAG case study (sub-page):
+    – Deep dive with challenge, solution, results
+    – Tech stack display with hover effects
+    – Metrics/stats in GlassCards
+
+
+9.5 CONTACT PAGE (src/app/contact/page.tsx)
+───────────────────────────────────────────
+
+  • 5-column grid: 2 cols info panel + 3 cols form
+
+  • Left panel:
+    – Contact info: email, phone, location with icons (HiMail, HiPhone, HiLocationMarker)
+    – Social media links: bg-white/5, hover:bg-white/10
+    – Response time notice
+
+  • Right panel — form:
+    – Two-column name fields (first + last)
+    – Full-width email
+    – Service interest dropdown
+    – Budget range dropdown
+    – Project description textarea
+    – reCAPTCHA checkbox
+    – Submit button (primary variant, w-full on mobile)
+
+  • Form inputs:
+    – bg-white/5, border-white/10, rounded-xl
+    – Focus: border-primary/50, ring-1 ring-primary/25
+    – Error state: border-error
+    – Submit success: success banner appears at top
+
+
+9.6 CAREERS PAGE (src/app/careers/page.tsx)
+──────────────────────────────────────────
+
+  Sections:
+    a) Hero with SectionHeading
+    b) Job listings: GlassCard per job
+       – Title, type (badge), location, department
+       – Expandable details: description, requirements list
+       – "Apply for Role" button triggers scroll to form
+    c) Benefits grid: 8 benefit cards with emojis
+    d) Application form:
+       – Job title pre-filled
+       – Name, email, portfolio URL inputs
+       – File upload (PDF/DOC) for resume
+       – Cover letter textarea
+       – Submit button with form validation
+
+  • Form inputs consistent with contact page: bg-white/5, border-white/10
+
+
+9.7 TESTIMONIALS PAGE (src/app/testimonials/page.tsx)
+────────────────────────────────────────────────────
+
+  • SectionHeading: "Trusted by Teams Worldwide"
+  • 3-column grid of TestimonialCards (8 testimonials)
+  • Each card staggers in with delay (i * 0.08)
+  • Bottom section: large "4.9" average rating in gradient-text
+    with 5 filled stars and "Average rating across 80+ clients"
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+10. GLOBAL DESIGN PATTERNS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+10.1 Glassmorphism
+──────────────────
+  The defining visual language of the site. Every card uses the .glass-card class:
+    • Semi-transparent dark background
+    • Heavy backdrop blur (20px)
+    • Subtle purple-tinted border
+    • Hover: border brightens, soft glow shadow
+
+10.2 Gradient Accents
+─────────────────────
+  • Purple→Deep purple: CTAs, primary buttons, active states
+  • Cyan→Dark cyan: secondary accents, mission icons
+  • Purple-light→Cyan: gradient-text for headlines, counter values
+  • All gradients use 135° angle for consistency
+
+10.3 Badge/Pill Pattern
+───────────────────────
+  Repeated across all pages for section labels, categories, and tags:
+    • px-4 py-1.5, text-xs, font-medium, tracking-wider, uppercase
+    • rounded-full
+    • bg-primary/10, text-primary-light, border border-primary/20
+
+10.4 Hero Section Pattern
+─────────────────────────
+  Every page follows the same hero structure:
+    • pt-24 (nav clearance) + py-16
+    • Radial gradient overlay (purple or cyan, 8% opacity)
+    • SectionHeading (badge + title + subtitle)
+    • relative overflow-hidden for gradient containment
+
+10.5 Form Input Pattern
+───────────────────────
+  Consistent across contact and careers pages:
+    • bg-white/5, border border-white/10, rounded-xl
+    • text-sm, text-white, placeholder:text-muted/50
+    • Focus: border-primary/50, ring-1 ring-primary/25
+    • Error: border-error (red)
+    • Labels: text-sm font-medium text-white
+
+10.6 Icon Container Pattern
+───────────────────────────
+  For feature icons throughout the site:
+    • w-10 h-10 (or w-14 h-14 for larger)
+    • rounded-lg (or rounded-2xl)
+    • bg-gradient-to-br from-primary to-primary-deep
+    • Icon inside: text-white
+    • Some use hover:scale-110 via group-hover
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+11. SCROLLBAR & SELECTION STYLES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Custom Scrollbar (WebKit):
+  • Width: 6px (thin, minimal)
+  • Track: var(--color-surface) — blends with page
+  • Thumb: var(--color-primary) — brand purple, fully rounded (border-radius: 999px)
+
+Text Selection:
+  • Background: rgba(139, 92, 246, 0.3) — semi-transparent purple
+  • Text color: white
+
+Focus Visible:
+  • Outline: 2px solid var(--color-primary)
+  • Offset: 2px
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+12. SEO & METADATA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Defined in src/app/layout.tsx:
+
+  • Title template: "%s | StackX"
+  • Default title: "StackX — Professional Web Development at Unbeatable Costs"
+  • Meta description: Comprehensive description covering all service areas
+  • Keywords: web development, software development, business automation,
+             ad tech, SaaS development, StackX, cost-effective development
+  • Favicon: /StackXMINI.svg (used for icon, shortcut, and apple-touch-icon)
+  • Open Graph: title, description, type:website, siteName:StackX
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+13. STATIC ASSETS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  public/
+  ├── stackx.svg          – Full logo (used in Navbar & Footer)
+  ├── StackXMINI.svg      – Mini logo / favicon
+  ├── file.svg            – Next.js default asset
+  ├── globe.svg           – Next.js default asset
+  ├── next.svg            – Next.js default asset
+  ├── vercel.svg          – Vercel default asset
+  ├── window.svg          – Next.js default asset
+  └── team/
+      ├── nuraj.png       – Team member photo (Nuraj)
+      ├── roshan.jpeg     – Team member photo (Roshan)
+      └── venu.jpeg       – Team member photo (Venu)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+14. PROJECT STRUCTURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  src/
+  ├── app/
+  │   ├── globals.css                  – Design tokens, global styles, animations
+  │   ├── layout.tsx                   – Root layout (fonts, metadata, nav, footer)
+  │   ├── page.tsx                     – Homepage
+  │   ├── about/page.tsx               – About page
+  │   ├── services/page.tsx            – Services page
+  │   ├── portfolio/
+  │   │   ├── page.tsx                 – Portfolio listing
+  │   │   └── communize-vizag/page.tsx – Case study detail
+  │   ├── careers/page.tsx             – Careers / job listings
+  │   ├── contact/page.tsx             – Contact form
+  │   └── testimonials/page.tsx        – Testimonials grid
+  ├── components/
+  │   ├── layout/
+  │   │   ├── Navbar.tsx               – Fixed navigation bar
+  │   │   └── Footer.tsx               – Site footer
+  │   └── ui/
+  │       ├── index.tsx                – Reusable components (SectionHeading,
+  │       │                              GlassCard, Button, AnimatedCounter,
+  │       │                              TestimonialCard)
+  │       └── CustomCursor.tsx         – Custom cursor with spring physics
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+15. DESIGN PHILOSOPHY & PRINCIPLES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  1. DARK-FIRST, PREMIUM FEEL
+     The entire site uses a single dark theme with deep navy-black backgrounds.
+     This creates contrast with the vibrant purple and cyan accents, giving the
+     site a modern, premium, tech-forward look.
+
+  2. GLASSMORPHISM AS VISUAL LANGUAGE
+     Every card, panel, and container uses the same glassmorphism treatment:
+     translucent backgrounds with blur and subtle purple-tinted borders. This
+     creates visual depth and layering without harsh edges.
+
+  3. GRADIENT ACCENTS FOR HIERARCHY
+     Purple-to-deep-purple gradients mark primary interactive elements.
+     Cyan accents provide secondary emphasis. Gradient text highlights key
+     phrases in headings, creating visual interest without additional imagery.
+
+  4. MOTION WITH PURPOSE
+     Animations serve clear purposes: fade-up entrances establish content
+     hierarchy as users scroll, floating shapes add life to the hero, and
+     the pulsing glow on the primary CTA draws attention to the key action.
+
+  5. CONSISTENT SPACING & SCALE
+     All sections use the same max-w-7xl container, consistent py-16/py-20
+     vertical rhythm, and a clear typography scale from 7xl hero headlines
+     down to xs labels.
+
+  6. RESPONSIVE BY DEFAULT
+     Every layout uses Tailwind's responsive grid system with clear breakpoints.
+     The navbar transforms from horizontal to a mobile drawer. Grids collapse
+     from 4→2→1 columns. Typography scales down gracefully.
+
+  7. ACCESSIBILITY CONSIDERATIONS
+     – All interactive elements have cursor-pointer
+     – Focus-visible outlines use brand purple
+     – Aria labels on icon buttons and social links
+     – Semantic HTML (nav, main, footer, section)
+     – Form validation with clear error messages
+
+================================================================================
+                              END OF DESIGN DOCUMENT
+================================================================================
