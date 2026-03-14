@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
-import CustomCursor from "@/components/ui/CustomCursor";
+import RootShell from "./RootShell";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -59,10 +57,7 @@ export default function RootLayout({
         className={`${inter.variable} ${poppins.variable} font-body antialiased bg-background text-foreground`}
         style={{ fontFamily: "var(--font-inter), sans-serif" }}
       >
-        <CustomCursor />
-        <Navbar />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
+        <RootShell>{children}</RootShell>
       </body>
     </html>
   );
