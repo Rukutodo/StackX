@@ -51,18 +51,12 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
       <div className="flex items-center justify-between px-5 h-16 border-b border-surface-border shrink-0">
         <Link href="/admin" className="flex items-center gap-2.5">
           <Image
-            src="/StackXMINI.svg"
+            src="/stackx.svg"
             alt="StackX"
-            width={32}
+            width={120}
             height={32}
-            className="w-8 h-8"
+            className="h-7 w-auto"
           />
-          <span
-            className="text-lg font-semibold text-white tracking-tight"
-            style={{ fontFamily: "var(--font-poppins), sans-serif" }}
-          >
-            Stack<span className="gradient-text">X</span>
-          </span>
         </Link>
 
         {/* Mobile close */}
@@ -86,10 +80,9 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
                 href={link.href}
                 onClick={onClose}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
-                  ${
-                    active
-                      ? "sidebar-nav-active bg-primary/10 text-white"
-                      : "sidebar-nav-item text-muted hover:text-white"
+                  ${active
+                    ? "sidebar-nav-active bg-primary/10 text-white"
+                    : "sidebar-nav-item text-muted hover:text-white"
                   }`}
               >
                 <link.icon

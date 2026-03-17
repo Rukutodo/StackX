@@ -6,10 +6,10 @@ import {
   HiUserGroup,
   HiMail,
   HiDocumentText,
-  HiTrendingUp,
-  HiClock,
-  HiEye,
-  HiCurrencyDollar,
+  HiPlus,
+  HiPencil,
+  HiPhotograph,
+  HiBriefcase,
 } from "react-icons/hi";
 import {
   DashboardGlassCard,
@@ -68,13 +68,21 @@ const recentApplications = [
   { id: 5, name: "Tom Baker", position: "Backend Developer", date: "Mar 8, 2026", status: "reviewed" as const },
 ];
 
-const revenueData = [
-  { month: "Jan", value: 65 },
-  { month: "Feb", value: 78 },
-  { month: "Mar", value: 90 },
-  { month: "Apr", value: 81 },
-  { month: "May", value: 95 },
-  { month: "Jun", value: 110 },
+const quickActions = [
+  { icon: <HiPlus size={20} />, label: "Add Service", desc: "Create a new service listing", href: "/admin/services", color: "from-primary to-purple-700" },
+  { icon: <HiPhotograph size={20} />, label: "Add Portfolio", desc: "Upload a new project", href: "/admin/portfolio", color: "from-cyan-500 to-cyan-700" },
+  { icon: <HiPencil size={20} />, label: "Manage Team", desc: "Edit team members", href: "/admin/team", color: "from-emerald-500 to-emerald-700" },
+  { icon: <HiBriefcase size={20} />, label: "Post Job", desc: "Create a job opening", href: "/admin/jobs", color: "from-amber-500 to-amber-700" },
+];
+
+const recentActivity = [
+  { id: 1, action: "New message received", detail: "Sarah Johnson — Website redesign inquiry", time: "2 hours ago", dot: "bg-primary" },
+  { id: 2, action: "Application submitted", detail: "Alex Turner applied for Senior React Developer", time: "4 hours ago", dot: "bg-cyan-400" },
+  { id: 3, action: "Portfolio updated", detail: "Communize Vizag project published", time: "1 day ago", dot: "bg-emerald-400" },
+  { id: 4, action: "Service modified", detail: "Web Development pricing updated", time: "1 day ago", dot: "bg-amber-400" },
+  { id: 5, action: "New message received", detail: "Michael Chen — Partnership proposal", time: "2 days ago", dot: "bg-primary" },
+  { id: 6, action: "Team member added", detail: "Priya Sharma joined as DevOps Lead", time: "3 days ago", dot: "bg-emerald-400" },
+  { id: 7, action: "Job posting created", detail: "UI/UX Designer position published", time: "3 days ago", dot: "bg-amber-400" },
 ];
 
 const container = {
@@ -107,57 +115,48 @@ export default function AdminDashboardPage() {
         ))}
       </motion.div>
 
-      {/* Revenue + Quick Stats row */}
+      {/* Quick Actions + Recent Activity */}
       <motion.div variants={item} className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Revenue overview */}
-        <DashboardGlassCard className="lg:col-span-2">
-          <DashboardSectionHeader
-            title="Revenue Overview"
-            subtitle="Monthly revenue trend"
-            action={
-              <AdminButton variant="ghost" size="sm">
-                <HiEye size={14} /> View Report
-              </AdminButton>
-            }
-          />
-          {/* Chart placeholder with bars */}
-          <div className="flex items-end gap-3 h-48 pt-4">
-            {revenueData.map((d) => (
-              <div key={d.month} className="flex-1 flex flex-col items-center gap-2">
-                <motion.div
-                  initial={{ height: 0 }}
-                  animate={{ height: `${d.value}%` }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                  className="w-full rounded-t-lg bg-gradient-to-t from-primary/40 to-primary/80 min-h-[8px] relative group"
-                >
-                  <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs text-muted opacity-0 group-hover:opacity-100 transition-opacity">
-                    ${d.value}k
-                  </span>
-                </motion.div>
-                <span className="text-xs text-muted">{d.month}</span>
-              </div>
+        {/* Quick Actions */}
+        <DashboardGlassCard>
+          <DashboardSectionHeader title="Quick Actions" subtitle="Common shortcuts" />
+          <div className="space-y-3">
+            {quickActions.map((a) => (
+              <a
+                key={a.label}
+                href={a.href}
+                className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-all duration-200 group"
+              >
+                <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${a.color} flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform`}>
+                  {a.icon}
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-white">{a.label}</p>
+                  <p className="text-xs text-muted">{a.desc}</p>
+                </div>
+              </a>
             ))}
           </div>
         </DashboardGlassCard>
 
-        {/* Quick performance stats */}
-        <DashboardGlassCard>
-          <DashboardSectionHeader title="Performance" subtitle="This month" />
-          <div className="space-y-5">
-            {[
-              { icon: <HiTrendingUp size={16} />, label: "Conversion Rate", value: "24.8%", color: "text-emerald-400" },
-              { icon: <HiEye size={16} />, label: "Page Views", value: "12.4K", color: "text-primary-light" },
-              { icon: <HiClock size={16} />, label: "Avg. Response Time", value: "1.8 hrs", color: "text-cyan-400" },
-              { icon: <HiCurrencyDollar size={16} />, label: "Revenue", value: "$110K", color: "text-amber-400" },
-            ].map((s) => (
-              <div key={s.label} className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-muted">
-                    {s.icon}
-                  </div>
-                  <span className="text-sm text-muted">{s.label}</span>
+        {/* Recent Activity */}
+        <DashboardGlassCard className="lg:col-span-2">
+          <DashboardSectionHeader title="Recent Activity" subtitle="Latest updates across the platform" />
+          <div className="space-y-0">
+            {recentActivity.map((event, i) => (
+              <div key={event.id} className="flex gap-4 py-3 relative">
+                {/* Timeline line */}
+                {i < recentActivity.length - 1 && (
+                  <div className="absolute left-[7px] top-[28px] w-px h-[calc(100%-12px)] bg-surface-border" />
+                )}
+                {/* Dot */}
+                <div className={`w-[15px] h-[15px] rounded-full ${event.dot} shrink-0 mt-0.5 ring-4 ring-surface`} />
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-white font-medium">{event.action}</p>
+                  <p className="text-xs text-muted truncate">{event.detail}</p>
                 </div>
-                <span className={`text-sm font-semibold ${s.color}`}>{s.value}</span>
+                <span className="text-xs text-muted whitespace-nowrap shrink-0">{event.time}</span>
               </div>
             ))}
           </div>
