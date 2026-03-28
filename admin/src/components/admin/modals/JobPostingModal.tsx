@@ -22,7 +22,7 @@ interface Props {
   onSaved: () => void;
 }
 
-const API = "http://localhost:4000";
+const API = "http://129.159.236.176:4000";
 
 const DEPARTMENTS = ["Engineering", "Design", "Automation", "Marketing", "Operations"];
 const TYPES = ["Full-time", "Full-time / Contract", "Contract", "Internship", "Part-time"];

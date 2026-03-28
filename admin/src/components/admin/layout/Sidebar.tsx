@@ -19,7 +19,7 @@ import {
   HiX,
 } from "react-icons/hi";
 
-const API = "http://localhost:4000";
+const API = "http://129.159.236.176:4000";
 
 const sidebarLinks = [
   { href: "/", label: "Dashboard", icon: HiViewGrid },

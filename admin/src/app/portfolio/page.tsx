@@ -13,7 +13,7 @@ import PortfolioProjectModal from "@/components/admin/modals/PortfolioProjectMod
 import type { PortfolioProject } from "@/types/portfolio";
 import Link from "next/link";
 
-const API = "http://localhost:4000";
+const API = "http://129.159.236.176:4000";
 
 
 

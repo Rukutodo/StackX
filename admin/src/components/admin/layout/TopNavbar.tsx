@@ -18,7 +18,7 @@ interface TopNavbarProps {
   onMenuToggle: () => void;
 }
 
-const API_BASE = "http://localhost:4000/api/auth";
+const API_BASE = "http://129.159.236.176:4000/api/auth";
 
 export default function TopNavbar({ onMenuToggle }: TopNavbarProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);

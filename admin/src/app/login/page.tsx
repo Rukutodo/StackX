@@ -30,7 +30,7 @@ export default function AdminLoginPage() {
     setErrors({});
 
     try {
-      const res = await fetch("http://localhost:4000/api/auth/login", {
+      const res = await fetch("http://129.159.236.176:4000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include", // Accept HTTP-only cookie from backend

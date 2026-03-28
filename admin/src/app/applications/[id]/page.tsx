@@ -7,7 +7,7 @@ import { DashboardGlassCard, AdminSelect } from "@/components/admin/ui";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
-const API = "http://localhost:4000";
+const API = "http://129.159.236.176:4000";
 
 interface Application {
   _id: string;

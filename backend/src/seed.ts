@@ -20,14 +20,14 @@ const connectDB = async () => {
 };
 
 const seedAdmin = async () => {
-  const existingAdmin = await AdminUser.findOne({ username: "admin" });
+  const existingAdmin = await AdminUser.findOne({ username: "roshan" });
   if (existingAdmin) {
-    console.log("⚠️  Admin user already exists. Skipping.");
+    console.log("⚠️  Admin user 'roshan' already exists. Skipping.");
     return;
   }
-  const admin = new AdminUser({ username: "admin", password: "password123" });
+  const admin = new AdminUser({ username: "roshan", password: "roshanmotion" });
   await admin.save();
-  console.log("✅ Default admin user created! (admin / password123)");
+  console.log("✅ Admin user created! (roshan / roshanmotion)");
 };
 
 const seedServices = async () => {

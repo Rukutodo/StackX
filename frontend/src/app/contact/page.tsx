@@ -11,7 +11,7 @@ import {
 import { FaTwitter, FaLinkedinIn, FaGithub } from "react-icons/fa";
 import { useState, FormEvent } from "react";
 
-const API = "http://localhost:4000";
+const API = "http://129.159.236.176:4000";
 
 const serviceOptions = [
     "Web Development",

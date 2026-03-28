@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 async function getProjects() {
   try {
-    const res = await fetch("http://localhost:4000/api/portfolio", {
+    const res = await fetch("http://129.159.236.176:4000/api/portfolio", {
       cache: "no-store",
     });
     if (!res.ok) return [];
@@ -22,7 +22,7 @@ async function getProjects() {
 
 async function getServices() {
   try {
-    const res = await fetch("http://localhost:4000/api/services", {
+    const res = await fetch("http://129.159.236.176:4000/api/services", {
       cache: "no-store",
     });
     if (!res.ok) return [];

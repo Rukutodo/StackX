@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import Sidebar from "@/components/admin/layout/Sidebar";
 import TopNavbar from "@/components/admin/layout/TopNavbar";
 
-const API_BASE = "http://localhost:4000/api/auth";
+const API_BASE = "http://129.159.236.176:4000/api/auth";
 
 /** Routes that skip authentication */
 const PUBLIC_ROUTES = ["/login", "/forgot-password"];

@@ -10,7 +10,7 @@ import {
 } from "react-icons/hi";
 import { useState, FormEvent, useRef } from "react";
 
-const API = "http://localhost:4000";
+const API = "http://129.159.236.176:4000";
 
 /* ── Types ──────────────────────────────────────── */
 
