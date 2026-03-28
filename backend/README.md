@@ -4,7 +4,7 @@
 StackX Backend API
 
 ## 2. Project Description
-The backend server for the StackX platform, handling authentication and future admin functionalities for the dashboard. Built with Node.js, Express, and MongoDB.
+The backend server for the StackX platform, handling authentication and admin functionalities for the dashboard — managing services, portfolio projects, and case studies. Built with Node.js, Express, and MongoDB.
 
 ## 3. Demo / Screenshots
 *(Coming soon)*
@@ -15,6 +15,10 @@ The backend server for the StackX platform, handling authentication and future a
 *   Bcrypt password hashing
 *   MongoDB integration with Mongoose ODM
 *   CORS enabled for specific frontends
+*   Portfolio project management with case study support
+*   Careers management (Job postings and applications)
+*   Admin dashboard statistics aggregation
+*   Image and resume upload via Multer (stored on disk, served statically)
 
 ## 5. Tech Stack
 *   **Runtime:** Node.js
@@ -23,17 +27,33 @@ The backend server for the StackX platform, handling authentication and future a
 *   **Database:** MongoDB
 *   **ODM:** Mongoose
 *   **Auth:** JSON Web Tokens (JWT), bcryptjs
+*   **Upload:** Multer (disk storage)
 *   **Security:** CORS, Cookie Parser
 
 ## 6. Project Structure
 ```
 backend/
 ├── src/
-│   ├── config/       # Configuration (e.g., db.ts)
-│   ├── models/       # Mongoose Schemas (e.g., AdminUser.ts)
-│   ├── routes/       # Express API routes (e.g., auth.ts)
+│   ├── config/       # Configuration (db.ts)
+│   ├── middlewares/  # Auth middleware (authMiddleware.ts)
+│   ├── models/       # Mongoose Schemas
+│   │   ├── AdminUser.ts
+│   │   ├── ServiceCategory.ts
+│   │   ├── PortfolioProject.ts
+│   │   ├── JobPosting.ts
+│   │   └── JobApplication.ts
+│   ├── routes/       # Express API routes
+│   │   ├── auth.ts
+│   │   ├── services.ts
+│   │   ├── portfolio.ts
+│   │   ├── jobs.ts
+│   │   ├── applications.ts
+│   │   └── stats.ts
 │   ├── seed.ts       # Database seeding script
 │   └── server.ts     # Main application entry point
+├── uploads/          # Uploaded files (images/resumes)
+│   ├── portfolio/    # Portfolio project images
+│   └── resumes/      # Job applicant resumes
 ├── docs/             # Documentation (API, Database)
 ├── .env              # Environment variables
 ├── .gitignore        # Git ignore rules
@@ -62,8 +82,27 @@ JWT_SECRET=your_super_secret_jwt_key
 *   Start compiled code: `node dist/server.js`
 
 ## 11. API Overview (short)
-*   `POST /api/auth/login` - Authenticate admin user
-*   `POST /api/auth/logout` - Clear authentication cookie
+*   `POST /api/auth/login` — Authenticate admin user
+*   `POST /api/auth/logout` — Clear authentication cookie
+*   `GET /api/services` — Fetch active service categories (`?all=true` for drafts)
+*   `POST /api/services` — Create a new service category (Protected)
+*   `PUT /api/services/:id` — Update a service category (Protected)
+*   `DELETE /api/services/:id` — Delete a service category (Protected)
+*   `GET /api/portfolio` — Fetch portfolio projects (`?all=true` for drafts)
+*   `GET /api/portfolio/:slug` — Fetch single project by slug
+*   `POST /api/portfolio` — Create a new project (Protected)
+*   `POST /api/portfolio/upload` — Upload project image (Protected, multipart)
+*   `PUT /api/portfolio/:id` — Update a project (Protected)
+*   `DELETE /api/portfolio/:id` — Delete a project (Protected)
+*   `GET /api/jobs` — Fetch job postings (`?all=true` for admin)
+*   `POST /api/jobs` — Create a job posting (Protected)
+*   `PUT /api/jobs/:id` — Update a job posting (Protected)
+*   `DELETE /api/jobs/:id` — Delete a job posting (Protected)
+*   `GET /api/applications` — Fetch all job applications (Protected)
+*   `POST /api/applications` — Submit a job application (Public, multipart)
+*   `PUT /api/applications/:id/status` — Update application status (Protected)
+*   `DELETE /api/applications/:id` — Delete an application (Protected)
+*   `GET /api/stats` — Fetch overview stats for the admin dashboard (Protected)
 
 > For comprehensive documentation, see [docs/api.md](docs/api.md)
 

@@ -1,0 +1,660 @@
+================================================================================
+         STACKX — COMPLETE LIGHT THEME IMPLEMENTATION PROMPT
+         (Single Prompt · Paragraph Format · Full Coverage)
+================================================================================
+
+I am building a Next.js 15 website called StackX using React 19, Tailwind CSS 4,
+and Framer Motion. The site is currently dark-only. I need you to implement a
+complete, fully adaptive light/dark theme toggle system where every single visual
+element — backgrounds, text, cards, shadows, borders, forms, buttons, nav, footer,
+cursor, scrollbars, badges, icons, glow orbs, hero gradients, marquee containers,
+accordions, filter bars, and animations — responds perfectly to the active theme.
+Nothing should be left hardcoded. Nothing should look broken or flat in light mode.
+Light mode should feel premium, airy, and genuinely beautiful — not just "inverted
+dark". Here is everything you need to implement, explained in full detail.
+
+
+────────────────────────────────────────────────────────────────────────────────
+PART 1 — CSS DESIGN TOKENS (globals.css)
+────────────────────────────────────────────────────────────────────────────────
+
+Open globals.css. All current design tokens are set as CSS custom properties. Keep
+the existing dark-mode tokens under :root as the baseline dark theme. The current
+dark tokens are: --color-background: #0a0a0f, --color-foreground: #ededed,
+--color-primary: #8B5CF6, --color-primary-light: #A78BFA, --color-primary-deep:
+#6D28D9, --color-accent: #06B6D4, --color-accent-dark: #0891B2, --color-surface:
+#13131a, --color-surface-light: #1a1a25, --color-surface-border: rgba(139,92,246,
+0.15), --color-muted: #9ca3af, --color-success: #10B981, --color-error: #EF4444,
+--color-warning: #F59E0B. Do not touch these dark values. Add the following new
+helper tokens to :root (dark defaults): --glass-bg: rgba(19,19,26,0.60),
+--glass-bg-hover: rgba(26,26,37,0.85), --glass-border: rgba(139,92,246,0.12),
+--glass-border-hover: rgba(139,92,246,0.35), --glass-shadow: rgba(139,92,246,0.08),
+--glass-shadow-hover: 0 0 30px rgba(139,92,246,0.08), --btn-secondary-bg:
+rgba(255,255,255,0.05), --btn-secondary-text: #ffffff, --btn-secondary-border:
+rgba(255,255,255,0.10), --btn-secondary-bg-hover: rgba(255,255,255,0.10),
+--btn-secondary-border-hover: rgba(139,92,246,0.30), --btn-outline-text: #A78BFA,
+--btn-outline-border: rgba(139,92,246,0.30), --input-bg: rgba(255,255,255,0.05),
+--input-border: rgba(255,255,255,0.10), --input-text: #ffffff,
+--input-placeholder: rgba(156,163,175,0.50), --input-label: #ffffff,
+--nav-scrolled-bg: rgba(19,19,26,0.85), --nav-link-color: #9ca3af,
+--nav-link-hover: #ededed, --nav-mobile-bg: rgba(19,19,26,0.95),
+--nav-mobile-link-hover: rgba(255,255,255,0.05), --footer-bg: rgba(19,19,26,0.50),
+--social-icon-bg: rgba(255,255,255,0.05), --social-icon-bg-hover:
+rgba(255,255,255,0.10), --marquee-container-bg: rgba(255,255,255,0.03),
+--marquee-container-border: rgba(255,255,255,0.05), --filter-inactive-bg:
+rgba(255,255,255,0.05), --filter-inactive-border: rgba(255,255,255,0.10),
+--filter-inactive-text: #9ca3af, --watermark-color: rgba(255,255,255,0.10),
+--tech-pill-bg: rgba(255,255,255,0.05), --tech-pill-border: rgba(255,255,255,0.10),
+--carousel-nav-bg: rgba(255,255,255,0.05), --carousel-dot-inactive:
+rgba(255,255,255,0.20), --accordion-border: rgba(255,255,255,0.08),
+--timeline-line: rgba(139,92,246,0.20), --star-empty: #374151,
+--hero-glow-opacity: 0.15, --pulseGlow-spread: 40px, --pulseGlow-opacity: 0.40,
+--scrollbar-track: #13131a, --selection-bg: rgba(139,92,246,0.30),
+--selection-text: #ffffff, --testimonial-author: #ffffff.
+
+Now add a [data-theme="light"] block that overrides every single one of those
+tokens with light equivalents: --color-background: #f7f5ff (soft lavender-white,
+not harsh flat white), --color-foreground: #0f0a1e (deep near-black for crisp
+legible text), --color-primary: #7C3AED (slightly deeper purple for contrast on
+white), --color-primary-light: #8B5CF6, --color-primary-deep: #5B21B6,
+--color-accent: #06B6D4 (unchanged — cyan looks great on light),
+--color-accent-dark: #0891B2 (unchanged), --color-surface: #ffffff,
+--color-surface-light: #ede9fe (soft lavender for hover surfaces),
+--color-surface-border: rgba(109,40,217,0.15), --color-muted: #5b6778
+(darker muted for readability on white), --color-success: #059669,
+--color-error: #DC2626, --color-warning: #D97706. Then override every helper
+token: --glass-bg: rgba(255,255,255,0.82), --glass-bg-hover:
+rgba(255,255,255,0.97), --glass-border: rgba(109,40,217,0.14),
+--glass-border-hover: rgba(109,40,217,0.38), --glass-shadow:
+rgba(109,40,217,0.09), --glass-shadow-hover: 0 8px 40px rgba(109,40,217,0.12)
+0 2px 12px rgba(109,40,217,0.07), --btn-secondary-bg: rgba(124,58,237,0.08),
+--btn-secondary-text: #5B21B6, --btn-secondary-border: rgba(124,58,237,0.22),
+--btn-secondary-bg-hover: rgba(124,58,237,0.15), --btn-secondary-border-hover:
+rgba(124,58,237,0.42), --btn-outline-text: #5B21B6, --btn-outline-border:
+rgba(124,58,237,0.28), --input-bg: #ffffff, --input-border: #ddd6fe,
+--input-text: #0f0a1e, --input-placeholder: rgba(91,107,120,0.55),
+--input-label: #1e1236, --nav-scrolled-bg: rgba(255,255,255,0.92),
+--nav-link-color: #4b5563, --nav-link-hover: #5B21B6, --nav-mobile-bg:
+rgba(255,255,255,0.97), --nav-mobile-link-hover: rgba(124,58,237,0.07),
+--footer-bg: rgba(245,243,255,0.80), --social-icon-bg: rgba(124,58,237,0.08),
+--social-icon-bg-hover: rgba(124,58,237,0.15), --marquee-container-bg:
+rgba(124,58,237,0.04), --marquee-container-border: rgba(124,58,237,0.10),
+--filter-inactive-bg: rgba(124,58,237,0.07), --filter-inactive-border:
+rgba(124,58,237,0.14), --filter-inactive-text: #5b6778, --watermark-color:
+rgba(109,40,217,0.08), --tech-pill-bg: rgba(124,58,237,0.08),
+--tech-pill-border: rgba(124,58,237,0.16), --carousel-nav-bg:
+rgba(124,58,237,0.09), --carousel-dot-inactive: rgba(109,40,217,0.20),
+--accordion-border: rgba(109,40,217,0.12), --timeline-line:
+rgba(109,40,217,0.25), --star-empty: #ddd6fe, --hero-glow-opacity: 0.08,
+--pulseGlow-spread: 28px, --pulseGlow-opacity: 0.22, --scrollbar-track: #ede9fe,
+--selection-bg: rgba(124,58,237,0.18), --selection-text: #0f0a1e,
+--testimonial-author: #0f0a1e.
+
+
+────────────────────────────────────────────────────────────────────────────────
+PART 2 — GLOBAL BASE STYLES (globals.css continued)
+────────────────────────────────────────────────────────────────────────────────
+
+Update all the global CSS rules that still use hardcoded values so they consume
+the new tokens. The custom scrollbar ::-webkit-scrollbar-track should use
+background: var(--scrollbar-track) instead of the hardcoded surface color.
+The ::-webkit-scrollbar-thumb stays var(--color-primary) in both themes.
+The ::selection block should use background: var(--selection-bg) and
+color: var(--selection-text). The :focus-visible outline stays 2px solid
+var(--color-primary) with offset 2px — no change needed since it uses the token.
+
+Update the .gradient-text class so it reads: background: linear-gradient(135deg,
+var(--color-primary-light), var(--color-accent)) — this already works in both
+themes since both tokens are defined per theme. The gradient-text remains
+unchanged in light mode because purple-to-cyan text gradient looks spectacular
+on both dark and light backgrounds.
+
+Update the @keyframes pulseGlow to use CSS variables: the keyframes should
+reference var(--pulseGlow-spread) and var(--pulseGlow-opacity) so the glow
+animation is less intense in light mode (28px spread, 0.22 opacity) vs dark mode
+(40px spread, 0.40 opacity). This makes the pulsing CTA button feel right on
+both backgrounds.
+
+Add a global body transition: body { transition: background-color 0.35s ease,
+color 0.35s ease; } so the entire page fades smoothly when the theme toggles
+instead of snapping instantly. Also add * { transition: background-color 0.25s
+ease, border-color 0.25s ease, box-shadow 0.25s ease, color 0.20s ease; } with
+careful exclusion on animated elements (add a .no-theme-transition class for
+Framer Motion elements that should not inherit this).
+
+
+────────────────────────────────────────────────────────────────────────────────
+PART 3 — THEME CONTEXT, HOOK, AND FOUC PREVENTION (layout.tsx + context)
+────────────────────────────────────────────────────────────────────────────────
+
+Create src/context/ThemeContext.tsx. Export a ThemeProvider component and a
+useTheme() hook. The context should manage state as 'dark' | 'light' with
+useState defaulting to 'dark'. On mount inside useEffect, first check
+localStorage.getItem('stackx-theme') — if it exists, use that value. If it
+doesn't exist, check window.matchMedia('(prefers-color-scheme: light)').matches
+and set accordingly. Whenever theme state changes, run two side effects:
+document.documentElement.setAttribute('data-theme', theme) to activate the CSS
+token override block, and localStorage.setItem('stackx-theme', theme) to persist
+across page reloads. Export a toggleTheme function from the context that simply
+flips dark to light and vice versa.
+
+In src/app/layout.tsx, wrap the entire app in ThemeProvider — it should wrap the
+<Navbar />, <main> content, and <Footer />. To prevent a flash of the wrong theme
+on page load (FOUC — Flash of Unstyled Content), add an inline script tag as the
+very first child of the HTML <head> section. This script must be synchronous and
+run before React hydrates. Write it using dangerouslySetInnerHTML and add
+suppressHydrationWarning to the html element. The script content should be exactly:
+(function(){ try { var t = localStorage.getItem('stackx-theme'); if(t)
+document.documentElement.setAttribute('data-theme', t); } catch(e){} })(). This
+ensures the correct data-theme is applied before any paint, so the user never sees
+a dark-to-light flicker on refresh.
+
+
+────────────────────────────────────────────────────────────────────────────────
+PART 4 — NAVBAR: TOGGLE BUTTON, STATES, LINKS, AND MOBILE MENU
+────────────────────────────────────────────────────────────────────────────────
+
+Open src/components/layout/Navbar.tsx. Import useTheme from the ThemeContext.
+Import Sun and Moon from lucide-react. In the desktop nav row, add the theme
+toggle button between the last nav link and the "Get Free Consultation" CTA button.
+Separate it visually with a thin vertical divider: a div with className "w-px h-5
+mx-3" and background color var(--color-surface-border). The toggle button itself
+should have: rounded-full, p-2, transition-all duration-300, background
+var(--social-icon-bg), border: 1px solid var(--glass-border), and on hover:
+background var(--social-icon-bg-hover). Inside the button, render Sun (w-4 h-4,
+color var(--color-primary-light)) when theme is dark, and Moon (w-4 h-4, same
+color) when theme is light. Wrap the icon in a span with transition-transform
+duration-500 and apply rotate-180 class when switching themes so the icon does a
+satisfying half-spin on toggle. Add aria-label="Toggle theme" to the button for
+accessibility.
+
+The navbar has two scroll states. For the not-scrolled state, bg-transparent works
+in both themes — no change needed. For the scrolled state, currently it uses
+bg-surface/85 which is fine in dark mode but looks off in light mode. Replace the
+scrolled background inline style with background: var(--nav-scrolled-bg) so it
+automatically becomes rgba(255,255,255,0.92) in light and the dark surface in dark.
+Also update the scrolled border-bottom to border-color: var(--color-surface-border)
+and the scrolled box-shadow to box-shadow: 0 4px 24px var(--glass-shadow),
+0 1px 0 var(--glass-border) — this gives the light navbar a clean elevated card
+feel instead of the dark glow.
+
+All nav link text currently renders as text-muted with hover:text-foreground. In
+light mode var(--nav-link-color) = #4b5563 (readable gray) and var(--nav-link-hover)
+= #5B21B6 (deep purple) — replace hardcoded Tailwind muted/foreground classes
+with inline color: var(--nav-link-color) on each link, and apply
+color: var(--nav-link-hover) on hover via a CSS class in globals.css targeting
+.nav-link:hover. The CTA button gradient stays identical in both themes —
+purple gradient on white backgrounds looks excellent, no changes needed — but
+change its border from border-white/10 to border: 1px solid var(--glass-border)
+so it doesn't disappear in light mode.
+
+The mobile menu currently has bg-surface/95 backdrop-blur-xl. Replace the
+background inline style with background: var(--nav-mobile-bg) so it becomes
+rgba(255,255,255,0.97) in light with a frosted white look. The mobile nav link
+hover was hover:bg-white/5 — replace with background on hover using
+var(--nav-mobile-link-hover) which gives rgba(124,58,237,0.07) in light mode
+(subtle purple tint on hover) vs rgba(255,255,255,0.05) in dark. Add a bottom
+border on the mobile menu in light mode: border-bottom: 1px solid
+var(--color-surface-border). On mobile, place the toggle icon immediately to the
+left of the hamburger/X icon in the top row of the mobile header, using the same
+button styling but with p-1.5 instead of p-2 for tighter fit.
+
+
+────────────────────────────────────────────────────────────────────────────────
+PART 5 — GLASSCARD COMPONENT
+────────────────────────────────────────────────────────────────────────────────
+
+Open src/components/ui/index.tsx and update GlassCard. The component currently
+uses hardcoded inline styles: background: rgba(19,19,26,0.6), backdropFilter:
+blur(20px), border: 1px solid rgba(139,92,246,0.12), and on hover border brightens
+to rgba(139,92,246,0.35) with box-shadow: 0 0 30px rgba(139,92,246,0.08). Replace
+every hardcoded value with CSS variables. Base styles: background var(--glass-bg),
+backdropFilter blur(20px) (stays same in both themes), border: 1px solid
+var(--glass-border). On hover: border-color: var(--glass-border-hover),
+box-shadow: var(--glass-shadow-hover). Additionally in light mode add an inset
+highlight at the top edge to create a paper-like lifted card feel — add
+box-shadow: inset 0 1px 0 rgba(255,255,255,0.95), var(--glass-shadow-hover) as
+the combined hover shadow in light mode. Since you can not conditionally set
+box-shadow values inside inline styles per theme, handle this by adding a global
+CSS rule in globals.css: [data-theme="light"] .glass-card:hover { box-shadow:
+inset 0 1px 0 rgba(255,255,255,0.95), 0 8px 40px rgba(109,40,217,0.12), 0 2px
+12px rgba(109,40,217,0.07); } and [data-theme="dark"] .glass-card:hover
+{ box-shadow: 0 0 30px rgba(139,92,246,0.08); }. Make sure the GlassCard root
+element has className that includes "glass-card" so these rules target it. The
+border-radius, padding (p-6 sm:p-8), and fade-up Framer Motion animation remain
+unchanged in both themes.
+
+
+────────────────────────────────────────────────────────────────────────────────
+PART 6 — BUTTON COMPONENT (ALL THREE VARIANTS)
+────────────────────────────────────────────────────────────────────────────────
+
+Update all three Button variants in src/components/ui/index.tsx to consume CSS
+variables. The primary variant (gradient purple button) stays exactly the same in
+both themes — the gradient from-primary to-primary-deep looks great on both light
+and dark backgrounds. The only change needed for primary is to update its border
+from border-white/10 to border: 1px solid var(--glass-border) so it does not
+disappear on a light background. The pulseGlow animation on the hero CTA also
+stays — it just uses lighter spread/opacity in light mode via the CSS variables
+already set in Part 1.
+
+The secondary variant currently uses bg-white/5, text-white, border-white/10,
+hover:bg-white/10, hover:border-primary/30. These completely break in light mode:
+bg-white/5 becomes invisible on a white page and text-white becomes unreadable.
+Replace every one of these hardcoded Tailwind classes with inline styles using
+the tokens: background: var(--btn-secondary-bg), color: var(--btn-secondary-text),
+border: 1px solid var(--btn-secondary-border), and on hover: background:
+var(--btn-secondary-bg-hover), border-color: var(--btn-secondary-border-hover).
+In light mode this renders as a faint purple-tinted background with deep purple
+text and a visible purple border — looks clean and on-brand. In dark mode it
+stays exactly the same translucent white look as before.
+
+The outline variant has border-primary/30, text-primary-light, hover:bg-primary/10,
+hover:border-primary/50. This works mostly fine in light mode but the text color
+needs to be var(--btn-outline-text) which is #5B21B6 (deep purple) in light for
+better contrast, and #A78BFA in dark. Replace the text class with
+color: var(--btn-outline-text) and border: 1px solid var(--btn-outline-border).
+Hover states for outline stay as hover:bg-primary/10 and hover:border-primary/50
+since these opacity-based purples look correct on both themes.
+
+
+────────────────────────────────────────────────────────────────────────────────
+PART 7 — SECTIONHEADING COMPONENT
+────────────────────────────────────────────────────────────────────────────────
+
+The SectionHeading badge currently uses bg-primary/10, text-primary-light,
+border-primary/20. In light mode, bg-primary/10 on a white background looks
+very faint. Add a global override in globals.css: [data-theme="light"]
+.section-badge { background: rgba(124,58,237,0.10); color: var(--color-primary);
+border-color: rgba(124,58,237,0.22); font-weight: 600; } — this makes the badge
+slightly stronger and uses the deeper primary purple for text. Add class
+"section-badge" to the badge element in SectionHeading if not already present.
+The title uses font-heading (Poppins), font-bold — it reads from var(--color-
+foreground) which is #0f0a1e in light, ensuring dark crisp headings on the light
+background. The subtitle uses text-muted which maps to var(--color-muted): #5b6778
+in light — this provides good contrast. No further changes needed for the component
+itself since it uses token-based classes.
+
+
+────────────────────────────────────────────────────────────────────────────────
+PART 8 — HERO SECTION (HOMEPAGE + ALL PAGE HEROES)
+────────────────────────────────────────────────────────────────────────────────
+
+The homepage hero has two 600×600px glow orbs: a purple one top-left
+(rgba(139,92,246,0.15)) and a cyan one bottom-right (rgba(6,182,212,0.15)).
+Replace the hardcoded 0.15 opacity values with var(--hero-glow-opacity) which is
+0.15 in dark and 0.08 in light. The orbs should remain exactly the same size and
+position — just lighter in light mode so they don't overpower the white background
+but still give the page visual depth and a premium feel.
+
+The radial gradient overlay on the hero (rgba(139,92,246,0.08) fading to
+transparent) should also use the hero-glow-opacity variable. Additionally in
+light mode add a soft multi-stop mesh gradient on the hero section background
+using a CSS rule in globals.css: [data-theme="light"] .hero-section {
+background-image: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(139,92,246,
+0.10) 0%, transparent 70%), radial-gradient(ellipse 40% 40% at 85% 90%,
+rgba(6,182,212,0.07) 0%, transparent 60%); } — this adds a painterly, airy
+lavender glow behind the hero content that makes the page feel expressive and
+premium rather than plain white. Make sure the hero section element has class
+"hero-section" applied.
+
+The three decorative floating shapes (rounded squares/circles using animate-float
+and animate-float-reverse, only shown on lg+) currently have gradient classes like
+from-primary/20 to-accent/20. In light mode these become slightly too faint on
+the near-white background. Add light-mode overrides in globals.css:
+[data-theme="light"] .float-shape { opacity: 0.35; } vs the current dark default
+of opacity: 0.20 on these shapes, so they remain visible and decorative.
+
+The hero bottom gradient fade reads linear-gradient(to bottom, transparent,
+var(--color-background)) — since --color-background is correctly set per theme,
+this fade works automatically with zero changes.
+
+For all other page heroes (Services, About, Portfolio, Contact, Careers,
+Testimonials), they use either a purple or cyan radial gradient overlay. These
+also reference rgba values with hardcoded opacity — replace those opacities with
+var(--hero-glow-opacity) wherever possible, or add [data-theme="light"]
+.hero-section-cyan { background: radial-gradient(ellipse at center top,
+rgba(6,182,212,0.09), transparent 65%); } overrides for the cyan variant.
+
+
+────────────────────────────────────────────────────────────────────────────────
+PART 9 — STATS SECTION AND ANIMATED COUNTER
+────────────────────────────────────────────────────────────────────────────────
+
+The AnimatedCounter component renders its large numeric value using the
+.gradient-text class (purple-to-cyan gradient). This already uses token-based
+colors and looks excellent in both themes — no changes needed. The label below
+each counter uses text-muted and text-sm uppercase tracking-wider — text-muted
+maps to var(--color-muted): #5b6778 in light, which is readable on the light
+background. No changes needed. The stats section background — if it uses any
+hardcoded surface or white/opacity values for a container or divider — should be
+replaced with var(--color-surface) or var(--glass-bg) as appropriate so it adapts.
+If the stats grid sits on a slightly tinted section background, use
+background: var(--color-surface-light) so it reads #ede9fe in light (a very subtle
+lavender tint) instead of #1a1a25 dark, creating gentle section differentiation
+without harsh contrast on the light page.
+
+
+────────────────────────────────────────────────────────────────────────────────
+PART 10 — CLIENT LOGOS MARQUEE SECTION
+────────────────────────────────────────────────────────────────────────────────
+
+The marquee container currently has bg-white/[0.03] and border-white/[0.05]. These
+are effectively invisible on a light background since white-on-white has no
+contrast. Replace these with background: var(--marquee-container-bg) and border:
+1px solid var(--marquee-container-border) — in light mode these resolve to
+rgba(124,58,237,0.04) and rgba(124,58,237,0.10), giving a faint purple-tinted
+container that is visible without being harsh. The outer bordered section has
+border-y and bg-surface/30 — replace with background: var(--color-surface) and
+border-color: var(--color-surface-border). The logo brand names inside the marquee
+render as text-muted — this maps to #5b6778 in light mode, providing subtle
+but visible muted gray text on the light background. No extra changes needed for
+the text. The marquee animation (translateX, 30s infinite) is purely CSS transform
+and works identically in both themes.
+
+
+────────────────────────────────────────────────────────────────────────────────
+PART 11 — FORM INPUTS (CONTACT PAGE AND CAREERS PAGE)
+────────────────────────────────────────────────────────────────────────────────
+
+Every form input across the Contact page and Careers page currently uses
+bg-white/5, border-white/10, text-white, placeholder:text-muted/50, and labels
+use text-white or text-sm font-medium text-white. In light mode these all become
+invisible or wrong. Replace every hardcoded input style with CSS variable-based
+inline styles or CSS classes: background: var(--input-bg) which is #ffffff in
+light (clean white inputs), border: 1px solid var(--input-border) which is
+#ddd6fe in light (soft purple-tinted border visible on the white field),
+color: var(--input-text) which is #0f0a1e in light (dark text in the field),
+placeholder color: var(--input-placeholder) which is rgba(91,107,120,0.55) in
+light (legible muted placeholder), and label color: var(--input-label) which is
+#1e1236 in light (deep dark label text).
+
+The focus state currently applies border-primary/50 and ring-1 ring-primary/25
+via Tailwind — these opacity-based purple values work acceptably in light mode but
+improve them by adding a global CSS rule: [data-theme="light"] input:focus,
+[data-theme="light"] select:focus, [data-theme="light"] textarea:focus
+{ border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(124,58,237,0.14);
+outline: none; } which gives a crisp purple border and a gentle purple ring glow
+on focus in light mode. The error state uses border-error which maps to
+var(--color-error) — this token is already updated in light mode to #DC2626.
+The success banner at the top of the contact form should use background:
+rgba(5,150,105,0.12) in light mode (a faint green tint) vs the dark version
+— add this via [data-theme="light"] .success-banner { background:
+rgba(5,150,105,0.12); border-color: rgba(5,150,105,0.30); color: #065f46; }.
+
+The service/budget dropdowns use the same input styles — apply the same tokens.
+The file upload input in careers also needs its border and background to use the
+same input tokens. The reCAPTCHA widget in contact is a third-party iframe and
+cannot be themed — leave it as-is.
+
+
+────────────────────────────────────────────────────────────────────────────────
+PART 12 — FOOTER
+────────────────────────────────────────────────────────────────────────────────
+
+Open src/components/layout/Footer.tsx. The footer currently has border-t
+border-surface-border and bg-surface/50. Replace the background with background:
+var(--footer-bg) which gives rgba(245,243,255,0.80) in light — a very soft
+lavender tinted footer that separates it from the page without being a stark white.
+The top gradient accent line (h-px, bg-gradient from-transparent via-primary to
+transparent) looks beautiful in both themes since the purple gradient line provides
+strong contrast on both dark and light — no changes needed.
+
+Social icon buttons currently use bg-white/5, text-muted, hover:text-primary,
+hover:bg-white/10. Replace background with var(--social-icon-bg) and hover
+background with var(--social-icon-bg-hover) so they show a faint purple tint in
+light mode rather than disappearing. The muted icon color stays — var(--color-muted)
+is #5b6778 in light which is visible. Footer link text uses text-muted
+hover:text-primary-light — both of these resolve from theme tokens correctly with
+no hardcoded changes needed. The bottom copyright bar text uses text-muted — again
+reads from the token. The border-t on the bottom bar should use
+border-color: var(--color-surface-border). The contact info items (email, phone,
+location) with their HiMail, HiPhone, HiLocationMarker icons are styled text-muted
+— correct automatically via the token. The tagline below the logo also uses
+text-muted — correct. The logo SVG itself may need to have a CSS filter applied in
+light mode if it is white-colored — add [data-theme="light"] .footer-logo
+{ filter: brightness(0) saturate(100%) invert(14%) sepia(50%) saturate(700%)
+hue-rotate(245deg) brightness(80%); } to render it in deep purple instead of white
+on the light footer.
+
+
+────────────────────────────────────────────────────────────────────────────────
+PART 13 — TESTIMONIALCARD COMPONENT
+────────────────────────────────────────────────────────────────────────────────
+
+Open the TestimonialCard in src/components/ui/index.tsx. The component wraps in
+GlassCard (already fixed in Part 5). The star rating renders 5 SVG stars where
+filled stars use #F59E0B (warning color — fine in both themes) and empty stars use
+#374151 (dark gray that is too light for the light background). Replace empty star
+color with var(--star-empty) which is #374151 in dark and #ddd6fe in light (a soft
+lavender for unfilled stars — more elegant on white). The feedback text uses
+text-muted text-sm — reads from token, fine. The bottom divider uses border-t
+border-surface-border — reads from token, fine. The author name currently uses
+text-sm font-medium text-white — replace the hardcoded text-white with
+color: var(--testimonial-author) which is #ffffff in dark and #0f0a1e in light.
+The company name uses text-xs text-muted — reads from token, fine. The project
+type badge uses bg-primary/10, text-primary-light, border-primary/20 — in light
+mode add the same section-badge light override rule from Part 7 to this badge class
+as well: stronger opacity and use var(--color-primary) for text.
+
+The testimonial carousel navigation buttons (w-10 h-10 rounded-full bg-white/5)
+need their background replaced with var(--carousel-nav-bg) which gives
+rgba(124,58,237,0.09) in light — a faint purple-tinted circle button visible on
+the light background. The active dot indicator uses bg-primary (fine in both
+themes). The inactive dots use bg-white/20 — replace with background:
+var(--carousel-dot-inactive) which is rgba(109,40,217,0.20) in light (visible
+purple-tinted dots) vs rgba(255,255,255,0.20) in dark.
+
+
+────────────────────────────────────────────────────────────────────────────────
+PART 14 — PORTFOLIO PAGE: FILTER BAR, CARDS, WATERMARKS, TECH PILLS
+────────────────────────────────────────────────────────────────────────────────
+
+The category filter buttons have two states: active (bg-primary text-white
+border-primary) and inactive (bg-white/5 text-muted border-white/10). Active state
+works in both themes — purple button with white text is always legible. Inactive
+state breaks in light. Replace inactive state background with var(--filter-inactive-
+bg), border with var(--filter-inactive-border), and color with
+var(--filter-inactive-text). In light mode this renders as a faint purple-tinted
+button with a visible border and gray text — clean and theme-consistent.
+
+Portfolio project cards wrap in GlassCard (already fixed). The large watermark
+numbers (text-4xl text-white/10) become invisible in light since white/10 on a
+white card is zero contrast. Replace with color: var(--watermark-color) which is
+rgba(255,255,255,0.10) in dark and rgba(109,40,217,0.08) in light — a faint purple
+tint that is subtly visible on white glass cards. The "Featured" badge uses
+bg-primary text-white — fine in both themes. Tech stack pills use bg-white/5 and
+border-white/10 — replace with background: var(--tech-pill-bg) and border: 1px
+solid var(--tech-pill-border). The result metric uses text-success — maps to token,
+fine. The "View Case Study" link text uses text-primary-light — maps to token, fine.
+The "Details Coming Soon" link uses text-muted — maps to token, fine.
+
+For the Communize VIZAG case study sub-page, the same rules apply: all GlassCards,
+tech stack badges, and metric GlassCards adapt automatically via the fixes above.
+Any hardcoded white opacity values in that page should be hunted down and replaced
+with the appropriate CSS variable tokens.
+
+
+────────────────────────────────────────────────────────────────────────────────
+PART 15 — SERVICES PAGE: ACCORDION AND TECH STACK BADGES
+────────────────────────────────────────────────────────────────────────────────
+
+The services page has three large category cards (also GlassCards, fixed in
+Part 5) and accordion items inside each. The accordion expand/collapse uses
+Framer Motion AnimatePresence — no theme changes needed for the animation itself.
+The accordion item borders currently use border-white/8 or similar hardcoded
+opacity — replace with border-color: var(--accordion-border) which gives
+rgba(109,40,217,0.12) in light (visible purple-tinted separator) vs
+rgba(255,255,255,0.08) in dark. The chevron icon color should use
+color: var(--color-muted) so it adapts to the theme. The tech stack badges inside
+each service card use bg-white/5 and border-white/10 — replace both with the
+--tech-pill-bg and --tech-pill-border variables (same as portfolio pills). The
+starting price text (e.g., "$3,000") likely uses gradient-text — fine in both
+themes. The case study link with HiArrowRight should use color: var(--color-
+primary-light) so it adapts. All section gradient icon containers (gradient-to-br
+from-primary to-primary-deep or from-accent to-accent-dark with white icons)
+remain exactly the same in both themes — colorful gradient icon containers look
+premium on both backgrounds.
+
+
+────────────────────────────────────────────────────────────────────────────────
+PART 16 — ABOUT PAGE: STORY, MISSION/VISION, VALUES, MILESTONES, TEAM
+────────────────────────────────────────────────────────────────────────────────
+
+The About page story section has narrative text on the left and a 2×2 stats grid
+on the right. The narrative body text uses text-foreground — maps to token, fine.
+Any inline hardcoded text-white should be replaced with text-foreground or
+color: var(--color-foreground). The stats GlassCards use gradient-text for values
+— fine in both themes. The Mission and Vision GlassCards have gradient icon
+containers (Vision: purple gradient with HiEye, Mission: cyan gradient with
+HiGlobe) — these look great in both themes, no changes. Card titles and
+descriptions read from foreground/muted tokens — fine.
+
+The Core Values section has 4 GlassCards with gradient bg icon circles, titles,
+and descriptions — all fixed by the GlassCard update and token-based text classes.
+No further changes needed.
+
+The Milestones Timeline has a vertical line connecting years. That line uses
+border or background in a muted purple color — apply border-color: var(--timeline-
+line) which is rgba(139,92,246,0.20) in dark and rgba(109,40,217,0.25) in light
+(slightly stronger for visibility on white). Year labels use gradient-text or
+text-primary-light — fine. Title and description text reads from foreground/muted
+tokens — fine.
+
+The Leadership Team cards contain real team member photos (nuraj.png, roshan.jpeg,
+venu.jpeg). The photo containers and name/role badge need attention. Role badges
+use the gradient pill style (bg-gradient from-primary to-primary-deep, text-white,
+rounded-full) — this looks great in both themes. Bio text uses text-muted — fine.
+Name uses text-foreground or text-white — replace text-white with
+text-foreground everywhere it appears in team cards.
+
+
+────────────────────────────────────────────────────────────────────────────────
+PART 17 — CUSTOM CURSOR
+────────────────────────────────────────────────────────────────────────────────
+
+Open src/components/ui/CustomCursor.tsx. The custom cursor has two elements: a
+small dot (8×8px, bg-primary, mix-blend-difference) and a larger ring (40×40px,
+border-primary/50). The mix-blend-difference on the dot already makes it adapt
+visually — on light backgrounds it appears as a dark purple, on dark backgrounds
+as a light purple, creating natural contrast in both themes with zero code changes.
+The ring (border: 1px solid rgba(139,92,246,0.50)) also adapts reasonably well.
+However, to make the ring more legible on a light background, update its border to
+border: 1.5px solid var(--color-primary) with opacity 0.45 — this uses the
+slightly deeper primary purple (#7C3AED) in light mode for better ring visibility.
+No changes needed to the spring physics, hover scale behavior, or click effects.
+
+
+────────────────────────────────────────────────────────────────────────────────
+PART 18 — ICON CONTAINERS AND BADGE/PILL PATTERNS
+────────────────────────────────────────────────────────────────────────────────
+
+Throughout the site, icon containers use bg-gradient-to-br from-primary to-primary-
+deep with white icons inside, and some use from-accent to-accent-dark. These
+gradient containers look excellent in both dark and light themes — colorful gradient
+icons on light backgrounds are a staple of premium light-mode design. No changes
+needed to icon containers. The group-hover:scale-110 transform animation works
+identically in both themes.
+
+The badge/pill pattern used across all pages for section labels, categories, and
+tags (px-4 py-1.5, text-xs, font-medium, tracking-wider, uppercase, rounded-full,
+bg-primary/10, text-primary-light, border-primary/20) needs the same treatment as
+the section badge. In light mode, bg-primary/10 on white is nearly invisible.
+Add a global CSS rule: [data-theme="light"] .badge-pill { background:
+rgba(124,58,237,0.11); color: var(--color-primary-deep); border-color:
+rgba(124,58,237,0.24); font-weight: 600; }. Ensure all badge/pill elements across
+all pages have the class "badge-pill" applied alongside their existing Tailwind
+classes.
+
+
+────────────────────────────────────────────────────────────────────────────────
+PART 19 — FINAL CTA SECTIONS (HOMEPAGE AND OTHER PAGES)
+────────────────────────────────────────────────────────────────────────────────
+
+The Final CTA sections at the bottom of pages use a gradient overlay background.
+The gradient typically goes from a darker surface color to the main background
+with purple/cyan gradient accents. In light mode, make the CTA section background
+a soft gradient using: [data-theme="light"] .cta-section { background: linear-
+gradient(135deg, rgba(124,58,237,0.07) 0%, rgba(6,182,212,0.05) 100%);
+border: 1px solid var(--color-surface-border); border-radius: 1.5rem; }. This
+gives a faint purple-to-cyan gradient wash for the CTA container — visually
+distinct from the white page body and premium-feeling. The two buttons inside
+(primary gradient and secondary) are already fixed in Part 6. Any text inside
+the CTA section using text-white should be changed to color: var(--color-
+foreground). Subtitle text using text-muted automatically adapts.
+
+
+────────────────────────────────────────────────────────────────────────────────
+PART 20 — SCROLLBAR, SELECTION, AND FOCUS STYLES
+────────────────────────────────────────────────────────────────────────────────
+
+These are all handled via globals.css. Scrollbar track: use var(--scrollbar-track)
+which is #13131a in dark and #ede9fe in light (soft lavender track that blends with
+the light page background). Scrollbar thumb: stays var(--color-primary) in both
+themes — a purple scrollbar thumb looks premium in both. Scrollbar width stays 6px.
+Text selection: ::selection { background: var(--selection-bg); color:
+var(--selection-text); } — in light this gives rgba(124,58,237,0.18) with
+#0f0a1e text (dark text on light purple selection highlight). Focus-visible:
+stays outline: 2px solid var(--color-primary) with offset 2px — already
+token-based, no changes needed. All three of these adapt automatically once you
+add the new token definitions from Part 1.
+
+
+────────────────────────────────────────────────────────────────────────────────
+PART 21 — LOGO SVG IN NAVBAR AND FOOTER
+────────────────────────────────────────────────────────────────────────────────
+
+The StackX logo (stackx.svg used in Navbar, StackXMINI.svg used as favicon) is
+likely white or light-colored for the dark theme. On a light navbar and light
+footer, a white logo becomes invisible. In the Navbar component, add a conditional
+filter style to the logo image: in dark mode no filter (logo shows normally), in
+light mode apply filter: brightness(0) to render it as pure black then tint via
+sepia/hue-rotate, or simply check if the SVG has a dark variant and switch the
+src. The cleanest solution: add a CSS rule [data-theme="light"] .navbar-logo
+{ filter: brightness(0) saturate(100%) invert(15%) sepia(60%) saturate(800%)
+hue-rotate(250deg) brightness(75%); } — this renders the white SVG as a deep
+purple in light mode, keeping it on-brand. Apply the same filter rule to
+.footer-logo. Add those class names to the logo img/Image elements in Navbar.tsx
+and Footer.tsx if not already present.
+
+
+────────────────────────────────────────────────────────────────────────────────
+PART 22 — THEME TRANSITION SMOOTHNESS
+────────────────────────────────────────────────────────────────────────────────
+
+For the smoothest possible theme switch experience, add the following to globals.css:
+html.theme-transitioning * { transition: background-color 0.30s ease, color 0.20s
+ease, border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.20s ease !important; }
+Then in the ThemeContext toggleTheme function, before setting the new theme, add
+document.documentElement.classList.add('theme-transitioning') and after 400ms
+remove it with document.documentElement.classList.remove('theme-transitioning').
+This ensures only the transition moment gets the global transition applied —
+preventing interference with Framer Motion animations during normal page use.
+Also add will-change: background-color, color to the body element during the
+transition for GPU acceleration on mobile devices.
+
+
+────────────────────────────────────────────────────────────────────────────────
+SUMMARY CHECKLIST OF ALL FILES TO MODIFY
+────────────────────────────────────────────────────────────────────────────────
+
+  src/app/globals.css                     — All token definitions and overrides
+  src/app/layout.tsx                      — FOUC script, ThemeProvider wrap
+  src/context/ThemeContext.tsx            — New file: context + hook + toggle
+  src/components/layout/Navbar.tsx        — Toggle button, scroll states, links
+  src/components/layout/Footer.tsx        — Background, social icons, logo filter
+  src/components/ui/index.tsx             — GlassCard, Button, SectionHeading,
+                                            AnimatedCounter, TestimonialCard
+  src/components/ui/CustomCursor.tsx      — Ring border update
+  src/app/page.tsx                        — Hero orbs, marquee, carousel, filter
+  src/app/services/page.tsx               — Accordion, tech pills
+  src/app/about/page.tsx                  — Timeline, team cards, text-white fixes
+  src/app/portfolio/page.tsx              — Filter bar, watermarks, tech pills
+  src/app/portfolio/communize-vizag/      — Same glass card and pill fixes
+  src/app/contact/page.tsx               — Form inputs, labels, success banner
+  src/app/careers/page.tsx               — Form inputs, labels, file upload
+  src/app/testimonials/page.tsx          — Star ratings, average section
+
+================================================================================
+                        END OF STACKX LIGHT THEME PROMPT
+================================================================================

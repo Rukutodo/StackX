@@ -11,6 +11,8 @@ import {
 import { FaTwitter, FaLinkedinIn, FaGithub } from "react-icons/fa";
 import { useState, FormEvent } from "react";
 
+const API = "http://localhost:4000";
+
 const serviceOptions = [
     "Web Development",
     "Business Automation",
@@ -42,6 +44,8 @@ export default function ContactPage() {
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [submitted, setSubmitted] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState("");
     const [recaptcha, setRecaptcha] = useState(false);
 
     const validate = () => {
@@ -56,10 +60,30 @@ export default function ContactPage() {
         return Object.keys(errs).length === 0;
     };
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        if (validate()) {
+        if (!validate()) return;
+
+        setSubmitting(true);
+        setSubmitError("");
+
+        try {
+            const res = await fetch(`${API}/api/messages`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(form),
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.message || "Failed to send message");
+            }
+
             setSubmitted(true);
+        } catch (err: any) {
+            setSubmitError(err.message);
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -324,9 +348,15 @@ export default function ContactPage() {
                                         )}
                                     </div>
 
-                                    <Button type="submit" variant="primary" className="w-full py-4 text-base">
-                                        Send Consultation Request <HiArrowRight />
-                                    </Button>
+                                    {submitError && <p className="text-red-400 text-sm">{submitError}</p>}
+
+                                    <button
+                                        type="submit"
+                                        disabled={submitting}
+                                        className="w-full py-4 text-base font-medium rounded-xl bg-gradient-to-r from-primary to-primary-deep text-white flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {submitting ? "Sending..." : <>Send Consultation Request <HiArrowRight /></>}
+                                    </button>
 
                                     <p className="text-xs text-muted text-center">
                                         By submitting, you agree to our privacy policy. We&apos;ll never share your data.

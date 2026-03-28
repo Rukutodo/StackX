@@ -109,3 +109,6 @@ dist
 
 # Mac OS explicit ignores
 .DS_Store
+
+# User uploads
+uploads/
