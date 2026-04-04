@@ -8,7 +8,7 @@ import { HiArrowLeft, HiArrowRight, HiCheckCircle } from "react-icons/hi";
 import Link from "next/link";
 import type { PortfolioProject } from "../PortfolioClient";
 
-const API_BASE = "http://129.159.236.176:4000";
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "";
 
 export default function CaseStudyPage() {
   const params = useParams();

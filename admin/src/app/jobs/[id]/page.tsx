@@ -7,7 +7,7 @@ import { DashboardGlassCard, AdminSelect } from "@/components/admin/ui";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
-const API = "http://129.159.236.176:4000";
+const API = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "";
 
 const DEPARTMENTS = ["Engineering", "Design", "Automation", "Marketing", "Operations"];
 const TYPES = ["Full-time", "Full-time / Contract", "Contract", "Internship", "Part-time"];

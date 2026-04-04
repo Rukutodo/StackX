@@ -3,7 +3,7 @@ import type { JobPosting } from "./CareersClient";
 
 async function getJobs(): Promise<JobPosting[]> {
   try {
-    const res = await fetch("http://129.159.236.176:4000/api/jobs", {
+    const res = await fetch((process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "/api/jobs", {
       cache: "no-store",
     });
     if (!res.ok) return [];

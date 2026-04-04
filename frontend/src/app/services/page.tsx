@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 // Fetch on the server so the page is SEO-friendly
 async function getServices() {
   try {
-    const res = await fetch("http://129.159.236.176:4000/api/services", {
+    const res = await fetch((process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "/api/services", {
       cache: "no-store", // always fresh
     });
     if (!res.ok) return [];

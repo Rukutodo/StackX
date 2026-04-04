@@ -28,7 +28,7 @@ export default function ServicesAdminPage() {
   const fetchServices = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://129.159.236.176:4000/api/services?all=true");
+      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "/api/services?all=true");
       const data = await res.json();
       setCategories(data);
     } catch (err) {
@@ -48,7 +48,7 @@ export default function ServicesAdminPage() {
       return;
     }
     try {
-      await fetch(`http://129.159.236.176:4000/api/services/${id}`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/api/services/${id}`, {
         method: "DELETE",
         credentials: "include",
       });

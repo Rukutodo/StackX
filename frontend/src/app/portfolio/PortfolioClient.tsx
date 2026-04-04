@@ -48,7 +48,7 @@ export interface PortfolioProject {
 
 /* ── Component ──────────────────────────────────── */
 
-const API_BASE = "http://129.159.236.176:4000";
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "";
 
 export default function PortfolioClient({ projects, categories }: { projects: PortfolioProject[]; categories: string[] }) {
   const [activeFilter, setActiveFilter] = useState("All");

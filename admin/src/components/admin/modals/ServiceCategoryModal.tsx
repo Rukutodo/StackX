@@ -68,8 +68,8 @@ export default function ServiceCategoryModal({ initial, onClose, onSaved }: Prop
 
     try {
       const url = isEdit
-        ? `http://129.159.236.176:4000/api/services/${initial!._id}`
-        : "http://129.159.236.176:4000/api/services";
+        ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/api/services/${initial!._id}`
+        : (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "/api/services";
       const res = await fetch(url, {
         method: isEdit ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },

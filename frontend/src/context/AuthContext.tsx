@@ -24,7 +24,7 @@ export function useAuth() {
   return useContext(AuthContext);
 }
 
-const API_BASE = "http://129.159.236.176:4000/api/auth";
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "/api/auth";
 
 /** Routes that do NOT require authentication */
 const PUBLIC_ADMIN_ROUTES = ["/admin/login", "/admin/forgot-password"];
