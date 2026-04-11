@@ -1,6 +1,7 @@
 import express from "express";
 import { Message } from "../models/Message";
 import { protect } from "../middlewares/authMiddleware";
+import { sendContactConfirmation } from "../utils/mailer";
 
 const router = express.Router();
 
@@ -8,7 +9,7 @@ const router = express.Router();
 // Public: submit a contact form message
 router.post("/", async (req, res) => {
   try {
-    const { name, email, phone, company, service, budget, description, timeline } = req.body;
+    const { name, email, phone, company, service, description } = req.body;
 
     if (!name || !email || !service || !description) {
       return res.status(400).json({ message: "name, email, service, and description are required" });
@@ -20,12 +21,16 @@ router.post("/", async (req, res) => {
       phone: phone || "",
       company: company || "",
       service,
-      budget: budget || "",
       description,
-      timeline: timeline || "",
     });
 
     await message.save();
+
+    // ─── Send confirmation email (non-blocking) ───────────────────────
+    sendContactConfirmation(email, name, service, company || "").catch((mailErr) => {
+      console.error("⚠️  Failed to send contact confirmation email:", mailErr);
+    });
+
     res.status(201).json({ message: "Message sent successfully" });
   } catch (error) {
     console.error("POST /api/messages error:", error);

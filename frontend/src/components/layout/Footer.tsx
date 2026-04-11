@@ -91,11 +91,15 @@ export default function Footer() {
                         <ul className="space-y-3">
                             <li className="flex items-center gap-3 text-sm text-muted">
                                 <HiMail className="text-primary-light shrink-0" />
-                                hello@stackx.dev
+                                <a href="mailto:hello@stackx.co.in" className="hover:text-primary-light transition-colors">
+                                    hello@stackx.co.in
+                                </a>
                             </li>
                             <li className="flex items-center gap-3 text-sm text-muted">
                                 <HiPhone className="text-primary-light shrink-0" />
-                                +1 (555) 123-4567
+                                <a href="tel:+919347858844" className="hover:text-primary-light transition-colors">
+                                    +91 93478 58844
+                                </a>
                             </li>
                             <li className="flex items-start gap-3 text-sm text-muted">
                                 <HiLocationMarker className="text-primary-light shrink-0 mt-0.5" />
@@ -111,10 +115,10 @@ export default function Footer() {
                         © {new Date().getFullYear()} StackX. All rights reserved.
                     </p>
                     <div className="flex gap-6">
-                        <Link href="#" className="text-xs text-muted hover:text-primary-light transition">
+                        <Link href="/privacy-policy" className="text-xs text-muted hover:text-primary-light transition">
                             Privacy Policy
                         </Link>
-                        <Link href="#" className="text-xs text-muted hover:text-primary-light transition">
+                        <Link href="/terms-of-service" className="text-xs text-muted hover:text-primary-light transition">
                             Terms of Service
                         </Link>
                     </div>

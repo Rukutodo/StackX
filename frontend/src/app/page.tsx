@@ -25,8 +25,8 @@ import { useState, useEffect, useCallback } from "react";
 /* ── Data ─────────────────────────────────────────────── */
 
 const stats = [
-  { end: 150, suffix: "+", label: "Projects Delivered" },
-  { end: 80, suffix: "+", label: "Happy Clients" },
+  { end: 20, suffix: "+", label: "Projects Delivered" },
+  { end: 15, suffix: "+", label: "Happy Clients" },
   { end: 99.9, suffix: "%", label: "Uptime Guaranteed" },
   { end: 40, suffix: "%", label: "Cost Savings" },
 ];
@@ -47,7 +47,7 @@ const services = [
   {
     icon: HiChartBar,
     title: "Ad Tech Solutions",
-    desc: "Performance-driven advertising platforms, analytics dashboards, and programmatic ad tech development.",
+    desc: "Performance driven advertising platforms, analytics dashboards, and programmatic ad tech development.",
     color: "from-primary-light to-accent",
   },
 ];
@@ -56,7 +56,7 @@ const whyItems = [
   {
     icon: HiShieldCheck,
     title: "Professionalism",
-    desc: "Enterprise-grade code quality with rigorous testing, CI/CD pipelines, and comprehensive documentation.",
+    desc: "Enterprise grade code quality with rigorous testing, CI/CD pipelines, and comprehensive documentation.",
   },
   {
     icon: HiLightningBolt,

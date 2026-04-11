@@ -26,12 +26,9 @@ const sidebarLinks = [
   { href: "/services", label: "Services", icon: HiCube },
   { href: "/portfolio", label: "Portfolio", icon: HiPhotograph },
   { href: "/testimonials", label: "Testimonials", icon: HiStar },
-  { href: "/team", label: "Team", icon: HiUserGroup },
   { href: "/jobs", label: "Jobs", icon: HiBriefcase },
   { href: "/messages", label: "Messages", icon: HiMail },
   { href: "/applications", label: "Applications", icon: HiDocumentText },
-  { href: "/media", label: "Media", icon: HiCollection },
-  { href: "/settings", label: "Settings", icon: HiCog },
 ];
 
 interface SidebarProps {

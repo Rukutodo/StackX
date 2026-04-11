@@ -36,19 +36,49 @@ const values = [
 ];
 
 const milestones = [
-    { year: "2020", title: "Founded", desc: "StackX started with a vision to make premium development accessible." },
-    { year: "2021", title: "First 25 Clients", desc: "Delivered solutions for startups across India and South-East Asia." },
-    { year: "2022", title: "Ad Tech Division", desc: "Launched our specialized advertising technology solutions practice." },
-    { year: "2023", title: "100+ Projects", desc: "Crossed the milestone of 100 successfully delivered projects." },
-    { year: "2024", title: "Global Expansion", desc: "Extended services to clients in North America and Europe." },
-    { year: "2025", title: "150+ Projects", desc: "Growing strong with 80+ happy clients and expanding into AI-powered solutions." },
+    {
+        year: "Feb 2026",
+        title: "Day One 🚀",
+        desc: "StackX officially launched — built on a clear mission: deliver premium software at prices that actually make sense for real businesses.",
+        done: true,
+    },
+    {
+        year: "Mar 2026",
+        title: "First Projects Delivered",
+        desc: "Shipped our first client projects — full-stack web apps, landing pages, and a SaaS MVP. Small team, big output.",
+        done: true,
+    },
+    {
+        year: "Apr 2026",
+        title: "Website & Brand Goes Live",
+        desc: "Launched stackx.co.in and our careers portal. Started hiring talented developers to grow the team.",
+        done: true,
+    },
+    {
+        year: "Q2 2026",
+        title: "First 10 Clients",
+        desc: "Our target: build lasting partnerships with 10 happy clients and maintain a 100% delivery record.",
+        done: false,
+    },
+    {
+        year: "Q3 2026",
+        title: "Ad Tech & Automation Practice",
+        desc: "Launching a dedicated practice for advertising technology and business automation solutions.",
+        done: false,
+    },
+    {
+        year: "2027",
+        title: "Global Reach",
+        desc: "Serving clients beyond India — expanding into South-East Asia, the Middle East, and beyond.",
+        done: false,
+    },
 ];
 
 const teamStats = [
-    { value: "25+", label: "Team Members" },
-    { value: "8+", label: "Countries Served" },
-    { value: "5+", label: "Years Experience" },
-    { value: "98%", label: "Client Retention" },
+    { value: "2", label: "Months Building" },
+    { value: "100%", label: "Delivery Rate" },
+    { value: "₹", label: "Transparent Pricing" },
+    { value: "∞", label: "Ambition" },
 ];
 
 export default function AboutPage() {
@@ -56,7 +86,15 @@ export default function AboutPage() {
         <div className="pt-24 pb-20">
             {/* Hero */}
             <section className="py-16 relative overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(6,182,212,0.08),transparent_60%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(6,182,212,0.08),transparent_60%)]">
+                  <div
+                    className="absolute inset-0 opacity-[0.03]"
+                    style={{
+                      backgroundImage: `linear-gradient(rgba(139,92,246,1) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,1) 1px, transparent 1px)`,
+                      backgroundSize: "60px 60px",
+                    }}
+                  />
+                </div>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <SectionHeading
                         badge="About Us"
@@ -82,25 +120,24 @@ export default function AboutPage() {
                             className="text-3xl font-heading font-bold mb-6"
                             style={{ fontFamily: "var(--font-poppins), sans-serif" }}
                         >
-                            From a Small Team to a{" "}
-                            <span className="gradient-text">Global Agency</span>
+                            We&apos;re New Here —{" "}
+                            <span className="gradient-text">And That&apos;s the Point</span>
                         </h3>
                         <div className="space-y-4 text-muted leading-relaxed">
                             <p>
-                                StackX was founded in 2020 with a simple yet ambitious mission: to bridge the gap
-                                between premium software quality and affordability. We saw too many startups and
-                                growing businesses struggle with overpriced development that delivered underwhelming
-                                results.
+                                StackX launched in early 2026. We&apos;re not a decade-old corporation with
+                                layers of bureaucracy — we&apos;re a lean, hungry team that started with one
+                                simple frustration: great software costs way too much.
                             </p>
                             <p>
-                                Our approach is different. By leveraging modern technologies, agile methodologies,
-                                and a globally distributed team of experts, we deliver solutions that rival those
-                                of top-tier agencies — at a fraction of the cost.
+                                Every project we take on right now gets our full attention — no junior devs
+                                handed off without oversight, no cookie-cutter templates. Being early-stage
+                                means your project actually matters to us, not just as a ticket number.
                             </p>
                             <p>
-                                Today, we serve 80+ clients across 8 countries, covering everything from custom
-                                web applications and SaaS products to business automation and advertising
-                                technology platforms.
+                                We&apos;re building our reputation one client at a time. That means we push
+                                harder, communicate more openly, and care more about results than any
+                                established agency that already has its name to fall back on.
                             </p>
                         </div>
                     </motion.div>
@@ -198,7 +235,8 @@ export default function AboutPage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <SectionHeading
                         badge="Our Journey"
-                        title="Milestones Along the Way"
+                        title="Where We&apos;ve Been & Where We&apos;re Going"
+                        subtitle="We started just 2 months ago — here&apos;s our honest timeline and the milestones we&apos;re chasing."
                     />
                     <div className="max-w-3xl mx-auto relative">
                         {/* Vertical line */}
@@ -215,11 +253,22 @@ export default function AboutPage() {
                                     }`}
                             >
                                 {/* Dot */}
-                                <div className="absolute left-4 md:left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-gradient-to-br from-primary to-accent border-2 border-background z-10 mt-2" />
+                                <div className={`absolute left-4 md:left-1/2 -translate-x-1/2 w-3 h-3 rounded-full border-2 border-background z-10 mt-2 ${
+                                    m.done
+                                        ? "bg-gradient-to-br from-primary to-accent"
+                                        : "bg-surface-light border border-primary/30"
+                                }`} />
 
                                 {/* Content */}
                                 <div className={`ml-12 md:ml-0 md:w-1/2 ${i % 2 === 0 ? "md:pr-12 md:text-right" : "md:pl-12"}`}>
-                                    <span className="text-xs font-medium text-primary-light">{m.year}</span>
+                                    <div className="flex items-center gap-2 flex-wrap mb-1 ${i % 2 === 0 ? 'md:justify-end' : ''}">
+                                        <span className="text-xs font-medium text-primary-light">{m.year}</span>
+                                        {m.done ? (
+                                            <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary-light border border-primary/20">Done ✓</span>
+                                        ) : (
+                                            <span className="text-xs px-2 py-0.5 rounded-full bg-white/5 text-muted border border-white/10">Upcoming</span>
+                                        )}
+                                    </div>
                                     <h4
                                         className="text-lg font-heading font-semibold mt-1"
                                         style={{ fontFamily: "var(--font-poppins), sans-serif" }}

@@ -4,11 +4,12 @@ import path from "path";
 import fs from "fs";
 import { JobApplication } from "../models/JobApplication";
 import { protect } from "../middlewares/authMiddleware";
+import { sendApplicationConfirmation } from "../utils/mailer";
 
 const router = express.Router();
 
 // ─── Multer Setup for Resumes ──────────────────────
-const uploadDir = path.join(__dirname, "../../uploads/resumes");
+const uploadDir = path.join(process.cwd(), "uploads/resumes");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
@@ -26,9 +27,10 @@ const upload = multer({
   storage,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
   fileFilter: (_req, file, cb) => {
-    const allowed = /pdf|doc|docx|txt/;
+    const allowed = /pdf|jpe?g/;
     const extOk = allowed.test(path.extname(file.originalname).toLowerCase());
-    cb(null, extOk);
+    const mimeOk = file.mimetype === "image/jpeg" || file.mimetype === "application/pdf";
+    cb(null, extOk && mimeOk);
   },
 });
 
@@ -40,6 +42,16 @@ router.post("/", upload.single("resume"), async (req, res) => {
 
     if (!fullName || !email || !phone || !position || !coverLetter) {
       return res.status(400).json({ message: "fullName, email, phone, position, and coverLetter are required" });
+    }
+
+    // ─── Duplicate email guard ────────────────────────────────────────
+    const existing = await JobApplication.findOne({
+      email: email.trim().toLowerCase(),
+    });
+    if (existing) {
+      return res.status(409).json({
+        message: `An application from ${email} already exists. Each email can only apply once.`,
+      });
     }
 
     const resumePath = req.file ? `/uploads/resumes/${req.file.filename}` : "";
@@ -57,6 +69,12 @@ router.post("/", upload.single("resume"), async (req, res) => {
     });
 
     await application.save();
+
+    // ─── Send confirmation email (non-blocking) ───────────────────────
+    sendApplicationConfirmation(email, fullName, position).catch((mailErr) => {
+      console.error("⚠️  Failed to send confirmation email:", mailErr);
+    });
+
     res.status(201).json({ message: "Application submitted successfully", application });
   } catch (error) {
     console.error("POST /api/applications error:", error);
@@ -116,6 +134,20 @@ router.delete("/:id", protect, async (req, res) => {
   try {
     const deleted = await JobApplication.findByIdAndDelete(req.params.id);
     if (!deleted) return res.status(404).json({ message: "Application not found" });
+
+    // ── Delete from disk ──────────────────────────────────────────────────
+    if (deleted.resume && deleted.resume.startsWith("/uploads/")) {
+      const absPath = path.join(process.cwd(), deleted.resume);
+      try {
+        if (fs.existsSync(absPath)) {
+          fs.unlinkSync(absPath);
+          console.log(`🗑️  Deleted resume: ${deleted.resume}`);
+        }
+      } catch (fileErr) {
+        console.warn(`⚠️  Could not delete resume ${deleted.resume}:`, fileErr);
+      }
+    }
+
     res.json({ message: "Application deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Failed to delete application" });

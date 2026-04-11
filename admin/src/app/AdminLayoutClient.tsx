@@ -19,6 +19,7 @@ export default function AdminLayoutClient({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
   const [isAuthed, setIsAuthed] = useState(false);
+  const [user, setUser] = useState<{ id: string; username: string } | null>(null);
 
   const isPublicRoute = PUBLIC_ROUTES.some((r) => pathname.startsWith(r));
 
@@ -46,9 +47,11 @@ export default function AdminLayoutClient({
       headers: { Authorization: `Bearer ${token}` },
       signal: controller.signal,
     })
-      .then((res) => {
+      .then(async (res) => {
         clearTimeout(timeout);
         if (res.ok) {
+          const data = await res.json();
+          setUser(data.user || null);
           setIsAuthed(true);
           setAuthChecked(true);
         } else {
@@ -113,7 +116,7 @@ export default function AdminLayoutClient({
         onClose={() => setSidebarOpen(false)}
       />
       <div className="lg:ml-[260px] flex flex-col min-h-screen">
-        <TopNavbar onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
+        <TopNavbar onMenuToggle={() => setSidebarOpen(!sidebarOpen)} user={user} />
         <main className="flex-1 p-4 lg:p-6 overflow-y-auto">
           {children}
         </main>

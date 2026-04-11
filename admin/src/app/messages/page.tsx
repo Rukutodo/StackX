@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { HiTrash, HiReply, HiEye, HiPhone, HiMail, HiOfficeBuilding, HiClock, HiCurrencyDollar } from "react-icons/hi";
+import { HiTrash, HiReply, HiEye, HiPhone, HiMail, HiOfficeBuilding } from "react-icons/hi";
 import {
   DashboardGlassCard,
   DashboardSectionHeader,
@@ -11,6 +11,7 @@ import {
   AdminButton,
 } from "@/components/admin/ui";
 import { HiDocumentText, HiCheckCircle, HiArchive, HiArrowLeft } from "react-icons/hi";
+import { DeleteConfirmModal } from "@/components/admin/DeleteConfirmModal";
 
 const API = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "";
 
@@ -21,9 +22,7 @@ interface Message {
   phone: string;
   company: string;
   service: string;
-  budget: string;
   description: string;
-  timeline: string;
   status: "unread" | "read" | "archived";
   createdAt: string;
 }
@@ -35,9 +34,17 @@ export default function MessagesAdminPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<string | null>(null);
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; label: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<"all" | "unread" | "read" | "archived">("all");
 
   const selectedMsg = messages.find((m) => m._id === selected);
+
+  // ── Filtered list ────────────────────────────────────
+  const visibleMessages =
+    statusFilter === "all"
+      ? messages
+      : messages.filter((m) => m.status === statusFilter);
 
   const fetchMessages = useCallback(async () => {
     setLoading(true);
@@ -83,19 +90,22 @@ export default function MessagesAdminPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (deleteConfirm !== id) { setDeleteConfirm(id); return; }
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
     try {
-      await fetch(`${API}/api/messages/${id}`, {
+      await fetch(`${API}/api/messages/${deleteTarget.id}`, {
         method: "DELETE",
         credentials: "include",
         headers: { Authorization: `Bearer ${localStorage.getItem("stackx_token") || ""}` },
       });
-      setDeleteConfirm(null);
-      if (selected === id) setSelected(null);
+      setDeleteTarget(null);
+      if (selected === deleteTarget.id) setSelected(null);
       fetchMessages();
     } catch (err) {
       console.error("Delete failed:", err);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -114,6 +124,7 @@ export default function MessagesAdminPage() {
   const archivedCount = messages.filter((m) => m.status === "archived").length;
 
   return (
+    <>
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
       <motion.div variants={item}>
         <h1 className="text-2xl lg:text-3xl font-bold text-white" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
@@ -135,16 +146,36 @@ export default function MessagesAdminPage() {
       <motion.div variants={item} className="grid grid-cols-1 lg:grid-cols-5 gap-4 h-[calc(100vh-280px)] min-h-[500px]">
         {/* Message list */}
         <DashboardGlassCard className={`lg:col-span-2 p-0 overflow-hidden flex-col ${selectedMsg ? "hidden lg:flex" : "flex"}`}>
-          <div className="p-4 border-b border-surface-border shrink-0">
-            <DashboardSectionHeader title="Inbox" subtitle={`${messages.length} messages`} />
+          <div className="p-4 border-b border-surface-border shrink-0 space-y-3">
+            <DashboardSectionHeader
+              title="Inbox"
+              subtitle={`${visibleMessages.length} message${visibleMessages.length !== 1 ? "s" : ""}`}
+            />
+            {/* Status filter */}
+            <select
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value as typeof statusFilter);
+                setSelected(null);
+              }}
+              className="w-full text-sm bg-white/5 border border-surface-border text-white rounded-lg px-3 py-2
+                focus:outline-none focus:ring-1 focus:ring-primary/50 appearance-none cursor-pointer"
+            >
+              <option value="all">All Messages</option>
+              <option value="unread">Unread</option>
+              <option value="read">Read</option>
+              <option value="archived">Archived</option>
+            </select>
           </div>
           <div className="flex-1 overflow-y-auto admin-scroll">
             {loading ? (
               <div className="py-10 text-center text-muted text-sm">Loading...</div>
-            ) : messages.length === 0 ? (
-              <div className="py-10 text-center text-muted text-sm">No messages yet.</div>
+            ) : visibleMessages.length === 0 ? (
+              <div className="py-10 text-center text-muted text-sm">
+                {statusFilter === "all" ? "No messages yet." : `No ${statusFilter} messages.`}
+              </div>
             ) : (
-              messages.map((msg) => (
+              visibleMessages.map((msg) => (
                 <button
                   key={msg._id}
                   onClick={() => handleSelect(msg._id)}
@@ -214,9 +245,9 @@ export default function MessagesAdminPage() {
                     </AdminButton>
                   )}
                   <button
-                    onClick={() => handleDelete(selectedMsg._id)}
-                    className={`p-2 rounded-lg transition text-sm ${deleteConfirm === selectedMsg._id ? "bg-red-500/10 text-red-400" : "text-muted hover:text-red-400 hover:bg-red-500/5"}`}
-                    title={deleteConfirm === selectedMsg._id ? "Click again to confirm" : "Delete"}
+                    onClick={() => setDeleteTarget({ id: selectedMsg._id, label: selectedMsg.name })}
+                    className="p-2 rounded-lg transition text-muted hover:text-red-400 hover:bg-red-500/5"
+                    title="Delete"
                   >
                     <HiTrash size={14} />
                   </button>
@@ -224,7 +255,7 @@ export default function MessagesAdminPage() {
               </div>
 
               {/* Contact details */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+              <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 mb-4">
                 {selectedMsg.phone && (
                   <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5">
                     <HiPhone className="text-primary-light shrink-0" size={14} />
@@ -240,24 +271,6 @@ export default function MessagesAdminPage() {
                     <div>
                       <p className="text-[10px] text-muted uppercase tracking-wider">Company</p>
                       <p className="text-xs text-white">{selectedMsg.company}</p>
-                    </div>
-                  </div>
-                )}
-                {selectedMsg.budget && (
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5">
-                    <HiCurrencyDollar className="text-primary-light shrink-0" size={14} />
-                    <div>
-                      <p className="text-[10px] text-muted uppercase tracking-wider">Budget</p>
-                      <p className="text-xs text-white">{selectedMsg.budget}</p>
-                    </div>
-                  </div>
-                )}
-                {selectedMsg.timeline && (
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5">
-                    <HiClock className="text-primary-light shrink-0" size={14} />
-                    <div>
-                      <p className="text-[10px] text-muted uppercase tracking-wider">Timeline</p>
-                      <p className="text-xs text-white">{selectedMsg.timeline}</p>
                     </div>
                   </div>
                 )}
@@ -295,5 +308,16 @@ export default function MessagesAdminPage() {
         </DashboardGlassCard>
       </motion.div>
     </motion.div>
+
+    <DeleteConfirmModal
+      open={!!deleteTarget}
+      title="Delete Message?"
+      itemLabel={deleteTarget?.label}
+      description="This will permanently delete this contact message. This cannot be undone."
+      onConfirm={handleDelete}
+      onCancel={() => setDeleteTarget(null)}
+      loading={deleting}
+    />
+    </>
   );
 }

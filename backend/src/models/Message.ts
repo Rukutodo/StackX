@@ -6,9 +6,7 @@ export interface IMessage extends Document {
   phone: string;
   company: string;
   service: string;
-  budget: string;
   description: string;
-  timeline: string;
   status: "unread" | "read" | "archived";
   createdAt: Date;
   updatedAt: Date;
@@ -16,15 +14,13 @@ export interface IMessage extends Document {
 
 const MessageSchema = new Schema<IMessage>(
   {
-    name: { type: String, required: true, trim: true },
-    email: { type: String, required: true, trim: true },
-    phone: { type: String, default: "" },
-    company: { type: String, default: "" },
-    service: { type: String, required: true },
-    budget: { type: String, default: "" },
+    name:        { type: String, required: true, trim: true },
+    email:       { type: String, required: true, trim: true },
+    phone:       { type: String, default: "" },
+    company:     { type: String, default: "" },
+    service:     { type: String, required: true },
     description: { type: String, required: true },
-    timeline: { type: String, default: "" },
-    status: { type: String, enum: ["unread", "read", "archived"], default: "unread" },
+    status:      { type: String, enum: ["unread", "read", "archived"], default: "unread" },
   },
   { timestamps: true }
 );

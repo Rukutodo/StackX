@@ -21,12 +21,13 @@ const testimonialSchema = new mongoose.Schema(
 
 const caseStudySchema = new mongoose.Schema(
   {
-    subtitle: { type: String, default: "" },
-    overview: { type: String, default: "" },
-    problem: { type: String, default: "" },
-    solution: { type: String, default: "" },
-    features: { type: [String], default: [] },
-    results: { type: [resultMetricSchema], default: [] },
+    subtitle:  { type: String, default: "" },
+    overview:  { type: String, default: "" },
+    problem:   { type: String, default: "" },
+    solution:  { type: String, default: "" },
+    features:  { type: [String], default: [] },
+    results:   { type: [resultMetricSchema], default: [] },
+    images:    { type: [String], default: [] },
     testimonial: { type: testimonialSchema, default: null },
   },
   { _id: false }

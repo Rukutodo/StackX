@@ -16,14 +16,36 @@ import {
 
 interface TopNavbarProps {
   onMenuToggle: () => void;
+  user?: { id: string; username: string } | null;
 }
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "/api/auth";
 
-export default function TopNavbar({ onMenuToggle }: TopNavbarProps) {
+/** Generate initials from a username */
+function getInitials(username: string): string {
+  if (!username) return "?";
+  // If it contains a space, use first letter of each word
+  const parts = username.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  // Single word: use first two characters
+  return username.slice(0, 2).toUpperCase();
+}
+
+/** Capitalize first letter */
+function capitalize(str: string): string {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+export default function TopNavbar({ onMenuToggle, user }: TopNavbarProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [resetModalOpen, setResetModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const displayName = user?.username ? capitalize(user.username) : "Admin";
+  const initials = user?.username ? getInitials(user.username) : "SX";
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -82,11 +104,11 @@ export default function TopNavbar({ onMenuToggle }: TopNavbarProps) {
                 className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-white/5 transition cursor-pointer"
               >
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-xs font-bold">
-                  SX
+                  {initials}
                 </div>
                 <div className="hidden md:block text-left">
-                  <p className="text-sm font-medium text-white leading-tight">Admin</p>
-                  <p className="text-[11px] text-muted leading-tight">admin@stackx.dev</p>
+                  <p className="text-sm font-medium text-white leading-tight">{displayName}</p>
+                  <p className="text-[11px] text-muted leading-tight">Administrator</p>
                 </div>
                 <HiChevronDown
                   size={14}
@@ -109,11 +131,11 @@ export default function TopNavbar({ onMenuToggle }: TopNavbarProps) {
                     <div className="px-4 py-3 border-b border-surface-border">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-sm font-bold">
-                          SX
+                          {initials}
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-white">Admin</p>
-                          <p className="text-[11px] text-muted">admin@stackx.dev</p>
+                          <p className="text-sm font-semibold text-white">{displayName}</p>
+                          <p className="text-[11px] text-muted">Administrator</p>
                         </div>
                       </div>
                     </div>

@@ -17,9 +17,9 @@ const team = [
         photo: "/team/nuraj.png",
         isFounder: true,
         shortBio:
-            "Visionary entrepreneur and full-stack architect who founded StackX with a mission to deliver premium technology at accessible costs.",
+            "Visionary entrepreneur and full stack architect who founded StackX with a mission to deliver premium technology at accessible costs.",
         fullBio: [
-            "Kandregula Nuraj Mani Sai is the visionary entrepreneur and full-stack architect who built StackX from the ground up. With a deep passion for building future-focused technology, Nuraj founded the company with a singular mission: to make enterprise-grade software development accessible to every business, regardless of budget.",
+            "Kandregula Nuraj Mani Sai is the visionary entrepreneur and full stack architect who built StackX from the ground up. With a deep passion for building future-focused technology, Nuraj founded the company with a singular mission: to make enterprise-grade software development accessible to every business, regardless of budget.",
             "As Founder & CEO, he leads the company\u2019s strategic direction, key client relationships, and technical innovation roadmap. His hands-on approach ensures that every project delivered under the StackX banner meets the highest standards of quality, performance, and reliability.",
             "Under his leadership, StackX has grown from a small team into a globally trusted technology partner, delivering 150+ successful projects across 8+ countries and earning the trust of 80+ clients worldwide.",
         ],
@@ -28,7 +28,7 @@ const team = [
     {
         id: "a-roshan",
         name: "A. Roshan",
-        role: "Co-Founder",
+        role: "CoFounder",
         photo: "/team/roshan.jpeg",
         isFounder: false,
         shortBio:
@@ -100,7 +100,7 @@ function CompactLayout() {
                 <SectionHeading
                     badge="Our Leadership"
                     title="The Minds Behind StackX"
-                    subtitle="Visionary leaders building world-class technology solutions with precision and purpose."
+                    subtitle="Visionary leaders building world class technology solutions with precision and purpose."
                 />
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">

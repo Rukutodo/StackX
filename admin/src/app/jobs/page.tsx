@@ -11,6 +11,7 @@ import {
   AdminButton,
 } from "@/components/admin/ui";
 import Link from "next/link";
+import { DeleteConfirmModal } from "@/components/admin/DeleteConfirmModal";
 
 const API = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "";
 
@@ -34,7 +35,8 @@ const item = { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } };
 export default function JobsAdminPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; label: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchJobs = useCallback(async () => {
     setLoading(true);
@@ -51,18 +53,21 @@ export default function JobsAdminPage() {
 
   useEffect(() => { fetchJobs(); }, [fetchJobs]);
 
-  const handleDelete = async (id: string) => {
-    if (deleteConfirm !== id) { setDeleteConfirm(id); return; }
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
     try {
-      await fetch(`${API}/api/jobs/${id}`, {
+      await fetch(`${API}/api/jobs/${deleteTarget.id}`, {
         method: "DELETE",
         credentials: "include",
         headers: { Authorization: `Bearer ${localStorage.getItem("stackx_token") || ""}` },
       });
-      setDeleteConfirm(null);
+      setDeleteTarget(null);
       fetchJobs();
     } catch (err) {
       console.error("Delete failed:", err);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -162,9 +167,9 @@ export default function JobsAdminPage() {
                           <HiPencil size={15} />
                         </Link>
                         <button
-                          onClick={(e) => { e.preventDefault(); handleDelete(row._id as string); }}
-                          className={`p-2 rounded-lg transition ${deleteConfirm === row._id ? "bg-red-500/10 text-red-400" : "text-muted hover:text-red-400 hover:bg-red-500/5"}`}
-                          title={deleteConfirm === row._id ? "Click again to confirm" : "Delete"}
+                          onClick={(e) => { e.preventDefault(); setDeleteTarget({ id: row._id as string, label: row.title as string }); }}
+                          className="p-2 rounded-lg transition text-muted hover:text-red-400 hover:bg-red-500/5"
+                          title="Delete"
                         >
                           <HiTrash size={15} />
                         </button>
@@ -178,6 +183,16 @@ export default function JobsAdminPage() {
           </DashboardGlassCard>
         </motion.div>
       </motion.div>
+
+    <DeleteConfirmModal
+      open={!!deleteTarget}
+      title="Delete Job Listing?"
+      itemLabel={deleteTarget?.label}
+      description="This will permanently remove the job listing and all its data. Applicants for this role will also be affected."
+      onConfirm={handleDelete}
+      onCancel={() => setDeleteTarget(null)}
+      loading={deleting}
+    />
     </>
   );
 }

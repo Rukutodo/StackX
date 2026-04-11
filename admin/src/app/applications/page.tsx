@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { HiTrash, HiDownload, HiEye } from "react-icons/hi";
+import { HiTrash, HiDownload } from "react-icons/hi";
 import Link from "next/link";
 import {
   DashboardGlassCard,
@@ -13,6 +13,7 @@ import {
   AdminSelect,
 } from "@/components/admin/ui";
 import { HiDocumentText, HiUserGroup, HiClock, HiCheckCircle } from "react-icons/hi";
+import { DeleteConfirmModal } from "@/components/admin/DeleteConfirmModal";
 
 const API = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "";
 
@@ -34,12 +35,14 @@ interface Application {
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.06 } } };
 const item = { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } };
 
-/* ── Main Page ──────────────────────────────────── */
-
 export default function ApplicationsAdminPage() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; label: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  // ── Position filter ──────────────────────────────────
+  const [positionFilter, setPositionFilter] = useState("all");
 
   const fetchApplications = useCallback(async () => {
     setLoading(true);
@@ -59,6 +62,15 @@ export default function ApplicationsAdminPage() {
 
   useEffect(() => { fetchApplications(); }, [fetchApplications]);
 
+  // Unique positions derived from ALL fetched applications
+  const uniquePositions = Array.from(new Set(applications.map((a) => a.position))).sort();
+
+  // Filtered slice shown in the table
+  const visibleApplications =
+    positionFilter === "all"
+      ? applications
+      : applications.filter((a) => a.position === positionFilter);
+
   const updateStatus = async (id: string, status: string) => {
     try {
       await fetch(`${API}/api/applications/${id}/status`, {
@@ -76,18 +88,21 @@ export default function ApplicationsAdminPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (deleteConfirm !== id) { setDeleteConfirm(id); return; }
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
     try {
-      await fetch(`${API}/api/applications/${id}`, {
+      await fetch(`${API}/api/applications/${deleteTarget.id}`, {
         method: "DELETE",
         credentials: "include",
         headers: { Authorization: `Bearer ${localStorage.getItem("stackx_token") || ""}` },
       });
-      setDeleteConfirm(null);
+      setDeleteTarget(null);
       fetchApplications();
     } catch (err) {
       console.error("Delete failed:", err);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -111,20 +126,44 @@ export default function ApplicationsAdminPage() {
           <DashboardStatCard icon={<HiDocumentText size={20} />} label="Total Applications" value={applications.length} />
           <DashboardStatCard icon={<HiClock size={20} />} label="New / Pending" value={applications.filter((a) => a.status === "new").length} iconBg="bg-cyan-500/10" />
           <DashboardStatCard icon={<HiCheckCircle size={20} />} label="Reviewed" value={applications.filter((a) => a.status === "reviewed").length} iconBg="bg-emerald-500/10" />
-          <DashboardStatCard icon={<HiUserGroup size={20} />} label="Positions Applied" value={new Set(applications.map((a) => a.position)).size} iconBg="bg-amber-500/10" />
+          <DashboardStatCard icon={<HiUserGroup size={20} />} label="Positions Applied" value={uniquePositions.length} iconBg="bg-amber-500/10" />
         </motion.div>
 
         {/* Applications table */}
         <motion.div variants={item}>
           <DashboardGlassCard>
-            <DashboardSectionHeader
-              title="All Applications"
-              subtitle="Career form submissions"
-            />
+            {/* Header row with title + position filter */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+              <DashboardSectionHeader
+                title={
+                  positionFilter === "all"
+                    ? "All Applications"
+                    : `Applications — ${positionFilter}`
+                }
+                subtitle={`${visibleApplications.length} result${visibleApplications.length !== 1 ? "s" : ""}`}
+              />
+
+              {/* Position filter dropdown */}
+              <div className="w-full sm:w-56 shrink-0">
+                <AdminSelect
+                  value={positionFilter}
+                  onChange={(val) => setPositionFilter(val)}
+                  options={[
+                    { label: "All Positions", value: "all" },
+                    ...uniquePositions.map((p) => ({ label: p, value: p })),
+                  ]}
+                />
+              </div>
+            </div>
+
             {loading ? (
               <div className="py-10 text-center text-muted text-sm">Loading...</div>
-            ) : applications.length === 0 ? (
-              <div className="py-10 text-center text-muted text-sm">No applications yet.</div>
+            ) : visibleApplications.length === 0 ? (
+              <div className="py-10 text-center text-muted text-sm">
+                {positionFilter === "all"
+                  ? "No applications yet."
+                  : `No applications for "${positionFilter}" yet.`}
+              </div>
             ) : (
               <DataTable
                 columns={[
@@ -200,9 +239,9 @@ export default function ApplicationsAdminPage() {
                           </a>
                         )}
                         <button
-                          onClick={() => handleDelete(row._id as string)}
-                          className={`p-2 rounded-lg transition ${deleteConfirm === row._id ? "bg-red-500/10 text-red-400" : "text-muted hover:text-red-400 hover:bg-red-500/5"}`}
-                          title={deleteConfirm === row._id ? "Click again to confirm" : "Delete"}
+                          onClick={() => setDeleteTarget({ id: row._id as string, label: row.fullName as string })}
+                          className="p-2 rounded-lg transition text-muted hover:text-red-400 hover:bg-red-500/5"
+                          title="Delete"
                         >
                           <HiTrash size={15} />
                         </button>
@@ -210,12 +249,22 @@ export default function ApplicationsAdminPage() {
                     ),
                   },
                 ]}
-                data={applications as unknown as Record<string, unknown>[]}
+                data={visibleApplications as unknown as Record<string, unknown>[]}
               />
             )}
           </DashboardGlassCard>
         </motion.div>
       </motion.div>
+
+      <DeleteConfirmModal
+        open={!!deleteTarget}
+        title="Delete Application?"
+        itemLabel={deleteTarget?.label}
+        description="This will permanently delete this job application including the resume and all submitted details."
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+        loading={deleting}
+      />
     </>
   );
 }
