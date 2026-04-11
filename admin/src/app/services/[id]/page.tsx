@@ -314,7 +314,7 @@ export default function ServiceEditPage() {
                 title="Sub-services"
                 subtitle="Individual services within this category"
                 action={
-                  <AdminButton variant="outline" size="sm" className="text-xs gap-1" onClick={addItem} type="button">
+                  <AdminButton variant="outline" size="sm" className="text-xs gap-1" onClick={addItem}>
                     <HiPlus size={14} /> Add Item
                   </AdminButton>
                 }
