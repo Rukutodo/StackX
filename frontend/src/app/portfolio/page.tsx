@@ -8,9 +8,12 @@ export const metadata: Metadata = {
     "Explore StackX's portfolio of successful web development, automation, and ad tech projects. See real results from real clients.",
 };
 
+// For Server Components (SSR), use localhost to bypass NAT hairpin issues on cloud VMs
+const SERVER_API = process.env.INTERNAL_API_URL || "http://localhost:4000";
+
 async function getProjects() {
   try {
-    const res = await fetch((process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "/api/portfolio", {
+    const res = await fetch(`${SERVER_API}/api/portfolio`, {
       cache: "no-store",
     });
     if (!res.ok) return [];
@@ -22,7 +25,7 @@ async function getProjects() {
 
 async function getServices() {
   try {
-    const res = await fetch((process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "/api/services", {
+    const res = await fetch(`${SERVER_API}/api/services`, {
       cache: "no-store",
     });
     if (!res.ok) return [];

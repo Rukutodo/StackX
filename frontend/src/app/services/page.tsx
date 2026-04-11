@@ -9,9 +9,12 @@ export const metadata: Metadata = {
 };
 
 // Fetch on the server so the page is SEO-friendly
+// For Server Components (SSR), use localhost to bypass NAT hairpin issues on cloud VMs
+const SERVER_API = process.env.INTERNAL_API_URL || "http://localhost:4000";
+
 async function getServices() {
   try {
-    const res = await fetch((process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "/api/services", {
+    const res = await fetch(`${SERVER_API}/api/services`, {
       cache: "no-store", // always fresh
     });
     if (!res.ok) return [];

@@ -7,7 +7,8 @@ export const metadata: Metadata = {
   description: "Read what our clients say about StackX — real reviews from real projects.",
 };
 
-const API = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "";
+// For Server Components (SSR), use localhost to bypass NAT hairpin issues on cloud VMs
+const SERVER_API = process.env.INTERNAL_API_URL || "http://localhost:4000";
 
 interface Testimonial {
   _id: string;
@@ -22,12 +23,16 @@ interface Testimonial {
 
 async function fetchTestimonials(): Promise<Testimonial[]> {
   try {
-    const res = await fetch(`${API}/api/testimonials`, {
+    const res = await fetch(`${SERVER_API}/api/testimonials`, {
       next: { revalidate: 60 }, // ISR: revalidate every 60s
     });
-    if (!res.ok) return [];
+    if (!res.ok) {
+      console.error("Testimonials fetch gave non-ok status:", res.status);
+      return [];
+    }
     return res.json();
-  } catch {
+  } catch (error) {
+    console.error("Failed to fetch testimonials from backend:", error);
     return [];
   }
 }
