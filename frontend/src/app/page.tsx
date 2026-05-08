@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import {
   SectionHeading,
   GlassCard,
@@ -153,72 +154,250 @@ export default function HomePage() {
   return (
     <>
       {/* ═══ HERO ═══ */}
-      <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
-        {/* Background effects */}
-        <div className="hero-glow bg-primary top-20 -left-40" />
-        <div className="hero-glow bg-accent bottom-20 -right-40" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.08),transparent_70%)]" />
+      <section className="relative pt-24 pb-8 lg:min-h-screen lg:flex lg:items-center lg:pt-20 overflow-hidden" id="hero">
+        {/* ── Layered Background Effects ── */}
+        <div className="hero-grid" />
+        <div className="hero-scan-line" />
+        <div className="hero-glow bg-primary top-10 -left-60 w-[700px] h-[700px]" />
+        <div className="hero-glow bg-accent bottom-10 -right-60 w-[500px] h-[500px]" />
+        <div className="hero-glow bg-primary-deep top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] opacity-[0.07]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(139,92,246,0.12),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.08),transparent_50%)]" />
 
-        {/* Floating shapes */}
-        <div className="absolute top-32 right-[15%] w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/20 to-transparent border border-primary/10 animate-float hidden lg:block" />
-        <div className="absolute bottom-40 left-[10%] w-16 h-16 rounded-full bg-gradient-to-br from-accent/20 to-transparent border border-accent/10 animate-float-reverse hidden lg:block" />
-        <div className="absolute top-60 left-[20%] w-12 h-12 rounded-lg bg-gradient-to-br from-primary-light/10 to-transparent border border-primary-light/10 animate-float hidden lg:block" />
+        {/* ── Floating Particles ── */}
+        {[
+          { w: 4, h: 4, top: '15%', left: '8%', bg: 'bg-primary/40', dur: '7s', delay: '0s' },
+          { w: 3, h: 3, top: '25%', left: '85%', bg: 'bg-accent/50', dur: '5s', delay: '1s' },
+          { w: 5, h: 5, top: '70%', left: '12%', bg: 'bg-primary-light/30', dur: '8s', delay: '2s' },
+          { w: 3, h: 3, top: '80%', left: '75%', bg: 'bg-primary/30', dur: '6s', delay: '0.5s' },
+          { w: 4, h: 4, top: '45%', left: '92%', bg: 'bg-accent/40', dur: '9s', delay: '3s' },
+          { w: 2, h: 2, top: '60%', left: '5%', bg: 'bg-accent/50', dur: '6s', delay: '1.5s' },
+        ].map((p, i) => (
+          <div
+            key={`particle-${i}`}
+            className={`particle ${p.bg} w-${p.w} h-${p.h} hidden sm:block`}
+            style={{
+              top: p.top,
+              left: p.left,
+              width: `${p.w * 4}px`,
+              height: `${p.h * 4}px`,
+              ['--particle-duration' as string]: p.dur,
+              ['--particle-delay' as string]: p.delay,
+            }}
+          />
+        ))}
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-20">
-          <div className="max-w-4xl mx-auto text-center">
+        {/* ── Main Content ── */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full py-10 sm:py-14 lg:py-0">
+          <div className="lg:flex lg:items-center lg:gap-8">
+
+            {/* ═══ TEXT CONTENT ═══ */}
+            <div className="text-left lg:flex-1 lg:max-w-[55%]">
+              {/* Shimmer Badge */}
+              <motion.div
+                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+              >
+                <span className="inline-flex items-center gap-2 px-5 py-2 text-xs font-semibold tracking-wider uppercase rounded-full hero-badge-shimmer text-primary-light border border-primary/25 mb-5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  Powering Digital Growth in Vizag
+                </span>
+              </motion.div>
+
+              {/* ★ MOBILE ORBITAL — floats right beside headline on < lg ★ */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
+                className="float-right lg:hidden w-[150px] h-[150px] sm:w-[170px] sm:h-[170px] ml-3 sm:ml-5 -mt-1 mb-2 relative"
+              >
+                <div className="relative w-full h-full">
+                  {/* Outer ring */}
+                  <div className="absolute inset-0 rounded-full border border-primary/25 animate-[spin_25s_linear_infinite]" />
+                  {/* Middle ring */}
+                  <div className="absolute inset-3 sm:inset-4 rounded-full border border-accent/20 animate-[spin_18s_linear_infinite_reverse]" />
+                  {/* Inner ring */}
+                  <div className="absolute inset-7 sm:inset-9 rounded-full border border-primary/15" />
+
+                  {/* Center logo orb */}
+                  <div className="absolute inset-0 flex items-center justify-center z-10">
+                    <div className="relative">
+                      <div className="absolute -inset-2 rounded-full bg-gradient-to-br from-primary/20 to-accent/15 blur-sm" />
+                      <div className="relative w-16 h-16 sm:w-18 sm:h-18 rounded-full bg-gradient-to-br from-primary via-primary-deep to-accent flex items-center justify-center shadow-xl shadow-primary/30 p-2.5 sm:p-3">
+                        <Image
+                          src="/StackXhero.svg"
+                          alt="StackX"
+                          width={56}
+                          height={56}
+                          className="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Decorative dots */}
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-primary/60" />
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-accent/60" />
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-primary-light/60" />
+                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-accent/60" />
+                </div>
+              </motion.div>
+
+              {/* Headline with rotating words */}
+              <motion.h1
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.1, ease: 'easeOut' }}
+                className="text-[2.2rem] sm:text-5xl md:text-6xl lg:text-[3.75rem] xl:text-[4.25rem] font-heading font-bold leading-none lg:leading-[1.08] tracking-tight"
+                style={{ fontFamily: "var(--font-poppins), sans-serif" }}
+              >
+                We Build, Validate &{" "}
+                <span className="rotating-words">
+                  <span className="rotating-words-inner">
+                    <span>Scale Businesses</span>
+                    <span>Drive Growth</span>
+                    <span>Create Impact</span>
+                    <span>Launch Brands</span>
+                    <span>Scale Businesses</span>
+                    {/* 5th span duplicates 1st for seamless loop */}
+                  </span>
+                </span>
+              </motion.h1>
+
+              {/* Subheading */}
+              <motion.p
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.25 }}
+                className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-xl text-muted max-w-xl leading-relaxed"
+              >
+                From idea to growth , we combine technology, marketing, and real market insight to build what actually works.
+              </motion.p>
+
+              {/* CTA Buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="mt-6 sm:mt-8 flex flex-row items-start gap-3 sm:gap-4"
+              >
+                <Button href="/contact" variant="primary" className="text-sm sm:text-base px-5 sm:px-8 py-3 sm:py-4 animate-pulse-glow">
+                  Get Free Consultation
+                  <HiArrowRight />
+                </Button>
+                <Button href="/portfolio" variant="secondary" className="text-sm sm:text-base px-5 sm:px-8 py-3 sm:py-4">
+                  View Our Work
+                </Button>
+              </motion.div>
+            </div>
+
+            {/* ═══ DESKTOP ORBITAL — shown lg+ in flex column ═══ */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.9, delay: 0.3, ease: 'easeOut' }}
+              className="hidden lg:flex items-center justify-center lg:flex-1"
             >
-              <span className="inline-block px-4 py-1.5 text-xs font-medium tracking-wider uppercase rounded-full bg-primary/10 text-primary-light border border-primary/20 mb-6">
-                🚀 Powering Digital Growth in Vizag
-              </span>
-            </motion.div>
+              <div className="relative w-[400px] h-[400px] xl:w-[440px] xl:h-[440px]">
+                {/* Outer ring */}
+                <div className="absolute inset-0 rounded-full border border-primary/10 animate-[spin_30s_linear_infinite]" />
+                {/* Middle ring */}
+                <div className="absolute inset-8 rounded-full border border-accent/10 animate-[spin_20s_linear_infinite_reverse]" />
+                {/* Inner ring */}
+                <div className="absolute inset-16 rounded-full border border-primary/15" />
+                {/* Innermost glow ring */}
+                <div className="absolute inset-24 rounded-full bg-gradient-to-br from-primary/5 to-accent/5" />
 
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-bold leading-[1.1] tracking-tight"
-              style={{ fontFamily: "var(--font-poppins), sans-serif" }}
-            >
-              We Build, Validate &{" "}
-              <span className="gradient-text">Scale Businesses</span>
-            </motion.h1>
+                {/* Center glowing orb with StackX logo */}
+                <div className="absolute inset-0 flex items-center justify-center z-20">
+                  <div className="relative">
+                    {/* Outer glow ring */}
+                    <div className="absolute -inset-3 rounded-full bg-gradient-to-br from-primary/20 via-accent/10 to-primary/20 blur-md" />
+                    {/* Main orb */}
+                    <div className="relative w-36 h-36 rounded-full bg-gradient-to-br from-primary via-primary-deep to-accent flex items-center justify-center shadow-2xl shadow-primary/40 p-6">
+                      <Image
+                        src="/StackXhero.svg"
+                        alt="StackX"
+                        width={120}
+                        height={120}
+                        className="w-full h-full object-contain drop-shadow-[0_0_12px_rgba(255,255,255,0.4)]"
+                        priority
+                      />
+                    </div>
+                  </div>
+                </div>
 
-            <motion.p
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="mt-6 text-lg sm:text-xl text-muted max-w-2xl mx-auto leading-relaxed"
-            >
-              From idea to growth we combine technology, marketing, and real market insight to build what actually works.
-            </motion.p>
+                {/* Orbiting icons */}
+                {[
+                  { icon: "💻", dur: '12s', color: 'from-primary/20 to-primary/5' },
+                  { icon: "📊", dur: '12s', color: 'from-accent/20 to-accent/5', startDelay: '3s' },
+                  { icon: "🚀", dur: '12s', color: 'from-primary-light/20 to-primary-light/5', startDelay: '6s' },
+                  { icon: "⚡", dur: '12s', color: 'from-accent/20 to-accent/5', startDelay: '9s' },
+                ].map((orb, i) => (
+                  <div
+                    key={`orb-${i}`}
+                    className="orbit-item z-10"
+                    style={{
+                      ['--orbit-duration' as string]: orb.dur,
+                      animationDelay: orb.startDelay || '0s',
+                    }}
+                  >
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${orb.color} border border-white/10 backdrop-blur-sm flex items-center justify-center text-xl shadow-lg`}>
+                      {orb.icon}
+                    </div>
+                  </div>
+                ))}
 
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
-            >
-              <Button href="/contact" variant="primary" className="text-base px-8 py-4 animate-pulse-glow">
-                Get Free Consultation
-                <HiArrowRight />
-              </Button>
-              <Button href="/portfolio" variant="secondary" className="text-base px-8 py-4">
-                View Our Work
-              </Button>
+                {/* Decorative dots on rings */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary/60 shadow-lg shadow-primary/40" />
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-accent/60 shadow-lg shadow-accent/40" />
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary-light/60 shadow-lg shadow-primary-light/40" />
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-accent/60 shadow-lg shadow-accent/40" />
+
+                {/* Floating labels */}
+                <motion.div
+                  animate={{ y: [-5, 5, -5] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                  className="absolute -top-6 -right-6 px-3 py-1.5 rounded-lg bg-surface/80 border border-primary/20 backdrop-blur-sm shadow-xl"
+                >
+                  <span className="text-xs font-medium text-primary-light">Web Dev</span>
+                </motion.div>
+
+                <motion.div
+                  animate={{ y: [5, -5, 5] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+                  className="absolute -bottom-6 -left-6 px-3 py-1.5 rounded-lg bg-surface/80 border border-accent/20 backdrop-blur-sm shadow-xl"
+                >
+                  <span className="text-xs font-medium text-accent">Ad Tech</span>
+                </motion.div>
+
+                <motion.div
+                  animate={{ y: [-3, 7, -3] }}
+                  transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+                  className="absolute top-1/2 -right-14 -translate-y-1/2 px-3 py-1.5 rounded-lg bg-surface/80 border border-primary-light/20 backdrop-blur-sm shadow-xl"
+                >
+                  <span className="text-xs font-medium text-primary-light">Marketing</span>
+                </motion.div>
+
+                <motion.div
+                  animate={{ y: [3, -7, 3] }}
+                  transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+                  className="absolute top-1/3 -left-10 px-3 py-1.5 rounded-lg bg-surface/80 border border-accent/20 backdrop-blur-sm shadow-xl"
+                >
+                  <span className="text-xs font-medium text-accent">Research</span>
+                </motion.div>
+              </div>
             </motion.div>
           </div>
         </div>
 
         {/* Bottom gradient fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background via-background/80 to-transparent" />
       </section>
 
       {/* ═══ STATS ═══ */}
-      <section className="py-20 relative">
+      <section className="py-10 sm:py-16 lg:py-20 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
             {stats.map((stat, i) => (
