@@ -48,7 +48,7 @@ StackX is a premium SaaS agency website designed to showcase the company's servi
 ## ✨ Features
 
 ### Core
-- **8 fully-designed pages** — Home, Services, About, Portfolio, Careers, Testimonials, Contact, and dynamic case studies
+- **10 fully-designed pages** — Home, Services, About, Portfolio, Careers, Testimonials, Contact, dynamic case studies, Privacy Policy, and Terms of Service
 - **Responsive design** — Mobile-first, optimized for 375px to 1280px+ screens
 - **Dark mode** — Glassmorphism UI with deep purple/cyan accents
 
@@ -130,9 +130,13 @@ stackx-website/
 │   │   ├── testimonials/
 │   │   │   ├── layout.tsx         # SEO metadata for /testimonials
 │   │   │   └── page.tsx           # Testimonials — 8-card grid, average rating
-│   │   └── contact/
-│   │       ├── layout.tsx         # SEO metadata for /contact
-│   │       └── page.tsx           # Contact — consultation form, info sidebar
+│   │   ├── contact/
+│   │   │   ├── layout.tsx         # SEO metadata for /contact
+│   │   │   └── page.tsx           # Contact — consultation form, info sidebar
+│   │   ├── privacy-policy/
+│   │   │   └── page.tsx           # Privacy Policy — static legal page with metadata
+│   │   └── terms-of-service/
+│   │       └── page.tsx           # Terms of Service — static legal page with metadata
 │   ├── components/
 │   │   ├── layout/
 │   │   │   ├── Navbar.tsx         # Sticky navbar — backdrop-blur, scroll detection, mobile hamburger menu
@@ -168,6 +172,8 @@ stackx-website/
 | `/careers` | **Careers** | Benefits overview (Remote-First, Growth, Flexible Hours, Competitive Pay) · SSR Job listings fetched from backend API · Full application form with validation and resume upload to backend |
 | `/testimonials` | **Testimonials** | 8 testimonial cards in 3-column grid · Star ratings · Project type badges · Average rating display (4.9/5) |
 | `/contact` | **Contact** | Lead-generation form with service interest, budget range, timeline, reCAPTCHA · Contact info sidebar · 2-hour response time guarantee |
+| `/privacy-policy` | **Privacy Policy** | Full privacy policy with data collection, usage, cookies, and contact sections |
+| `/terms-of-service` | **Terms of Service** | Full terms covering usage, intellectual property, liability, and governing law |
 
 ---
 
@@ -294,19 +300,31 @@ The website interacts with a companion Node.js backend to fetch dynamic content.
 | **Dashboard Stats** | ✅ Real-time data aggregation via Backend API | Connected (fetching live counts + recent activity) |
 | **Contact Form** | Client-side validation + success UI | Add Next.js API route → email service (Resend, SendGrid) or form backend (Formspree) |
 | **reCAPTCHA** | Checkbox placeholder | Integrate Google reCAPTCHA v2/v3 |
-| **Testimonials** | Static data array | Connect to CMS (Sanity, Contentful) or database |
+| **Testimonials** | ✅ Fetched from Backend API / Admin Dashboard | Connected |
 
 ---
 
 ## 📊 SEO
 
-- **Metadata API** — Page-level `<title>` and `<meta description>` on every route via Next.js `metadata` export
-- **OpenGraph tags** — Configured on root layout for social sharing
+### Implemented
+- **Metadata API** — Page-level `<title>` and `<meta description>` on most routes via Next.js `metadata` export and a root title template (`%s | StackX`)
+- **Partial OpenGraph** — `og:title`, `og:description`, `og:type`, and `og:site_name` set on root layout (no `og:image` or `metadataBase` yet)
 - **Semantic HTML5** — `<nav>`, `<main>`, `<section>`, `<footer>` throughout
 - **Single `<h1>`** per page with proper heading hierarchy (h1 → h2 → h3)
-- **Descriptive alt text** and ARIA labels on interactive elements
+- **ARIA labels** on interactive elements
 - **Zero-layout-shift fonts** — `next/font/google` for optimized font loading
 - **Keywords meta** — Relevant keywords defined in root metadata
+
+### Known Gaps
+- **No `robots.txt`** — Search engines receive no crawl directives
+- **No `sitemap.ts`** — Pages must be manually discovered by crawlers
+- **No `metadataBase`** — OpenGraph URLs are relative and break on social shares
+- **No `og:image`** — Social media link previews render blank cards
+- **No Twitter card metadata** — Poor appearance when shared on X/Twitter
+- **No structured data (JSON-LD)** — Missing Organization, LocalBusiness, JobPosting, and Review schemas that enable rich results in Google
+- **`/portfolio/[slug]` is client-rendered** — Search engines cannot read case study titles or descriptions; needs `generateMetadata()` + SSR conversion
+- **Duplicate metadata** — `/services`, `/portfolio`, and `/testimonials` define metadata in both `layout.tsx` and `page.tsx`
+- **No canonical URLs** — Duplicate content risk if the site is reachable at multiple URLs
 
 ---
 
@@ -328,6 +346,8 @@ The website interacts with a companion Node.js backend to fetch dynamic content.
 - **Client logos** — Text-based placeholders in the marquee; replace with actual SVG/PNG logos
 - **Project thumbnails** — Gradient placeholders; replace with real project screenshots
 - **Social links** — Footer social icons link to `#`; update with actual social media URLs
+- **SEO infrastructure incomplete** — `robots.txt`, `sitemap.ts`, `metadataBase`, `og:image`, and JSON-LD structured data are not yet implemented (see SEO section for full list)
+- **Case study pages not indexable** — `/portfolio/[slug]` uses client-side rendering; metadata is not readable by search engine crawlers until converted to SSR with `generateMetadata()`
 
 ---
 
