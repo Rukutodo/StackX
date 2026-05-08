@@ -19,14 +19,17 @@ import {
   HiStar,
   HiCurrencyDollar,
   HiArrowRight,
+  HiLightBulb,
+  HiLocationMarker,
+  HiTrendingUp,
 } from "react-icons/hi";
 import { useState, useEffect, useCallback } from "react";
 
 /* ── Data ─────────────────────────────────────────────── */
 
 const stats = [
-  { end: 20, suffix: "+", label: "Projects Delivered" },
-  { end: 15, suffix: "+", label: "Happy Clients" },
+  { end: 5, suffix: "+", label: "Projects Delivered" },
+  { end: 5, suffix: "+", label: "Happy Clients" },
   { end: 99.9, suffix: "%", label: "Uptime Guaranteed" },
   { end: 40, suffix: "%", label: "Cost Savings" },
 ];
@@ -39,40 +42,46 @@ const services = [
     color: "from-primary to-primary-deep",
   },
   {
-    icon: HiCog,
-    title: "Business Automation",
-    desc: "Streamline operations with intelligent workflow automation, CRM integrations, and custom business process solutions.",
-    color: "from-accent to-accent-dark",
-  },
-  {
     icon: HiChartBar,
     title: "Ad Tech Solutions",
     desc: "Performance driven advertising platforms, analytics dashboards, and programmatic ad tech development.",
+    color: "from-accent to-accent-dark",
+  },
+    {
+    icon: HiCog,
+    title: "Digital Marketing",
+    desc: "Digital marketing, performance campaigns, and analytics systems designed to bring real customers,not just traffic",
     color: "from-primary-light to-accent",
   },
+  {
+  icon: HiLightBulb,
+  title: "Market Research & Insights",
+  desc: "Every product starts with clarity. We research your market, validate your ideas, and shape them around real demand — helping businesses build what truly works, especially in Vizag.",
+  color: "from-accent-dark to-primary",
+},
 ];
 
 const whyItems = [
   {
-    icon: HiShieldCheck,
-    title: "Professionalism",
-    desc: "Enterprise grade code quality with rigorous testing, CI/CD pipelines, and comprehensive documentation.",
-  },
-  {
-    icon: HiLightningBolt,
-    title: "Enthusiasm",
-    desc: "A passionate team that treats your project as our own, going above and beyond to deliver excellence.",
-  },
-  {
-    icon: HiStar,
-    title: "Experience",
-    desc: "150+ successful projects across diverse industries with deep expertise in modern tech stacks.",
-  },
-  {
-    icon: HiCurrencyDollar,
-    title: "Cost Efficiency",
-    desc: "Premium quality at 40% lower costs. We optimize every dollar without compromising on performance.",
-  },
+  icon: HiLocationMarker,
+  title: "Built for Vizag",
+  desc: "We’re local , Which means we deeply understand the audience, behavior, and market dynamics. We build solutions that actually work for Vizag businesses.",
+ },
+ {
+  icon: HiLightningBolt,
+  title: "Enthusiasm",
+  desc: "A passionate team that treats your project as our own, going above and beyond to deliver excellence.",
+},
+ {
+  icon: HiTrendingUp,
+  title: "We Think Beyond Launch",
+  desc: "Launch is just the start. Everything we build is designed to grow, adapt, and scale with your business.",
+ },
+{
+  icon: HiCurrencyDollar,
+  title: "Spend It Right",
+  desc: "Working with us means spending smarter. We focus on clarity, execution, and long-term value  so you don’t end up paying later to fix what should’ve been done right the first time.",
+},
 ];
 
 const testimonials = [
@@ -163,7 +172,7 @@ export default function HomePage() {
               transition={{ duration: 0.5 }}
             >
               <span className="inline-block px-4 py-1.5 text-xs font-medium tracking-wider uppercase rounded-full bg-primary/10 text-primary-light border border-primary/20 mb-6">
-                🚀 Software Development Agency
+                🚀 Powering Digital Growth in Vizag
               </span>
             </motion.div>
 
@@ -174,8 +183,8 @@ export default function HomePage() {
               className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-bold leading-[1.1] tracking-tight"
               style={{ fontFamily: "var(--font-poppins), sans-serif" }}
             >
-              Professional Web Development at{" "}
-              <span className="gradient-text">Unbeatable Costs</span>
+              We Build, Validate &{" "}
+              <span className="gradient-text">Scale Businesses</span>
             </motion.h1>
 
             <motion.p
@@ -184,8 +193,7 @@ export default function HomePage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="mt-6 text-lg sm:text-xl text-muted max-w-2xl mx-auto leading-relaxed"
             >
-              We build high-performance web solutions, automation systems, and ad&nbsp;tech
-              platforms — optimizing costs by up to 40% without compromising quality.
+              From idea to growth we combine technology, marketing, and real market insight to build what actually works.
             </motion.p>
 
             <motion.div
@@ -254,7 +262,7 @@ export default function HomePage() {
           <SectionHeading
             badge="What We Do"
             title="Services That Drive Growth"
-            subtitle="From concept to deployment, we deliver end-to-end solutions that transform your business."
+            subtitle="From concept to launch to growth, everything we do is designed to move your business forward."
           />
 
           <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
@@ -302,7 +310,7 @@ export default function HomePage() {
           <SectionHeading
             badge="Why Choose Us"
             title="Why StackX?"
-            subtitle="We combine technical excellence with cost efficiency to deliver solutions that truly matter."
+            subtitle="We understand how businesses grow in Vizag and build systems that actually work here."
           />
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">

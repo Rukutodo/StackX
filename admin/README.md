@@ -2,7 +2,7 @@
   <img src="public/stackx.svg" alt="StackX Logo" width="260" />
 </p>
 
-<h1 align="center">StackX — Professional Web Development at Unbeatable Costs</h1>
+<h1 align="center">StackX — We build, validate, and scale business</h1>
 
 <p align="center">
   A modern, premium, conversion-focused agency website for <strong>StackX</strong> — a software development company specializing in Web Development, Business Automation, and Advertising Technology solutions.

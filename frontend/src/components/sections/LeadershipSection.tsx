@@ -13,14 +13,13 @@ const team = [
     {
         id: "nuraj-mani-sai",
         name: "Kandregula Nuraj Mani Sai",
-        role: "Founder & CEO",
+        role: "Co-Founder",
         photo: "/team/nuraj.png",
-        isFounder: true,
         shortBio:
             "Visionary entrepreneur and full stack architect who founded StackX with a mission to deliver premium technology at accessible costs.",
         fullBio: [
             "Kandregula Nuraj Mani Sai is the visionary entrepreneur and full stack architect who built StackX from the ground up. With a deep passion for building future-focused technology, Nuraj founded the company with a singular mission: to make enterprise-grade software development accessible to every business, regardless of budget.",
-            "As Founder & CEO, he leads the company\u2019s strategic direction, key client relationships, and technical innovation roadmap. His hands-on approach ensures that every project delivered under the StackX banner meets the highest standards of quality, performance, and reliability.",
+            "He leads the company\u2019s strategic direction, key client relationships, and technical innovation roadmap. His hands-on approach ensures that every project delivered under the StackX banner meets the highest standards of quality, performance, and reliability.",
             "Under his leadership, StackX has grown from a small team into a globally trusted technology partner, delivering 150+ successful projects across 8+ countries and earning the trust of 80+ clients worldwide.",
         ],
         tags: ["Strategic Leadership", "Full-Stack Architecture", "Product Vision"],
@@ -28,8 +27,8 @@ const team = [
     {
         id: "a-roshan",
         name: "A. Roshan",
-        role: "CoFounder",
-        photo: "/team/roshan.jpeg",
+        role: "Co-Founder",
+        photo: "/team/arroshan.jpeg",
         isFounder: false,
         shortBio:
             "Strategic co-founder and business development expert who builds client relationships, forges key partnerships, and drives StackX\u2019s growth engine.",
@@ -44,7 +43,7 @@ const team = [
         id: "venu-gopal",
         name: "Venu Gopal",
         role: "Head of Technology",
-        photo: "/team/venu.jpeg",
+        photo: "/team/venu.png",
         isFounder: false,
         shortBio:
             "Engineering leader with deep expertise in scalable system design, cloud infrastructure, and modern web technologies.",
@@ -98,9 +97,9 @@ function CompactLayout() {
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <SectionHeading
-                    badge="Our Leadership"
-                    title="The Minds Behind StackX"
-                    subtitle="Visionary leaders building world class technology solutions with precision and purpose."
+                    badge="Visionary leadership"
+                    title="The People Behind StackX"
+                    subtitle=" Built by people who understand both technology and the Vizag market,not from the outside, but from within."
                 />
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">

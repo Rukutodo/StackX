@@ -18,7 +18,7 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: {
-    default: "StackX — Professional Web Development at Unbeatable Costs",
+    default: "StackX — We build, validate, and scale business",
     template: "%s | StackX",
   },
   description:
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     apple: "/StackXMINI.svg",
   },
   openGraph: {
-    title: "StackX — Professional Web Development at Unbeatable Costs",
+    title: "StackX — We build, validate, and scale business ",
     description:
       "High-performance web solutions, automation systems, and ad tech platforms at industry-leading prices.",
     type: "website",

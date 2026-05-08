@@ -46,7 +46,7 @@ export default function Footer() {
                         </Link>
                         <p className="text-muted text-sm leading-relaxed mb-6">
                             Professional software development at unbeatable costs.
-                            We build high-performance web solutions, automation systems, and ad tech platforms.
+                             From idea to growth  we combine technology, marketing, and real market insight to build what actually works
                         </p>
                         <div className="flex gap-3">
                             {socials.map((s) => (
