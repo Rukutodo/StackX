@@ -169,7 +169,7 @@ export default function PrivacyPolicyPage() {
               </p>
               <p>
                 <span className="text-gray-500">Phone:</span>{" "}
-                <a href="tel:+919347858844" className="text-purple-400 hover:underline">+91 93478 58844</a>
+                <a href="tel:+919490973391" className="text-purple-400 hover:underline">+91 93478 58844</a>
               </p>
               <p><span className="text-gray-500">Location:</span> Visakhapatnam, India</p>
             </div>

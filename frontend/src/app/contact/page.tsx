@@ -42,8 +42,8 @@ const contactInfo = [
   {
     icon: HiPhone,
     label: "Phone",
-    value: "+91 98765 43210",
-    href: "tel:+919876543210",
+    value: "+91 9490973391",
+    href: "tel:+919490973391",
     color: "from-cyan-500/20 to-blue-500/20",
     border: "border-cyan-500/20",
     iconColor: "text-cyan-400",
@@ -69,10 +69,8 @@ const contactInfo = [
 ];
 
 const socials = [
-  { icon: FaTwitter, label: "Twitter", href: "#" },
-  { icon: FaLinkedinIn, label: "LinkedIn", href: "#" },
-  { icon: FaGithub, label: "GitHub", href: "#" },
-  { icon: FaInstagram, label: "Instagram", href: "#" },
+  { icon: FaLinkedinIn, label: "LinkedIn", href: "https://www.linkedin.com/company/stackxin/" },
+  { icon: FaInstagram, label: "Instagram", href: "https://www.instagram.com/stack.x_" },
 ];
 
 /* ── Custom Select Dropdown ─────────────────────────── */
@@ -529,7 +527,7 @@ export default function ContactPage() {
                           type="tel"
                           value={form.phone}
                           onChange={(v) => setForm((f) => ({ ...f, phone: v }))}
-                          placeholder="+91 98765 43210"
+                          placeholder="+91 9490973391"
                         />
                         <InputField
                           label="Company"

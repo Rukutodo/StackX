@@ -586,9 +586,9 @@ export async function sendContactConfirmation(
   const firstName = name.split(" ")[0];
 
   const mailOptions = {
-    from: `"StackX" <${process.env.CAREERS_EMAIL || "careers@stackx.co.in"}>`,
+    from: `"StackX" <${process.env.CONTACT_EMAIL || "contact@stackx.co.in"}>`,
     to,
-    replyTo: process.env.CAREERS_EMAIL || "careers@stackx.co.in",
+    replyTo: process.env.CONTACT_EMAIL || "contact@stackx.co.in",
     subject: `✅ We got your message – StackX`,
     attachments: [
       {
@@ -1059,10 +1059,10 @@ export async function sendContactConfirmation(
                   stackx.co.in
                 </a>
                 &nbsp;&nbsp;&middot;&nbsp;&nbsp;
-                <a href="mailto:careers@stackx.co.in"
+                <a href="mailto:contact@stackx.co.in"
                   class="col-link"
                   style="color:#0891b2;text-decoration:none;font-weight:700;">
-                  careers@stackx.co.in
+                  contact@stackx.co.in
                 </a>
               </p>
               <p class="col-fsub"
@@ -1097,7 +1097,7 @@ export async function sendContactConfirmation(
 </html>
     `,
 
-    text: `Hey ${firstName}! ✅\n\nThanks for reaching out to StackX!\n\nEnquiry Summary:\n- Name: ${name}\n- Service: ${service}${company ? `\n- Company: ${company}` : ""}\n- Status: Received — We'll Be In Touch\n\nOne of our team members will review your message and respond within 1–2 business days.\n\nWhat happens next:\n1. Message Review — we assign your enquiry to the right person.\n2. We Prepare a Response — a tailored answer for your needs.\n3. You Hear Back! — expect a reply within 1–2 business days.\n\nExplore our services: https://stackx.co.in/services\n\nBest,\nStackX Team\ncareers@stackx.co.in\n© ${year} StackX Technologies`,
+    text: `Hey ${firstName}! ✅\n\nThanks for reaching out to StackX!\n\nEnquiry Summary:\n- Name: ${name}\n- Service: ${service}${company ? `\n- Company: ${company}` : ""}\n- Status: Received — We'll Be In Touch\n\nOne of our team members will review your message and respond within 1–2 business days.\n\nWhat happens next:\n1. Message Review — we assign your enquiry to the right person.\n2. We Prepare a Response — a tailored answer for your needs.\n3. You Hear Back! — expect a reply within 1–2 business days.\n\nExplore our services: https://stackx.co.in/services\n\nBest,\nStackX Team\ncontact@stackx.co.in\n© ${year} StackX Technologies`,
   };
 
   await transporter.sendMail(mailOptions);

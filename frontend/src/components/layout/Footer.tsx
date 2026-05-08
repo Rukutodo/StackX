@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { FaTwitter, FaLinkedinIn, FaGithub, FaInstagram } from "react-icons/fa";
+import { FaLinkedinIn,  FaInstagram } from "react-icons/fa";
 import { HiMail, HiPhone, HiLocationMarker } from "react-icons/hi";
 
 const footerLinks = {
@@ -19,10 +19,9 @@ const footerLinks = {
 };
 
 const socials = [
-    { icon: FaTwitter, href: "#", label: "Twitter" },
-    { icon: FaLinkedinIn, href: "#", label: "LinkedIn" },
-    { icon: FaGithub, href: "#", label: "GitHub" },
-    { icon: FaInstagram, href: "#", label: "Instagram" },
+    { icon: FaLinkedinIn, href: "https://www.instagram.com/stack.x_", label: "LinkedIn" },
+
+    { icon: FaInstagram, href: "https://www.linkedin.com/company/stackxin/", label: "Instagram" },
 ];
 
 export default function Footer() {
@@ -97,7 +96,7 @@ export default function Footer() {
                             </li>
                             <li className="flex items-center gap-3 text-sm text-muted">
                                 <HiPhone className="text-primary-light shrink-0" />
-                                <a href="tel:+919347858844" className="hover:text-primary-light transition-colors">
+                                <a href="tel:+919490973391" className="hover:text-primary-light transition-colors">
                                     +91 93478 58844
                                 </a>
                             </li>

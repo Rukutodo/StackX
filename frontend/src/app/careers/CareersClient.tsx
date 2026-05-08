@@ -579,7 +579,7 @@ export default function CareersClient({ jobs }: { jobs: JobPosting[] }) {
                     <InputField label="Email Address" type="email" value={form.email} onChange={(v) => setForm((f) => ({ ...f, email: v }))}
                       error={errors.email} placeholder="john@example.com" required />
                     <InputField label="Phone Number" type="tel" value={form.phone} onChange={(v) => setForm((f) => ({ ...f, phone: v }))}
-                      error={errors.phone} placeholder="+91 98765 43210" required />
+                      error={errors.phone} placeholder="+91 9490973391" required />
                     <InputField label="Years of Experience" value={form.experience} onChange={(v) => setForm((f) => ({ ...f, experience: v }))}
                       placeholder="e.g. 3 years" />
                   </div>
