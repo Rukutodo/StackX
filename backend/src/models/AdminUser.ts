@@ -24,7 +24,7 @@ adminUserSchema.methods.matchPassword = async function (enteredPassword: string)
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// Pre-save hook to hash password before saving
+// Pre-save hook to hash password before savings
 adminUserSchema.pre("save", async function () {
   if (!this.isModified("password")) {
     return;
