@@ -563,7 +563,7 @@ export async function sendApplicationConfirmation(
 /**
  * Sends a professional thank-you email to someone who submitted the contact form.
  *
- * @param to          - Sender's email address
+ * @param to          - Sender's email addresss
  * @param name        - Sender's full name
  * @param service     - Service they enquired about
  * @param company     - Their company name (optional)
