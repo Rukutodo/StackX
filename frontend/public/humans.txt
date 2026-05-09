@@ -1,0 +1,10 @@
+/* TEAM */
+    Founder: [Your Name/Team Name]
+    Contact: hello@stackx.co.in
+    Location: Visakhapatnam, India
+
+/* SITE */
+    Last update: 2026/05/08
+    Standards: HTML5, CSS3, Semantic HTML
+    Components: Next.js, React, TailwindCSS, Framer Motion
+    Software: VS Code, Neovim

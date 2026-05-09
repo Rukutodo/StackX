@@ -5,6 +5,9 @@ import { TestimonialsClientSection } from "./TestimonialsClient";
 export const metadata: Metadata = {
   title: "Testimonials | StackX",
   description: "Read what our clients say about StackX — real reviews from real projects.",
+  alternates: {
+    canonical: "/testimonials",
+  },
 };
 
 // For Server Components (SSR), use localhost to bypass NAT hairpin issues on cloud VMs
