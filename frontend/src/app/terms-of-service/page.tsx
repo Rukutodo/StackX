@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Terms of Service | StackX",
   description: "Read the terms and conditions governing your use of StackX services.",
+  alternates: {
+    canonical: "/terms-of-service",
+  },
 };
 
 export default function TermsOfServicePage() {

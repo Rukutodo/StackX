@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Privacy Policy | StackX",
   description: "Learn how StackX collects, uses, and protects your personal information.",
+  alternates: {
+    canonical: "/privacy-policy",
+  },
 };
 
 export default function PrivacyPolicyPage() {

@@ -1,0 +1,3 @@
+# StackX Authorized Digital Sellers
+# For more information: https://stackx.co.in/ads.txt
+# No authorized sellers currently defined.

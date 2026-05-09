@@ -1,0 +1,17 @@
+# StackX
+
+StackX is a professional software development agency based in Visakhapatnam, India. We specialize in web development, business automation, and ad tech solutions.
+
+## Core Services
+- **Web Development**: Custom web applications, SaaS platforms, and e-commerce solutions.
+- **Business Automation**: Streamlining operations through custom software and AI integrations.
+- **Ad Tech Solutions**: High-performance advertising platforms and analytics dashboards.
+
+## Contact Information
+- Website: https://stackx.co.in
+- Email: hello@stackx.co.in
+- Phone: +91 93478 58844
+- Location: Visakhapatnam, India
+
+## Technologies
+- React, Next.js, TypeScript, Node.js, TailwindCSS, MongoDB/PostgreSQL.
