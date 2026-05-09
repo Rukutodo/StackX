@@ -19,9 +19,9 @@ const footerLinks = {
 };
 
 const socials = [
-    { icon: FaLinkedinIn, href: "https://www.instagram.com/stack.x_", label: "LinkedIn" },
+    { icon: FaLinkedinIn, href: "https://www.linkedin.com/company/stackxin/", label: "LinkedIn" },
 
-    { icon: FaInstagram, href: "https://www.linkedin.com/company/stackxin/", label: "Instagram" },
+    { icon: FaInstagram, href: "https://www.instagram.com/stack.x_", label: "Instagram" },
 ];
 
 export default function Footer() {

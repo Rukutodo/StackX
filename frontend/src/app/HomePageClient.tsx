@@ -230,6 +230,7 @@ export default function HomePageClient() {
                           alt="StackX"
                           width={56}
                           height={56}
+                          priority
                           className="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
                         />
                       </div>

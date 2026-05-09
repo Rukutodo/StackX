@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { GlassCard, Button } from "@/components/ui";
 import { HiArrowLeft, HiArrowRight, HiCheckCircle, HiChevronLeft, HiChevronRight } from "react-icons/hi";
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import type { PortfolioProject } from "../PortfolioClient";
 
@@ -63,19 +64,25 @@ function ImageCarousel({ images }: { images: string[] }) {
           <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] aspect-video bg-black/20"
             style={{ boxShadow: "0 24px 60px rgba(0,0,0,0.4)" }}>
             <AnimatePresence custom={direction} mode="popLayout" initial={false}>
-              <motion.img
+              <motion.div
                 key={current}
-                src={`${API_BASE}${images[current]}`}
-                alt={`Case study image ${current + 1} of ${total}`}
                 custom={direction}
                 variants={variants}
                 initial="enter"
                 animate="center"
                 exit="exit"
                 transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                className="absolute inset-0 w-full h-full object-cover"
-                draggable={false}
-              />
+                className="absolute inset-0 w-full h-full"
+              >
+                <Image
+                  src={`${API_BASE}${images[current]}`}
+                  alt={`Case study image ${current + 1} of ${total}`}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 800px"
+                  className="object-cover"
+                  draggable={false}
+                />
+              </motion.div>
             </AnimatePresence>
 
             {/* Gradient overlays */}
@@ -138,7 +145,7 @@ function ImageCarousel({ images }: { images: string[] }) {
                       : "border-white/10 opacity-50 hover:opacity-80"
                   }`}
                 >
-                  <img src={`${API_BASE}${url}`} alt={`Thumbnail ${i + 1}`} className="w-full h-full object-cover" />
+                  <Image src={`${API_BASE}${url}`} alt={`Thumbnail ${i + 1}`} fill sizes="80px" className="object-cover" />
                 </button>
               ))}
             </div>
@@ -186,7 +193,7 @@ export default function PortfolioDetailClient({ project }: { project: PortfolioP
           <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
             <div className="w-full aspect-video rounded-2xl bg-gradient-to-br from-surface-light to-surface border border-surface-border flex items-center justify-center relative overflow-hidden">
               {project.image ? (
-                <img src={`${API_BASE}${project.image}`} alt={project.title} className="w-full h-full object-cover" />
+                <Image src={`${API_BASE}${project.image}`} alt={project.title} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
               ) : (
                 <>
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/8 to-accent/8" />

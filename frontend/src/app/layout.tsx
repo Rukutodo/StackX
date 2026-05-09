@@ -34,9 +34,7 @@ export const metadata: Metadata = {
     "cost-effective development",
     "Vizag tech agency",
   ],
-  alternates: {
-    canonical: "/",
-  },
+
   icons: {
     icon: "/StackXMINI.svg",
     shortcut: "/StackXMINI.svg",
@@ -86,79 +84,62 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "Organization",
-              name: "StackX",
-              url: "https://stackx.co.in",
-              logo: "https://stackx.co.in/StackXhero.svg",
-              description: "Professional software development, business automation, and ad tech solutions at unbeatable costs.",
-              address: {
-                "@type": "PostalAddress",
-                addressLocality: "Visakhapatnam",
-                addressRegion: "Andhra Pradesh",
-                addressCountry: "IN",
-              },
-              contactPoint: {
-                "@type": "ContactPoint",
-                telephone: "+91-93478-58844",
-                contactType: "customer service",
-                email: "hello@stackx.co.in",
-              },
-              sameAs: [
-                "https://www.linkedin.com/company/stackxin/",
-                "https://www.instagram.com/stack.x_",
-              ],
-            }),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebSite",
-              url: "https://stackx.co.in",
-              name: "StackX",
-              potentialAction: {
-                "@type": "SearchAction",
-                target: "https://stackx.co.in/portfolio?q={search_term_string}",
-                "query-input": "required name=search_term_string",
-              },
-            }),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "LocalBusiness",
-              name: "StackX",
-              image: "https://stackx.co.in/og-image.png",
-              "@id": "https://stackx.co.in",
-              url: "https://stackx.co.in",
-              telephone: "+919347858844",
-              address: {
-                "@type": "PostalAddress",
-                streetAddress: "Visakhapatnam",
-                addressLocality: "Vizag",
-                addressRegion: "Andhra Pradesh",
-                postalCode: "530001",
-                addressCountry: "IN",
-              },
-              geo: {
-                "@type": "GeoCoordinates",
-                latitude: 17.6868,
-                longitude: 83.2185,
-              },
-              openingHoursSpecification: {
-                "@type": "OpeningHoursSpecification",
-                dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-                opens: "09:00",
-                closes: "18:00",
-              },
-              sameAs: [
-                "https://www.linkedin.com/company/stackxin/",
-                "https://www.instagram.com/stack.x_",
+              "@graph": [
+                {
+                  "@type": "Organization",
+                  "@id": "https://stackx.co.in/#organization",
+                  name: "StackX",
+                  url: "https://stackx.co.in",
+                  logo: {
+                    "@type": "ImageObject",
+                    url: "https://stackx.co.in/StackXhero.svg",
+                  },
+                  image: "https://stackx.co.in/og-image.png",
+                  description: "Professional software development, business automation, and ad tech solutions at unbeatable costs.",
+                  telephone: "+91-93478-58844",
+                  email: "hello@stackx.co.in",
+                  address: {
+                    "@type": "PostalAddress",
+                    streetAddress: "Visakhapatnam",
+                    addressLocality: "Visakhapatnam",
+                    addressRegion: "Andhra Pradesh",
+                    postalCode: "530001",
+                    addressCountry: "IN",
+                  },
+                  geo: {
+                    "@type": "GeoCoordinates",
+                    latitude: 17.6868,
+                    longitude: 83.2185,
+                  },
+                  openingHoursSpecification: {
+                    "@type": "OpeningHoursSpecification",
+                    dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                    opens: "09:00",
+                    closes: "18:00",
+                  },
+                  contactPoint: {
+                    "@type": "ContactPoint",
+                    telephone: "+91-93478-58844",
+                    contactType: "customer service",
+                    email: "hello@stackx.co.in",
+                  },
+                  sameAs: [
+                    "https://www.linkedin.com/company/stackxin/",
+                    "https://www.instagram.com/stack.x_",
+                  ],
+                },
+                {
+                  "@type": "WebSite",
+                  "@id": "https://stackx.co.in/#website",
+                  url: "https://stackx.co.in",
+                  name: "StackX",
+                  publisher: { "@id": "https://stackx.co.in/#organization" },
+                  potentialAction: {
+                    "@type": "SearchAction",
+                    target: "https://stackx.co.in/portfolio?q={search_term_string}",
+                    "query-input": "required name=search_term_string",
+                  },
+                },
               ],
             }),
           }}

@@ -5,6 +5,7 @@ import { SectionHeading, GlassCard, Button } from "@/components/ui";
 import { HiArrowRight } from "react-icons/hi";
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 /* ── Types ───────────────────────────────────────── */
 
@@ -114,10 +115,12 @@ export default function PortfolioClient({ projects, categories }: { projects: Po
                 {/* Thumbnail */}
                 <div className="w-full h-44 rounded-lg bg-gradient-to-br from-surface-light to-surface mb-6 flex items-center justify-center overflow-hidden relative">
                   {project.image ? (
-                    <img
+                    <Image
                       src={`${API_BASE}${project.image}`}
                       alt={project.title}
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover"
                     />
                   ) : (
                     <>

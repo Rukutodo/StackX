@@ -1,0 +1,70 @@
+StackX Services Page Architecture - Detailed Explanation
+
+The "Services" section of StackX is a fully dynamic, full-stack feature. It is built using a modern decoupled architecture: an Express/MongoDB backend serving a Next.js public frontend (optimized for SEO and performance) and a Next.js admin frontend (for content management).
+
+Here is a detailed breakdown of how all three pieces work together.
+
+=======================================================
+1. THE BACKEND (Node.js, Express, MongoDB)
+=======================================================
+The backend is responsible for defining the data structure, securely storing it in the database, and exposing APIs to both the public site and the admin panel.
+
+A. Database Model (backend/src/models/ServiceCategory.ts)
+-------------------------------------------------------
+The MongoDB schema uses Mongoose and defines a "ServiceCategory".
+Each category includes:
+- Basic info: `slug` (unique identifier), `title`, `tagline`, `pricing` (e.g., "Starting from $3,000").
+- Visuals: `icon` (stored as a string name, e.g., "HiCode", which the frontend maps to an actual React icon).
+- Details: `techStack` (array of strings) and `items` (array of sub-services with a title and description, which power the accordion UI).
+- `caseStudy`: Optional link to a related portfolio project.
+- `status`: Either "active" or "draft".
+- `order`: To control the display sequence.
+
+B. API Routes (backend/src/routes/services.ts)
+-------------------------------------------------------
+The backend exposes a REST API:
+- GET `/api/services`: Publicly accessible. By default, it returns only "active" services sorted by their `order`. If the admin panel requests it (using `?all=true`), it returns both active and draft services.
+- POST `/api/services`: Protected route (requires admin authentication token) to create a new service.
+- PUT `/api/services/:id`: Protected route to update an existing service. It includes validation to prevent two services from having the same slug.
+- DELETE `/api/services/:id`: Protected route to permanently delete a service.
+
+=======================================================
+2. THE PUBLIC FRONTEND (Next.js App Router)
+=======================================================
+The public frontend is designed for maximum SEO, high performance (Core Web Vitals), and excellent user experience. It splits the workload between the server and the browser.
+
+A. Server Component (frontend/src/app/services/page.tsx)
+-------------------------------------------------------
+- SEO First: It exports a `metadata` object containing the title, description, and canonical URL. Because it's a Server Component, search engines see this metadata instantly.
+- Data Fetching: It fetches the services data securely from the backend using the internal server-to-server URL (`http://localhost:4000/api/services`).
+- Incremental Static Regeneration (ISR): It uses `next: { revalidate: 3600 }`. This tells Next.js to cache the HTML page for 1 hour. When a user visits, they get an instantly loading static page. In the background, Next.js refreshes the data every hour if changes occurred.
+
+B. Client Component (frontend/src/app/services/ServicesClient.tsx)
+-------------------------------------------------------
+- Interactivity: It uses `"use client"` so it can run JavaScript in the browser.
+- Animations: It uses `framer-motion` for scroll animations (items sliding up as you scroll down) and accordion open/close animations.
+- Dynamic Icons & Colors: It uses an `ICON_MAP` dictionary to map the string icon name from the database (e.g., "HiGlobe") to a real React component from `react-icons/hi`. It also applies custom CSS gradients based on the category slug (e.g., Web Development gets a purple gradient, Automation gets a cyan gradient).
+
+=======================================================
+3. THE ADMIN FRONTEND (Next.js App Router)
+=======================================================
+The admin panel is a separate frontend application restricted to authorized users. It allows the team to manage services without touching code.
+
+A. Admin Interface (admin/src/app/services/page.tsx)
+-------------------------------------------------------
+- Client-Side Fetching: Unlike the public site, the admin panel fetches data directly from the browser using the public API URL (`NEXT_PUBLIC_API_URL`) and passes `?all=true` so the admin can see and manage "draft" services before publishing them.
+- User Interface: It displays all services in a clean, glassmorphic card layout. It shows the status badge (Active/Draft), the pricing, and allows the admin to expand a row to preview the sub-services (accordion items) and tech stack.
+- Actions: 
+  - Clicking "Add Service" takes the user to `/services/new`.
+  - Clicking a service title takes the user to the edit page `/services/[id]`.
+  - Clicking the Delete (trash icon) opens a confirmation modal. If confirmed, it sends a DELETE request to the protected backend API and instantly refreshes the UI.
+
+=======================================================
+SUMMARY WORKFLOW
+=======================================================
+1. The admin logs into the Admin Panel, goes to the Services tab, and creates a new service (e.g., "Mobile App Development"). They fill out the title, pricing, accordion sub-items, and mark it as "active".
+2. The Admin Panel sends a secure POST request to the Node.js backend.
+3. The Node.js backend validates the data, checks for slug conflicts, and saves the document to MongoDB.
+4. On the public site, the Next.js server eventually revalidates the cache (or on the next build) and fetches the updated list of active services via the GET route.
+5. A user (or Googlebot) visits `stackx.co.in/services`. Next.js serves the pre-rendered, SEO-optimized HTML page instantly.
+6. The user's browser hydrates the page, rendering the mapped React Icons and enabling the Framer Motion animations and accordion clicks.

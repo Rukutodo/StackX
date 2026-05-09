@@ -131,18 +131,20 @@ export default async function CaseStudyPage({ params }: { params: Promise<{ slug
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "Product",
+            "@type": "CreativeWork",
             name: project.title,
             description: project.description,
-            brand: {
-              "@type": "Brand",
+            url: `https://stackx.co.in/portfolio/${slug}`,
+            image: project.image,
+            author: {
+              "@type": "Organization",
+              "@id": "https://stackx.co.in/#organization",
               name: "StackX",
             },
-            offers: {
-              "@type": "Offer",
-              url: `https://stackx.co.in/portfolio/${slug}`,
-              priceCurrency: "USD",
-              availability: "https://schema.org/InStock",
+            publisher: {
+              "@type": "Organization",
+              "@id": "https://stackx.co.in/#organization",
+              name: "StackX",
             },
           }),
         }}
