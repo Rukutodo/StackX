@@ -40,8 +40,8 @@ const contactInfo = [
   {
     icon: HiPhone,
     label: "Phone",
-    value: "+91 93478 58844",
-    href: "tel:+919347858844",
+    value: "+91 94909 73391",
+    href: "tel:+919490973391",
     color: "from-cyan-500/20 to-blue-500/20",
     border: "border-cyan-500/20",
     iconColor: "text-cyan-400",
@@ -521,7 +521,7 @@ export default function ContactContent() {
                           type="tel"
                           value={form.phone}
                           onChange={(v) => setForm((f) => ({ ...f, phone: v }))}
-                          placeholder="+91 93478 58844"
+                          placeholder="+91 9490973391"
                         />
                         <InputField
                           label="Company"

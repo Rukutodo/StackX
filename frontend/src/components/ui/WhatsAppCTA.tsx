@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaWhatsapp } from "react-icons/fa";
 
-const PHONE = "919347858844";
+const PHONE = "919490973391";
 const MESSAGE = encodeURIComponent(
   "Hi StackX! I'm interested in your services. Can we discuss my project?"
 );

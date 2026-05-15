@@ -10,7 +10,7 @@ StackX is a professional software development agency based in Visakhapatnam, Ind
 ## Contact Information
 - Website: https://stackx.co.in
 - Email: hello@stackx.co.in
-- Phone: +91 93478 58844
+- Phone: +91 9490973391
 - Location: Visakhapatnam, India
 
 ## Technologies

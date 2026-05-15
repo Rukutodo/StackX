@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { FaLinkedinIn,  FaInstagram } from "react-icons/fa";
+import { FaLinkedinIn, FaInstagram } from "react-icons/fa";
 import { HiMail, HiPhone, HiLocationMarker } from "react-icons/hi";
 
 const footerLinks = {
@@ -45,7 +45,7 @@ export default function Footer() {
                         </Link>
                         <p className="text-muted text-sm leading-relaxed mb-6">
                             Professional software development at unbeatable costs.
-                             From idea to growth  we combine technology, marketing, and real market insight to build what actually works
+                            From idea to growth  we combine technology, marketing, and real market insight to build what actually works
                         </p>
                         <div className="flex gap-3">
                             {socials.map((s) => (
@@ -97,7 +97,7 @@ export default function Footer() {
                             <li className="flex items-center gap-3 text-sm text-muted">
                                 <HiPhone className="text-primary-light shrink-0" />
                                 <a href="tel:+919490973391" className="hover:text-primary-light transition-colors">
-                                    +91 93478 58844
+                                    +91 94909 73391
                                 </a>
                             </li>
                             <li className="flex items-start gap-3 text-sm text-muted">
