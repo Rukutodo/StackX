@@ -19,10 +19,28 @@ router.get("/", async (req, res) => {
   }
 });
 
+// ─── GET /api/services/slug/:slug ──────────────────────────
+// Fetch a single service by its slug, populating featured projects and testimonials
+router.get("/slug/:slug", async (req, res) => {
+  try {
+    const category = await ServiceCategory.findOne({ slug: req.params.slug })
+      .populate("featuredProjects")
+      .populate("testimonials");
+    
+    if (!category) return res.status(404).json({ message: "Service not found" });
+    res.json(category);
+  } catch (error) {
+    console.error("GET /api/services/slug/:slug error:", error);
+    res.status(500).json({ message: "Failed to fetch service" });
+  }
+});
+
 // ─── GET /api/services/:id ─────────────────────────────────
 router.get("/:id", async (req, res) => {
   try {
-    const category = await ServiceCategory.findById(req.params.id);
+    const category = await ServiceCategory.findById(req.params.id)
+      .populate("featuredProjects")
+      .populate("testimonials");
     if (!category) return res.status(404).json({ message: "Service not found" });
     res.json(category);
   } catch (error) {
@@ -34,7 +52,10 @@ router.get("/:id", async (req, res) => {
 // Protected: admin only
 router.post("/", protect, async (req, res) => {
   try {
-    const { slug, title, tagline, pricing, techStack, items, caseStudy, status, order } = req.body;
+    const { 
+      slug, title, tagline, pricing, techStack, items, 
+      caseStudy, status, order, featuredProjects, testimonials 
+    } = req.body;
 
     if (!slug || !title || !tagline || !pricing) {
       return res.status(400).json({ message: "slug, title, tagline, and pricing are required" });
@@ -52,6 +73,8 @@ router.post("/", protect, async (req, res) => {
       caseStudy: caseStudy || null,
       status: status || "active",
       order: order ?? 0,
+      featuredProjects: featuredProjects || [],
+      testimonials: testimonials || [],
     });
 
     await category.save();
@@ -66,7 +89,10 @@ router.post("/", protect, async (req, res) => {
 // Protected: admin only
 router.put("/:id", protect, async (req, res) => {
   try {
-    const { slug, title, tagline, pricing, techStack, items, caseStudy, status, order } = req.body;
+    const { 
+      slug, title, tagline, pricing, techStack, items, 
+      caseStudy, status, order, featuredProjects, testimonials 
+    } = req.body;
 
     // If slug changed, check it doesn't conflict with another doc
     if (slug) {
@@ -78,7 +104,10 @@ router.put("/:id", protect, async (req, res) => {
 
     const updated = await ServiceCategory.findByIdAndUpdate(
       req.params.id,
-      { slug, title, tagline, pricing, techStack, items, caseStudy, status, order },
+      { 
+        slug, title, tagline, pricing, techStack, items, 
+        caseStudy, status, order, featuredProjects, testimonials 
+      },
       { new: true, runValidators: true }
     );
 

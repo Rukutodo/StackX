@@ -6,6 +6,7 @@ import { PortfolioProject } from "./models/PortfolioProject";
 import { JobPosting } from "./models/JobPosting";
 import { JobApplication } from "./models/JobApplication";
 import { Message } from "./models/Message";
+import { Testimonial } from "./models/Testimonial";
 
 dotenv.config();
 
@@ -128,21 +129,6 @@ const seedServices = async () => {
   console.log("✅ Service categories seeded (3 categories, 4 items each)!");
 };
 
-const runSeed = async () => {
-  try {
-    await connectDB();
-    await seedAdmin();
-    await seedServices();
-    await seedPortfolio();
-    await seedJobs();
-    await seedMessages();
-    process.exit(0);
-  } catch (error: any) {
-    console.error("❌ Seeding failed:", error.message);
-    process.exit(1);
-  }
-};
-
 const seedPortfolio = async () => {
   const count = await PortfolioProject.countDocuments();
   if (count > 0) {
@@ -249,8 +235,6 @@ const seedPortfolio = async () => {
   await PortfolioProject.insertMany(projects);
   console.log("✅ Portfolio projects seeded (6 projects, 1 with case study)!");
 };
-
-runSeed();
 
 const seedJobs = async () => {
   const count = await JobPosting.countDocuments();
@@ -444,3 +428,75 @@ const seedMessages = async () => {
   await Message.insertMany(msgs);
   console.log("✅ Messages seeded (5 sample messages)!");
 };
+
+const runSeed = async () => {
+  try {
+    await connectDB();
+    await seedAdmin();
+    await seedServices();
+    await seedPortfolio();
+    await seedJobs();
+    await seedMessages();
+    await seedTestimonials();
+
+    // Link some data to Web Development service for testing
+    const webDev = await ServiceCategory.findOne({ slug: "web-development" });
+    if (webDev) {
+      const projects = await PortfolioProject.find({ category: "Web Development" }).limit(3);
+      const testimonials = await Testimonial.find().limit(3);
+      
+      webDev.featuredProjects = projects.map(p => p._id);
+      webDev.testimonials = testimonials.map(t => t._id);
+      await webDev.save();
+      console.log("✅ Linked featured projects and testimonials to Web Development service!");
+    }
+
+    process.exit(0);
+  } catch (error: any) {
+    console.error("❌ Seeding failed:", error.message);
+    process.exit(1);
+  }
+};
+
+const seedTestimonials = async () => {
+  const count = await Testimonial.countDocuments();
+  if (count > 0) {
+    console.log("⚠️  Testimonials already seeded. Skipping.");
+    return;
+  }
+
+  const testimonials = [
+    {
+      name: "Sarah Jenkins",
+      company: "TechFlow",
+      role: "CTO",
+      feedback: "StackX transformed our outdated monolith into a lightning-fast modern web app. Their engineering rigor is unmatched.",
+      rating: 5,
+      projectType: "Web Development",
+      status: "active",
+    },
+    {
+      name: "Marcus Chen",
+      company: "Elevate SaaS",
+      role: "Founder",
+      feedback: "The best development agency we've partnered with. Flawless execution and incredible communication throughout.",
+      rating: 5,
+      projectType: "SaaS",
+      status: "active",
+    },
+    {
+      name: "Emma Watson",
+      company: "Nova",
+      role: "Marketing Dir",
+      feedback: "Conversion rates doubled in the first month post-launch purely thanks to their UX optimizations.",
+      rating: 5,
+      projectType: "UX Design",
+      status: "active",
+    },
+  ];
+
+  await Testimonial.insertMany(testimonials);
+  console.log("✅ Testimonials seeded (3 samples)!");
+};
+
+runSeed();

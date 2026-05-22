@@ -132,12 +132,14 @@ export default function ServicesClient({ categories }: { categories: ServiceCate
                       <Icon className="w-7 h-7 text-white" />
                     </div>
                     <div>
-                      <h3
-                        className="text-2xl font-heading font-bold"
-                        style={{ fontFamily: "var(--font-poppins), sans-serif" }}
-                      >
-                        {cat.title}
-                      </h3>
+                      <Link href={`/services/${cat.slug}`} className="hover:text-primary-light transition-colors">
+                        <h3
+                          className="text-2xl font-heading font-bold"
+                          style={{ fontFamily: "var(--font-poppins), sans-serif" }}
+                        >
+                          {cat.title}
+                        </h3>
+                      </Link>
                       <p className="text-sm text-muted">{cat.tagline}</p>
                     </div>
                   </div>
@@ -168,9 +170,14 @@ export default function ServicesClient({ categories }: { categories: ServiceCate
 
                 {/* Footer */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-surface-border">
-                  <Button href="/contact" variant="primary">
-                    Get a Quote <HiArrowRight />
-                  </Button>
+                  <div className="flex items-center gap-3">
+                    <Button href="/contact" variant="primary">
+                      Get a Quote <HiArrowRight />
+                    </Button>
+                    <Button href={`/services/${cat.slug}`} variant="secondary">
+                      Learn More
+                    </Button>
+                  </div>
                   {cat.caseStudy && (
                     <a
                       href={cat.caseStudy.href}

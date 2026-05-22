@@ -38,6 +38,18 @@ const serviceCategorySchema = new mongoose.Schema(
       default: "active",
     },
     order: { type: Number, default: 0 },
+    featuredProjects: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "PortfolioProject",
+      },
+    ],
+    testimonials: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Testimonial",
+      },
+    ],
   },
   { timestamps: true }
 );
