@@ -20,7 +20,7 @@ import { useState, FormEvent, useRef, useEffect } from "react";
 
 const API = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "";
 
-/* ── Types ─────────────────────────────────────── */
+/* ── Typess ─────────────────────────────────────── */
 
 export interface JobPosting {
   _id: string;
