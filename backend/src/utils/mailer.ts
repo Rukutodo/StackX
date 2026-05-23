@@ -14,7 +14,7 @@ export async function sendApplicationConfirmation(
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: process.env.GMAIL_USER || "nurajkandregula@gmail.com",
+      user: process.env.GMAIL_USER || "stackx.noreply@gmail.com",
       pass: process.env.GMAIL_APP_PASS,
     },
   });
@@ -577,7 +577,7 @@ export async function sendContactConfirmation(
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: process.env.GMAIL_USER || "nurajkandregula@gmail.com",
+      user: process.env.GMAIL_USER || "stackx.noreply@gmail.com",
       pass: process.env.GMAIL_APP_PASS,
     },
   });
