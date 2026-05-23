@@ -46,6 +46,9 @@ export default function ServicesAdminPage() {
     try {
       await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/api/services/${deleteTarget.id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("stackx_token") || ""}`,
+        },
         credentials: "include",
       });
       setDeleteTarget(null);

@@ -75,7 +75,10 @@ export default function ServiceCategoryModal({ initial, onClose, onSaved }: Prop
         : (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "/api/services";
       const res = await fetch(url, {
         method: isEdit ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("stackx_token") || ""}`
+        },
         credentials: "include",
         body: JSON.stringify(payload),
       });
