@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { SectionHeading, GlassCard, Button } from "@/components/ui";
 import {
   HiCode, HiCog, HiChartBar, HiChevronDown, HiArrowRight,

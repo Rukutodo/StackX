@@ -34,6 +34,8 @@ export interface ServiceCategory {
   caseStudy: CaseStudy | null;
   status: "active" | "draft";
   order: number;
+  featuredProjects: string[];
+  testimonials: string[];
 }
 
 /* ── All available icons (name → component) ── */

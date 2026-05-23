@@ -12,22 +12,9 @@ import {
   AdminButton,
 } from "@/components/admin/ui";
 import { DeleteConfirmModal } from "@/components/admin/DeleteConfirmModal";
+import type { Testimonial } from "@/types/testimonials";
 
 const API = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "";
-
-interface Testimonial {
-  _id: string;
-  name: string;
-  company: string;
-  role: string;
-  feedback: string;
-  rating: number;
-  projectType: string;
-  status: "active" | "pending" | "archived";
-  order: number;
-  portfolioProject: { id: string; slug: string; title: string } | null;
-  createdAt: string;
-}
 
 interface PortfolioItem {
   _id: string;

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, type FormEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { HiArrowLeft, HiPlus, HiTrash, HiCheckCircle, HiExclamationCircle } from "react-icons/hi";
+import { HiArrowLeft, HiPlus, HiTrash, HiCheckCircle, HiExclamationCircle, HiStar } from "react-icons/hi";
 import {
   DashboardGlassCard,
   DashboardSectionHeader,
@@ -11,9 +11,11 @@ import {
 } from "@/components/admin/ui";
 import type { ServiceCategory } from "@/types/services";
 import { ICON_MAP } from "@/types/services";
+import type { Testimonial } from "@/types/testimonials";
+import type { PortfolioProject } from "@/types/portfolio";
 
 const PORTFOLIO_API = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "/api/portfolio";
-
+const TESTIMONIALS_API = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "/api/testimonials";
 const API = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "/api/services";
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.06 } } };
@@ -30,6 +32,8 @@ const EMPTY_FORM = {
   caseStudy: null as { title: string; href: string } | null,
   status: "active",
   order: 0,
+  featuredProjects: [] as string[],
+  testimonials: [] as string[],
 };
 
 export default function ServiceEditPage() {
@@ -47,7 +51,9 @@ export default function ServiceEditPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [removeConfirm, setRemoveConfirm] = useState<number | null>(null);
-  const [portfolioProjects, setPortfolioProjects] = useState<{ _id: string; title: string; slug: string }[]>([]);
+  
+  const [portfolioProjects, setPortfolioProjects] = useState<PortfolioProject[]>([]);
+  const [allTestimonials, setAllTestimonials] = useState<Testimonial[]>([]);
 
   /* ── Fetch existing service ── */
   const fetchService = useCallback(async () => {
@@ -68,6 +74,8 @@ export default function ServiceEditPage() {
           caseStudy: found.caseStudy,
           status: found.status,
           order: found.order,
+          featuredProjects: found.featuredProjects || [],
+          testimonials: found.testimonials || [],
         });
         setTechStackInput(found.techStack.join(", "));
         setHasCaseStudy(!!found.caseStudy);
@@ -86,14 +94,18 @@ export default function ServiceEditPage() {
     fetchService();
   }, [fetchService]);
 
-  // Fetch portfolio projects that have case studies
+  // Fetch projects and testimonials
   useEffect(() => {
+    // Projects
     fetch(`${PORTFOLIO_API}?all=true`)
       .then((r) => r.json())
-      .then((data: any[]) => {
-        const withCS = data.filter((p) => p.caseStudy !== null && p.caseStudy !== undefined);
-        setPortfolioProjects(withCS.map((p) => ({ _id: p._id, title: p.title, slug: p.slug })));
-      })
+      .then((data: PortfolioProject[]) => setPortfolioProjects(data))
+      .catch(() => {});
+
+    // Testimonials
+    fetch(`${TESTIMONIALS_API}?all=true`)
+      .then((r) => r.json())
+      .then((data: Testimonial[]) => setAllTestimonials(data))
       .catch(() => {});
   }, []);
 
@@ -128,6 +140,26 @@ export default function ServiceEditPage() {
       items[i] = { ...items[i], [key]: val };
       return { ...f, items };
     });
+
+  const toggleFeaturedProject = (id: string) => {
+    setForm(f => {
+      const current = f.featuredProjects || [];
+      const updated = current.includes(id) 
+        ? current.filter(pid => pid !== id)
+        : [...current, id];
+      return { ...f, featuredProjects: updated };
+    });
+  };
+
+  const toggleTestimonial = (id: string) => {
+    setForm(f => {
+      const current = f.testimonials || [];
+      const updated = current.includes(id) 
+        ? current.filter(tid => tid !== id)
+        : [...current, id];
+      return { ...f, testimonials: updated };
+    });
+  };
 
   /* ── Submit ── */
   const handleSubmit = async (e: FormEvent) => {
@@ -404,6 +436,75 @@ export default function ServiceEditPage() {
               )}
             </DashboardGlassCard>
 
+            {/* Featured Projects Selection */}
+            <DashboardGlassCard>
+              <DashboardSectionHeader title="Featured Work" subtitle="Select projects to showcase on this service page" />
+              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                {portfolioProjects.map(proj => {
+                  const isSelected = (form.featuredProjects || []).includes(proj._id);
+                  return (
+                    <button
+                      key={proj._id}
+                      type="button"
+                      onClick={() => toggleFeaturedProject(proj._id)}
+                      className="flex items-start gap-3 p-3 rounded-xl border text-left transition-all group"
+                      style={{
+                        background: isSelected ? "rgba(139,92,246,0.1)" : "rgba(255,255,255,0.02)",
+                        borderColor: isSelected ? "rgba(139,92,246,0.3)" : "rgba(255,255,255,0.06)",
+                      }}
+                    >
+                      <div className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-all ${
+                        isSelected ? "bg-primary border-primary text-white" : "border-white/20 group-hover:border-primary/50"
+                      }`}>
+                        {isSelected && <HiCheckCircle size={12} />}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-white truncate">{proj.title}</p>
+                        <p className="text-xs text-muted truncate">{proj.category}</p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </DashboardGlassCard>
+
+            {/* Testimonials Selection */}
+            <DashboardGlassCard>
+              <DashboardSectionHeader title="Client Success Stories" subtitle="Select testimonials to display" />
+              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                {allTestimonials.map(t => {
+                  const isSelected = (form.testimonials || []).includes(t._id);
+                  return (
+                    <button
+                      key={t._id}
+                      type="button"
+                      onClick={() => toggleTestimonial(t._id)}
+                      className="flex items-start gap-3 p-3 rounded-xl border text-left transition-all group"
+                      style={{
+                        background: isSelected ? "rgba(139,92,246,0.1)" : "rgba(255,255,255,0.02)",
+                        borderColor: isSelected ? "rgba(139,92,246,0.3)" : "rgba(255,255,255,0.06)",
+                      }}
+                    >
+                      <div className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-all ${
+                        isSelected ? "bg-primary border-primary text-white" : "border-white/20 group-hover:border-primary/50"
+                      }`}>
+                        {isSelected && <HiCheckCircle size={12} />}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1 mb-1">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                             <HiStar key={i} size={10} className={i < t.rating ? "text-amber-400" : "text-gray-700"} />
+                          ))}
+                        </div>
+                        <p className="text-sm font-medium text-white truncate">{t.name}</p>
+                        <p className="text-xs text-muted truncate">{t.company}</p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </DashboardGlassCard>
+
             {/* Case Study */}
             <DashboardGlassCard>
               <DashboardSectionHeader title="Case Study" subtitle="Link to a portfolio case study" />
@@ -426,7 +527,7 @@ export default function ServiceEditPage() {
 
                 {hasCaseStudy && (
                   <div className="space-y-3">
-                    {portfolioProjects.length > 0 ? (
+                    {portfolioProjects.filter(p => p.caseStudy).length > 0 ? (
                       <div>
                         <label className="block text-xs text-muted mb-1.5 font-medium">
                           Pick a Portfolio Project
@@ -444,7 +545,7 @@ export default function ServiceEditPage() {
                           }}
                         >
                           <option value="">— Select a project —</option>
-                          {portfolioProjects.map((p) => (
+                          {portfolioProjects.filter(p => p.caseStudy).map((p) => (
                             <option key={p._id} value={p.slug}>{p.title}</option>
                           ))}
                         </select>
