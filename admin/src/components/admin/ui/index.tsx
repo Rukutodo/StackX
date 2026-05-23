@@ -234,6 +234,9 @@ interface AdminButtonProps {
   size?: "sm" | "md";
   onClick?: () => void;
   className?: string;
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
+  title?: string;
 }
 
 const adminBtnVariants: Record<string, string> = {
@@ -253,12 +256,18 @@ export function AdminButton({
   size = "md",
   onClick,
   className = "",
+  type = "button",
+  disabled = false,
+  title,
 }: AdminButtonProps) {
   const sizeClass = size === "sm" ? "px-3 py-1.5 text-xs" : "px-5 py-2.5 text-sm";
   return (
     <button
+      type={type}
       onClick={onClick}
-      className={`inline-flex items-center justify-center gap-2 font-medium rounded-xl transition-all duration-200 cursor-pointer ${sizeClass} ${adminBtnVariants[variant]} ${className}`}
+      disabled={disabled}
+      title={title}
+      className={`inline-flex items-center justify-center gap-2 font-medium rounded-xl transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${sizeClass} ${adminBtnVariants[variant]} ${className}`}
     >
       {children}
     </button>

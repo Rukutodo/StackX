@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import { connectDB } from "./config/db";
 import authRoutes from "./routes/auth";
 import servicesRoutes from "./routes/services";
+import referencesRoutes from "./routes/references";
 import portfolioRoutes from "./routes/portfolio";
 import jobsRoutes from "./routes/jobs";
 import applicationsRoutes from "./routes/applications";
@@ -23,17 +24,33 @@ const PORT = process.env.PORT || 4000;
 connectDB();
 
 // Middleware
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://129.159.236.176:3000",
+  "http://129.159.236.176:3001",
+  "https://stackx.co.in",
+  "https://www.stackx.co.in",
+  "https://admin.stackx.co.in",
+  process.env.FRONTEND_URL,
+  process.env.ADMIN_URL,
+].filter(Boolean) as string[];
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000", 
-      "http://localhost:3001", 
-      "http://129.159.236.176:3000", 
-      "http://129.159.236.176:3001",
-      "https://stackx.co.in",
-      "https://www.stackx.co.in",
-      "https://admin.stackx.co.in"
-    ],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      if (
+        allowedOrigins.includes(origin) ||
+        origin.endsWith(".vercel.app") ||
+        origin.includes("stackx.co.in")
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
@@ -51,6 +68,7 @@ app.use("/uploads", express.static(uploadsDir));
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/services", servicesRoutes);
+app.use("/api/references", referencesRoutes);
 app.use("/api/portfolio", portfolioRoutes);
 app.use("/api/jobs", jobsRoutes);
 app.use("/api/applications", applicationsRoutes);
@@ -63,6 +81,11 @@ app.get("/", (req, res) => {
   res.send("StackX Backend API is running...");
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
+// Export app for Vercel
+export default app;
+
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+  });
+}

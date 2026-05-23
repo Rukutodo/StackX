@@ -25,18 +25,48 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: route === "" ? 1 : 0.8,
   }));
 
-  // Dynamic portfolio routes
+  // Dynamic routes
   try {
-    const res = await fetch(`${SERVER_API}/api/portfolio`);
-    if (res.ok) {
-      const projects = await res.json();
-      const projectRoutes = projects.map((project: any) => ({
-        url: `${SITE_URL}/portfolio/${project.slug}`,
-        lastModified: project.updatedAt ? new Date(project.updatedAt) : STATIC_LAST_MODIFIED,
-        changeFrequency: "monthly" as const,
-        priority: 0.6,
-      }));
-      return [...routes, ...projectRoutes];
+    const [portfolioRes, servicesRes, referencesRes] = await Promise.all([
+      fetch(`${SERVER_API}/api/portfolio`),
+      fetch(`${SERVER_API}/api/services`),
+      fetch(`${SERVER_API}/api/references`),
+    ]);
+
+    if (portfolioRes.ok) {
+      const projects = await portfolioRes.json();
+      projects.forEach((p: any) => {
+        routes.push({
+          url: `${SITE_URL}/portfolio/${p.slug}`,
+          lastModified: p.updatedAt ? new Date(p.updatedAt) : STATIC_LAST_MODIFIED,
+          changeFrequency: "monthly",
+          priority: 0.6,
+        });
+      });
+    }
+
+    if (servicesRes.ok) {
+      const services = await servicesRes.json();
+      services.forEach((s: any) => {
+        routes.push({
+          url: `${SITE_URL}/services/${s.slug}`,
+          lastModified: s.updatedAt ? new Date(s.updatedAt) : STATIC_LAST_MODIFIED,
+          changeFrequency: "weekly",
+          priority: 0.7,
+        });
+      });
+    }
+
+    if (referencesRes.ok) {
+      const references = await referencesRes.json();
+      references.forEach((r: any) => {
+        routes.push({
+          url: `${SITE_URL}/${r.slug}`,
+          lastModified: r.updatedAt ? new Date(r.updatedAt) : STATIC_LAST_MODIFIED,
+          changeFrequency: "weekly",
+          priority: 0.7,
+        });
+      });
     }
   } catch (error) {
     console.error("Sitemap generation error:", error);

@@ -26,6 +26,7 @@ const sidebarLinks = [
   { href: "/services", label: "Services", icon: HiCube },
   { href: "/portfolio", label: "Portfolio", icon: HiPhotograph },
   { href: "/testimonials", label: "Testimonials", icon: HiStar },
+  { href: "/references", label: "References", icon: HiCollection },
   { href: "/jobs", label: "Jobs", icon: HiBriefcase },
   { href: "/messages", label: "Messages", icon: HiMail },
   { href: "/applications", label: "Applications", icon: HiDocumentText },

@@ -23,6 +23,9 @@ const EMPTY: Omit<ServiceCategory, "_id" | "status"> & { status: string } = {
   caseStudy: null,
   status: "active",
   order: 0,
+  pageType: "auto",
+  featuredProjects: [],
+  testimonials: [],
 };
 
 export default function ServiceCategoryModal({ initial, onClose, onSaved }: Props) {

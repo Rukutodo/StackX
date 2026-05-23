@@ -29,6 +29,16 @@ const serviceCategorySchema = new mongoose.Schema(
     icon: { type: String, default: "HiCode", trim: true }, // icon name from react-icons/hi
     tagline: { type: String, required: true, trim: true },
     pricing: { type: String, required: true, trim: true }, // e.g. "$3,000"
+    description: { type: String, trim: true }, // SEO Meta Description
+    keywords: { type: String, trim: true },
+    ogImage: { type: String, trim: true },
+    canonical: { type: String, trim: true },
+    robots: { 
+      type: String, 
+      default: "index, follow",
+      trim: true 
+    },
+    focusKeyword: { type: String, trim: true },
     techStack: { type: [String], default: [] },
     items: { type: [accordionItemSchema], default: [] },
     caseStudy: { type: caseStudySchema, default: null },
@@ -38,6 +48,11 @@ const serviceCategorySchema = new mongoose.Schema(
       default: "active",
     },
     order: { type: Number, default: 0 },
+    pageType: {
+      type: String,
+      enum: ["original", "auto"],
+      default: "auto",
+    },
     featuredProjects: [
       {
         type: mongoose.Schema.Types.ObjectId,

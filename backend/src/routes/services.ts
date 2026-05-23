@@ -1,12 +1,14 @@
 import express from "express";
 import { ServiceCategory } from "../models/ServiceCategory";
 import { protect } from "../middlewares/authMiddleware";
+import { 
+  createServicePage, 
+  deleteServicePage 
+} from "../utils/fileGenerator";
 
 const router = express.Router();
 
 // ─── GET /api/services ─────────────────────────────────────
-// Public: returns only active categories sorted by order
-// Admin: pass ?all=true to include drafts (still needs no auth — admin page handles display)
 router.get("/", async (req, res) => {
   try {
     const showAll = req.query.all === "true";
@@ -20,7 +22,6 @@ router.get("/", async (req, res) => {
 });
 
 // ─── GET /api/services/slug/:slug ──────────────────────────
-// Fetch a single service by its slug, populating featured projects and testimonials
 router.get("/slug/:slug", async (req, res) => {
   try {
     const category = await ServiceCategory.findOne({ slug: req.params.slug })
@@ -49,12 +50,12 @@ router.get("/:id", async (req, res) => {
 });
 
 // ─── POST /api/services ────────────────────────────────────
-// Protected: admin only
 router.post("/", protect, async (req, res) => {
   try {
     const { 
       slug, title, tagline, pricing, techStack, items, 
-      caseStudy, status, order, featuredProjects, testimonials 
+      caseStudy, status, order, featuredProjects, testimonials,
+      pageType, description, keywords, ogImage, canonical, robots, focusKeyword
     } = req.body;
 
     if (!slug || !title || !tagline || !pricing) {
@@ -68,34 +69,45 @@ router.post("/", protect, async (req, res) => {
 
     const category = new ServiceCategory({
       slug, title, tagline, pricing,
+      description, keywords, ogImage, canonical, robots, focusKeyword,
       techStack: techStack || [],
       items: items || [],
       caseStudy: caseStudy || null,
+      pageType: pageType || "auto",
       status: status || "active",
       order: order ?? 0,
-      featuredProjects: featuredProjects || [],
-      testimonials: testimonials || [],
+      featuredProjects: (featuredProjects || []).filter((id: string) => id && id.length === 24),
+      testimonials: (testimonials || []).filter((id: string) => id && id.length === 24),
     });
 
     await category.save();
+
+    // Physically create the Next.js page files ONLY if type is auto
+    if (category.pageType === "auto") {
+      createServicePage(slug, title, tagline);
+    }
+
     res.status(201).json(category);
-  } catch (error) {
-    console.error("POST /api/services error:", error);
-    res.status(500).json({ message: "Failed to create service" });
+  } catch (error: any) {
+    res.status(500).json({ message: "Failed to create service", error: error.message });
   }
 });
 
 // ─── PUT /api/services/:id ─────────────────────────────────
-// Protected: admin only
 router.put("/:id", protect, async (req, res) => {
   try {
     const { 
       slug, title, tagline, pricing, techStack, items, 
-      caseStudy, status, order, featuredProjects, testimonials 
+      caseStudy, status, order, featuredProjects, testimonials,
+      pageType, description, keywords, ogImage, canonical, robots, focusKeyword
     } = req.body;
 
-    // If slug changed, check it doesn't conflict with another doc
-    if (slug) {
+    const oldCategory = await ServiceCategory.findById(req.params.id);
+    if (!oldCategory) return res.status(404).json({ message: "Service not found" });
+
+    const oldSlug = oldCategory.slug;
+
+    if (slug && slug !== oldSlug) {
       const conflict = await ServiceCategory.findOne({ slug, _id: { $ne: req.params.id } });
       if (conflict) {
         return res.status(409).json({ message: `Slug "${slug}" is already used by another service` });
@@ -106,12 +118,23 @@ router.put("/:id", protect, async (req, res) => {
       req.params.id,
       { 
         slug, title, tagline, pricing, techStack, items, 
-        caseStudy, status, order, featuredProjects, testimonials 
+        caseStudy, status, order, featuredProjects, testimonials,
+        pageType, description, keywords, ogImage, canonical, robots, focusKeyword
       },
       { new: true, runValidators: true }
     );
 
     if (!updated) return res.status(404).json({ message: "Service not found" });
+
+    // --- File Sync Logic ---
+    if (updated.pageType === "auto") {
+      const newSlug = updated.slug;
+      if (newSlug !== oldSlug) {
+        deleteServicePage(oldSlug);
+        createServicePage(newSlug, updated.title, updated.tagline);
+      }
+    }
+
     res.json(updated);
   } catch (error) {
     console.error("PUT /api/services/:id error:", error);
@@ -120,11 +143,18 @@ router.put("/:id", protect, async (req, res) => {
 });
 
 // ─── DELETE /api/services/:id ──────────────────────────────
-// Protected: admin only
 router.delete("/:id", protect, async (req, res) => {
   try {
-    const deleted = await ServiceCategory.findByIdAndDelete(req.params.id);
-    if (!deleted) return res.status(404).json({ message: "Service not found" });
+    const category = await ServiceCategory.findById(req.params.id);
+    if (!category) return res.status(404).json({ message: "Service not found" });
+
+    const slug = category.slug;
+
+    await ServiceCategory.findByIdAndDelete(req.params.id);
+
+    // Physically delete the Next.js page folder safely
+    deleteServicePage(slug);
+    
     res.json({ message: "Service deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Failed to delete service" });

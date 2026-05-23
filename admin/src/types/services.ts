@@ -29,11 +29,18 @@ export interface ServiceCategory {
   icon?: string;
   tagline: string;
   pricing: string;
+  description?: string;
+  keywords?: string;
+  ogImage?: string;
+  canonical?: string;
+  robots?: string;
+  focusKeyword?: string;
   techStack: string[];
   items: AccordionItem[];
   caseStudy: CaseStudy | null;
   status: "active" | "draft";
   order: number;
+  pageType: "original" | "auto";
   featuredProjects: string[];
   testimonials: string[];
 }

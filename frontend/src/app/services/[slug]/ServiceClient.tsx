@@ -1,12 +1,32 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { SectionHeading, GlassCard, Button } from "@/components/ui";
-import { HiArrowRight, HiChevronDown, HiCode } from "react-icons/hi";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import Link from "next/link";
+import { 
+  LuCode as Code, 
+  LuLayoutDashboard as Layout, 
+  LuZap as Zap, 
+  LuCheck as CheckCircle, 
+  LuArrowRight as ArrowRight, 
+  LuChevronDown as ChevronDown, 
+  LuStar as Star, 
+  LuGlobe as Globe, 
+  LuShield as Shield, 
+  LuLayers as Layers, 
+  LuMonitor as Monitor, 
+  LuDatabase as Database, 
+  LuChartBar as BarChart, 
+  LuUsers as Users, 
+  LuArrowUpRight as ArrowUpRight, 
+  LuServer as Server, 
+  LuSmartphone as Smartphone,
+  LuRocket as Rocket
+} from "react-icons/lu";
 import { ICON_MAP } from "../ServicesClient";
 import FeaturedWorkSection from "@/components/sections/FeaturedWorkSection";
 import SuccessStoriesSection from "@/components/sections/SuccessStoriesSection";
+import { GlassCard, Button } from "@/components/ui";
 
 interface AccordionItem {
   title: string;
@@ -26,143 +46,169 @@ interface ServiceCategory {
   testimonials: any[];
 }
 
-function Accordion({ title, desc }: { title: string; desc: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="border-b border-surface-border last:border-b-0">
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between py-6 text-left group cursor-pointer"
-      >
-        <span className="text-lg font-medium text-white group-hover:text-primary-light transition-colors">
-          {title}
-        </span>
-        <HiChevronDown
-          className={`w-6 h-6 text-muted transition-transform duration-300 ${open ? "rotate-180" : ""}`}
-        />
-      </button>
-      <motion.div
-        initial={false}
-        animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }}
-        transition={{ duration: 0.3 }}
-        className="overflow-hidden"
-      >
-        <p className="pb-6 text-muted leading-relaxed">{desc}</p>
-      </motion.div>
-    </div>
-  );
+const fadeInUp = {
+  hidden: { opacity: 0, y: 40 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" as const } }
+};
+const scaleIn = {
+  hidden: { opacity: 0, scale: 0.85 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.6, ease: "easeOut" as const } }
+};
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.12 } }
+};
+
+function FloatingOrb({ className }: { className?: string }) {
+  return <div className={`absolute rounded-full pointer-events-none ${className}`} />;
 }
 
-export default function ServiceClient({ service }: { service: ServiceCategory }) {
-  const Icon = (service.icon && ICON_MAP[service.icon]) ? ICON_MAP[service.icon] : HiCode;
+export default function ServiceClient({ 
+  service,
+  overrideTitle,
+  overrideTagline
+}: { 
+  service: ServiceCategory;
+  overrideTitle?: string;
+  overrideTagline?: string;
+}) {
+  const [activeFaq, setActiveFaq] = useState<number | null>(0);
+  const toggleFaq = (index: number) => setActiveFaq(activeFaq === index ? null : index);
 
+  const Icon = (service.icon && ICON_MAP[service.icon]) ? ICON_MAP[service.icon] : Code;
+  const displayTitle = overrideTitle || service.title;
+  const displayTagline = overrideTagline || service.tagline;
+
+  // Use DB items if they exist, otherwise fallback to defaults based on slug
+  const hasItems = service.items && service.items.length > 0;
+  
   return (
-    <div className="pt-24 pb-20">
-      {/* Hero */}
-      <section className="py-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(139,92,246,0.1),transparent_70%)]" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="flex flex-col items-center text-center"
-          >
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-primary-deep flex items-center justify-center shadow-2xl mb-8">
-              <Icon className="w-10 h-10 text-white" />
-            </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-bold mb-6">
-              {service.title}
-            </h1>
-            <p className="text-xl text-muted max-w-3xl leading-relaxed">
-              {service.tagline}
-            </p>
-          </motion.div>
-        </div>
-      </section>
+    <div className="min-h-screen bg-background text-foreground overflow-hidden">
+      {/* Fixed Background Ambient */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-[-15%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/15 blur-[150px] animate-pulse" />
+        <div className="absolute top-[30%] right-[-15%] w-[45%] h-[45%] rounded-full bg-accent/12 blur-[140px]" />
+        <div className="absolute bottom-[-10%] left-[20%] w-[40%] h-[40%] rounded-full bg-primary-deep/10 blur-[120px]" />
+        <div className="absolute inset-0 hero-grid opacity-40" />
+      </div>
 
-      {/* Main Content */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
-        <div className="grid lg:grid-cols-3 gap-12">
-          {/* Details */}
-          <div className="lg:col-span-2">
-             <div className="mb-12">
-                <h3 className="text-2xl font-heading font-bold mb-8">Service Features</h3>
-                <div className="border-t border-surface-border">
-                  {service.items.map((item) => (
-                    <Accordion key={item.title} title={item.title} desc={item.desc} />
-                  ))}
+      <div className="relative z-10 pt-24">
+        {/* ═══════════ HERO SECTION ═══════════ */}
+        <section className="relative py-20 lg:py-32 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none" />
+          <FloatingOrb className="w-72 h-72 bg-primary/20 blur-[100px] top-20 left-10 animate-float" />
+          
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center gap-12 lg:gap-20 relative z-10">
+            <motion.div className="flex-1 text-left" initial="hidden" animate="visible" variants={staggerContainer}>
+              <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/25 text-sm font-medium text-primary-light mb-6 hero-badge-shimmer">
+                <Icon className="w-4 h-4" />
+                <span>{service.title} Solutions</span>
+              </motion.div>
+              <motion.h1 variants={fadeInUp} className="text-5xl lg:text-7xl font-bold font-heading leading-tight mb-6">
+                {displayTitle}
+              </motion.h1>
+              <motion.p variants={fadeInUp} className="text-lg lg:text-xl text-muted mb-8 max-w-2xl">
+                {displayTagline}
+              </motion.p>
+              <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4">
+                <Button href="/contact" variant="primary" className="px-8 py-4 rounded-xl font-semibold shadow-[0_0_25px_rgba(139,92,246,0.4)] hover:shadow-[0_0_40px_rgba(139,92,246,0.6)]">
+                  Start Your Project <ArrowRight className="w-5 h-5" />
+                </Button>
+                <div className="flex items-center gap-6 px-4">
+                  <div>
+                    <p className="text-[10px] text-muted uppercase tracking-widest">Investment</p>
+                    <p className="text-2xl font-bold gradient-text">{service.pricing}</p>
+                  </div>
                 </div>
-             </div>
-          </div>
+              </motion.div>
+            </motion.div>
 
-          {/* Sidebar */}
-          <div className="space-y-8">
-            <GlassCard hover={false} className="sticky top-28 border-white/5 bg-white/[0.02]">
-              <div className="mb-6">
-                <p className="text-sm text-muted uppercase tracking-widest mb-1">Investment</p>
-                <p className="text-4xl font-heading font-bold gradient-text">{service.pricing}</p>
+            <motion.div className="flex-1 w-full" initial={{ opacity: 0, scale: 0.85, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.3 }}>
+              <div className="relative w-full aspect-square rounded-2xl overflow-hidden gradient-border bg-gradient-to-br from-surface via-surface-light to-surface animate-pulse-glow">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 flex items-center justify-center">
+                  <div className="text-center p-8">
+                    <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/20 flex items-center justify-center animate-float">
+                      <Icon className="w-12 h-12 text-primary-light" />
+                    </div>
+                    <p className="text-primary-light/70 text-sm font-semibold tracking-widest uppercase mb-1">Tailored {service.title}</p>
+                    <p className="text-muted/50 text-xs">High-performance digital solutions</p>
+                  </div>
+                </div>
               </div>
-              
-              <div className="mb-8">
-                <p className="text-sm text-muted uppercase tracking-widest mb-4">Technologies</p>
-                <div className="flex flex-wrap gap-2">
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ═══════════ SERVICE BREAKDOWN ═══════════ */}
+        {hasItems && (
+          <section className="relative py-24 overflow-hidden">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+              <motion.div className="text-center mb-16" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}>
+                <h2 className="text-3xl md:text-5xl font-bold font-heading mb-4">Core <span className="gradient-text-glow">Offerings</span></h2>
+                <p className="text-muted max-w-2xl mx-auto text-lg">Comprehensive solutions combining cutting-edge technology with unparalleled design.</p>
+              </motion.div>
+
+              <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer}>
+                {service.items.map((item, idx) => (
+                  <motion.div key={idx} variants={scaleIn} className="glass-card glass-card-hover p-8 group relative overflow-hidden transition-all duration-500 hover:-translate-y-2 bg-white/[0.01] border-white/5">
+                    <div className="relative z-10 w-14 h-14 rounded-xl bg-gradient-to-br from-primary/15 to-accent/10 border border-primary/20 flex items-center justify-center text-primary-light mb-6 group-hover:scale-110 transition-all duration-300">
+                      <Icon className="w-7 h-7" />
+                    </div>
+                    <h3 className="relative z-10 text-xl font-bold text-foreground mb-3">{item.title}</h3>
+                    <p className="relative z-10 text-muted leading-relaxed text-sm">{item.desc}</p>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </div>
+          </section>
+        )}
+
+        {/* ═══════════ TECH STACK ═══════════ */}
+        {service.techStack && service.techStack.length > 0 && (
+          <section className="py-20 border-y border-white/5 bg-white/[0.01]">
+            <div className="max-w-7xl mx-auto px-4 text-center">
+               <p className="text-xs font-bold text-muted uppercase tracking-[0.3em] mb-10">Technologies We Use</p>
+               <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
                   {service.techStack.map((tech) => (
-                    <span key={tech} className="px-3 py-1 text-xs font-medium rounded-full bg-white/5 border border-white/10 text-muted">
+                    <span key={tech} className="text-lg sm:text-2xl font-bold text-white/20 hover:text-primary-light transition-colors duration-300 cursor-default">
                       {tech}
                     </span>
                   ))}
-                </div>
-              </div>
-
-              <Button href="/contact" variant="primary" className="w-full py-4">
-                Get Started <HiArrowRight />
-              </Button>
-            </GlassCard>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Work Section */}
-      {service.featuredProjects && service.featuredProjects.length > 0 && (
-        <FeaturedWorkSection 
-            projects={service.featuredProjects} 
-            title={`Featured ${service.title} Work`}
-            subtitle={`Explore a selection of our recent ${service.title.toLowerCase()} projects.`}
-        />
-      )}
-
-      {/* Testimonials Section */}
-      {service.testimonials && service.testimonials.length > 0 && (
-        <SuccessStoriesSection testimonials={service.testimonials} />
-      )}
-
-      {/* CTA */}
-      <section className="py-24">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-3xl sm:text-4xl font-heading font-bold mb-6">
-               Ready to start your <span className="gradient-text">{service.title}</span> project?
-            </h2>
-            <p className="text-muted text-lg mb-10 max-w-2xl mx-auto">
-              Book a consultation today and let&apos;s build something amazing together.
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-4">
-               <Button href="/contact" variant="primary" className="px-10 py-4">
-                 Book Consultation <HiArrowRight />
-               </Button>
-               <Button href="/services" variant="secondary" className="px-10 py-4">
-                 Back to Services
-               </Button>
+               </div>
             </div>
-          </motion.div>
-        </div>
-      </section>
+          </section>
+        )}
+
+        {/* ═══════════ FEATURED WORK ═══════════ */}
+        {service.featuredProjects && service.featuredProjects.length > 0 && (
+          <FeaturedWorkSection 
+              projects={service.featuredProjects} 
+              title={`Featured ${displayTitle} Work`}
+              subtitle={`Explore a selection of our recent ${displayTitle.toLowerCase()} projects.`}
+          />
+        )}
+
+        {/* ═══════════ TESTIMONIALS ═══════════ */}
+        {service.testimonials && service.testimonials.length > 0 && (
+          <SuccessStoriesSection testimonials={service.testimonials} />
+        )}
+
+        {/* ═══════════ FINAL CTA ═══════════ */}
+        <section className="relative py-28 overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={scaleIn} className="relative rounded-3xl overflow-hidden gradient-border shadow-[0_0_60px_rgba(139,92,246,0.15)]">
+              <div className="absolute inset-0 bg-gradient-to-br from-surface via-surface-light to-surface z-0" />
+              <div className="relative z-10 text-center py-20 px-8">
+                <h2 className="text-4xl md:text-6xl font-bold font-heading mb-6 leading-tight">Ready to Build <br/><span className="gradient-text-glow">Something Amazing?</span></h2>
+                <p className="text-xl text-muted mb-10 max-w-2xl mx-auto">Let&apos;s discuss your vision and see how our engineering team can bring it to life.</p>
+                <Button href="/contact" variant="primary" className="px-10 py-5 rounded-xl font-bold inline-flex items-center gap-3 shadow-[0_0_25px_rgba(139,92,246,0.5)]">
+                  Start a Conversation <ArrowRight className="w-5 h-5" />
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

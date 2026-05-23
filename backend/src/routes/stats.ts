@@ -2,6 +2,7 @@ import express from "express";
 import { ServiceCategory } from "../models/ServiceCategory";
 import { PortfolioProject } from "../models/PortfolioProject";
 import { JobPosting } from "../models/JobPosting";
+import { Reference } from "../models/Reference";
 import { JobApplication } from "../models/JobApplication";
 import { Message } from "../models/Message";
 import { protect } from "../middlewares/authMiddleware";
@@ -16,6 +17,7 @@ router.get("/", protect, async (_req, res) => {
       totalServices,
       totalProjects,
       activeProjects,
+      totalReferences,
       totalJobs,
       activeJobs,
       totalApplications,
@@ -29,6 +31,7 @@ router.get("/", protect, async (_req, res) => {
       ServiceCategory.countDocuments(),
       PortfolioProject.countDocuments(),
       PortfolioProject.countDocuments({ status: { $in: ["active", "completed"] } }),
+      Reference.countDocuments(),
       JobPosting.countDocuments(),
       JobPosting.countDocuments({ status: "active" }),
       JobApplication.countDocuments(),
@@ -74,13 +77,14 @@ router.get("/", protect, async (_req, res) => {
     }
 
     // Sort by timestamp descending (most recent first)
-    activity.sort((a, b) => b.ts - a.ts);
+    activity.sort((a: any, b: any) => b.ts - a.ts);
 
     res.json({
       counts: {
         totalServices,
         totalProjects,
         activeProjects,
+        totalReferences,
         totalJobs,
         activeJobs,
         totalApplications,
