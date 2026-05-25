@@ -126,7 +126,7 @@ export default async function DynamicServicePage({ params }: { params: Promise<{
     notFound();
   }
 
-  const isWebDev = targetService.slug === "web-development" || slug === "web-development";
+  const isWebDev = targetService.slug === "web-development";
 
   const jsonLdTitle = referenceData?.title || targetService.title;
   const jsonLdDesc = referenceData?.description || targetService.description || targetService.tagline;
