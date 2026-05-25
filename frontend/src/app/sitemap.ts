@@ -8,7 +8,7 @@ const STATIC_LAST_MODIFIED = new Date("2026-05-01");
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Static routes
-  const routes = [
+  const routes: MetadataRoute.Sitemap = [
     "",
     "/about",
     "/services",
@@ -21,7 +21,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ].map((route) => ({
     url: `${SITE_URL}${route}`,
     lastModified: STATIC_LAST_MODIFIED,
-    changeFrequency: "weekly" as const,
+    changeFrequency: "weekly",
     priority: route === "" ? 1 : 0.8,
   }));
 
