@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Next.js
+.next/
+out/
+
+# Gemini CLI Instructions
+GEMINI.md
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+restored_code.txt
