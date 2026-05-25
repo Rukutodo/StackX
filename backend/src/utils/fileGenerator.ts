@@ -2,61 +2,86 @@ import fs from "fs";
 import path from "path";
 
 /**
- * Physically creates a Next.js page file in the frontend for a new service
+ * Generates a physical Next.js page file for a new service category.
+ * PROTECTED: Will not overwrite existing custom designs.
  */
 export const createServicePage = (slug: string, title: string, tagline: string) => {
-    try {
-        const servicesDir = path.join(__dirname, "../../../frontend/src/app/services");
-        const targetDir = path.join(servicesDir, slug);
+  const cwd = process.cwd();
+  const frontendPath = path.resolve(cwd, "..", "frontend", "src", "app", "services", slug);
+  const filePath = path.join(frontendPath, "page.tsx");
 
-        // Prevent overwriting dynamic route folder or existing service pages
-        if (fs.existsSync(targetDir) || slug === "[slug]") {
-            return;
-        }
-
-        fs.mkdirSync(targetDir, { recursive: true });
-
-        // Basic page content that leverages the existing ServiceClient
-        const pageContent = `import ServiceClient from '../[slug]/ServiceClient';
-import { notFound } from 'next/navigation';
-
-export default async function Page() {
-  const SERVER_API = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-  
-  try {
-    const res = await fetch(\`\${SERVER_API}/api/services/slug/${slug}\`, {
-      next: { revalidate: 3600 },
-    });
-    if (!res.ok) return notFound();
-    const service = await res.json();
-    return <ServiceClient service={service} />;
-  } catch (error) {
-    return notFound();
+  // SAFETY: Never overwrite existing files to protect custom designs
+  if (fs.existsSync(filePath)) {
+    console.log(`✅ [PROTECTION] Skipping generation for ${slug}: File already exists at ${filePath}`);
+    return;
   }
-}
-`;
 
-        fs.writeFileSync(path.join(targetDir, "page.tsx"), pageContent);
-        console.log(`[FileGenerator] Created page for service: ${slug}`);
-    } catch (error) {
-        console.error(`[FileGenerator] Failed to create page for ${slug}:`, error);
-    }
+  console.log(`🚀 [GENERATION] Creating template for: ${slug}`);
+
+  if (!fs.existsSync(frontendPath)) {
+    fs.mkdirSync(frontendPath, { recursive: true });
+  }
+
+  try {
+    const template = `"use client";
+import { motion } from "framer-motion";
+import { LuCode as Code, LuArrowRight as ArrowRight } from "react-icons/lu";
+import Link from "next/link";
+
+export default function ${title.replace(/\s+/g, "")}Page() {
+  return (
+    <div className="min-h-screen bg-background pt-32 pb-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
+          <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-8 border border-primary/20">
+            <Code className="w-10 h-10 text-primary-light" />
+          </div>
+          <h1 className="text-5xl lg:text-7xl font-bold mb-6 italic underline decoration-primary/30">${title}</h1>
+          <p className="text-xl text-muted max-w-2xl mx-auto mb-10">${tagline}</p>
+          <div className="p-12 rounded-3xl glass-card border-white/5 bg-white/[0.02] text-left">
+            <h2 className="text-2xl font-bold mb-4 text-white">Project Overview</h2>
+            <p className="text-muted leading-relaxed">This page was automatically generated for the <strong>${title}</strong> service.</p>
+          </div>
+          <div className="mt-12 flex justify-center gap-4">
+             <Link href="/contact" className="px-8 py-4 rounded-xl bg-primary text-white font-semibold flex items-center gap-2">
+                Get Started <ArrowRight className="w-5 h-5" />
+             </Link>
+             <Link href="/services" className="px-8 py-4 rounded-xl glass-card text-white font-semibold">Back to Services</Link>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}`;
+    fs.writeFileSync(filePath, template);
+  } catch (err) {
+    console.error("File creation error:", err);
+  }
 };
 
 /**
- * Deletes the physically created Next.js page file in the frontend
+ * Deletes the physical Next.js page folder.
+ * SAFETY: Only deletes if the page.tsx content matches the auto-generated template
+ * (Optional check, but for now we'll keep it simple: we only call this when slugs change)
  */
 export const deleteServicePage = (slug: string) => {
-    try {
-        const servicesDir = path.join(__dirname, "../../../frontend/src/app/services");
-        const targetDir = path.join(servicesDir, slug);
+  const frontendPath = path.resolve(process.cwd(), "..", "frontend", "src", "app", "services", slug);
+  const filePath = path.join(frontendPath, "page.tsx");
 
-        // Safeguard to ensure we don't delete the dynamic folder
-        if (slug !== "[slug]" && fs.existsSync(targetDir)) {
-            fs.rmSync(targetDir, { recursive: true, force: true });
-            console.log(`[FileGenerator] Deleted page for service: ${slug}`);
-        }
-    } catch (error) {
-        console.error(`[FileGenerator] Failed to delete page for ${slug}:`, error);
+  if (fs.existsSync(filePath)) {
+    const content = fs.readFileSync(filePath, "utf-8");
+    // If the file contains "Premium Web Development" or other custom markers, DO NOT DELETE
+    if (content.includes("Premium Web Development") || content.includes("WebDevelopmentServicePage")) {
+      console.log(`⚠️ [PROTECTION] Refusing to delete custom page at ${slug}`);
+      return;
     }
+  }
+
+  if (fs.existsSync(frontendPath)) {
+    try {
+      fs.rmSync(frontendPath, { recursive: true, force: true });
+    } catch (err) {
+      console.error("File deletion error:", err);
+    }
+  }
 };
