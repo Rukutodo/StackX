@@ -69,12 +69,12 @@ export const deleteServicePage = (slug: string) => {
   const filePath = path.join(frontendPath, "page.tsx");
 
   if (fs.existsSync(filePath)) {
-    const content = fs.readFileSync(filePath, "utf-8");
-    // If the file contains "Premium Web Development" or other custom markers, DO NOT DELETE
-    if (content.includes("Premium Web Development") || content.includes("WebDevelopmentServicePage")) {
-      console.log(`⚠️ [PROTECTION] Refusing to delete custom page at ${slug}`);
-      return;
-    }
+     const content = fs.readFileSync(filePath, "utf-8");
+     // If the file contains "Premium Web Development" or other custom markers, DO NOT DELETE
+     if (content.includes("Premium Web Development") || content.includes("WebDevelopmentServicePage")) {
+        console.log(`⚠️ [PROTECTION] Refusing to delete custom page at ${slug}`);
+        return;
+     }
   }
 
   if (fs.existsSync(frontendPath)) {
