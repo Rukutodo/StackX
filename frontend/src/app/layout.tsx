@@ -74,10 +74,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" suppressHydrationWarning>
       <body
         className={`${inter.variable} ${poppins.variable} font-body antialiased bg-background text-foreground`}
         style={{ fontFamily: "var(--font-inter), sans-serif" }}
+        suppressHydrationWarning
       >
         <script
           type="application/ld+json"
