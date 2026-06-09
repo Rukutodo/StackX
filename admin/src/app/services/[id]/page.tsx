@@ -37,6 +37,7 @@ const EMPTY_FORM = {
   focusKeyword: "",
   techStack: [] as string[],
   items: [] as { title: string; desc: string }[],
+  faqs: [] as { question: string; answer: string }[],
   caseStudy: null as { title: string; href: string } | null,
   status: "active",
   pageType: "auto" as "original" | "auto",
@@ -60,6 +61,10 @@ export default function ServiceEditPage() {
   const [removeConfirm, setRemoveConfirm] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<"general" | "seo">("general");
 
+  // FAQ remove confirm tracks separately
+  const [removeFaqConfirm, setRemoveFaqConfirm] = useState<number | null>(null);
+  const [collapsedFaqs, setCollapsedFaqs] = useState<number[]>([]);
+
   const [portfolioProjects, setPortfolioProjects] = useState<PortfolioProject[]>([]);
   const [allTestimonials, setAllTestimonials] = useState<Testimonial[]>([]);
 
@@ -69,6 +74,12 @@ export default function ServiceEditPage() {
   // Toggle functions
   const toggleItemCollapse = (i: number) => {
     setCollapsedItems(prev => 
+      prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i]
+    );
+  };
+
+  const toggleFaqCollapse = (i: number) => {
+    setCollapsedFaqs(prev =>
       prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i]
     );
   };
@@ -91,6 +102,7 @@ export default function ServiceEditPage() {
         focusKeyword: found.focusKeyword || "",
         techStack: found.techStack,
         items: found.items,
+        faqs: found.faqs || [],
         caseStudy: found.caseStudy,
         status: found.status,
         pageType: found.pageType || "auto",
@@ -126,6 +138,22 @@ export default function ServiceEditPage() {
       const items = [...f.items];
       items[i] = { ...items[i], [key]: val };
       return { ...f, items };
+    });
+
+  const addFaq = () =>
+    setForm((f) => ({ ...f, faqs: [...(f.faqs || []), { question: "", answer: "" }] }));
+
+  const removeFaq = (i: number) => {
+    setRemoveFaqConfirm(null);
+    setForm((f) => ({ ...f, faqs: (f.faqs || []).filter((_, idx) => idx !== i) }));
+    setCollapsedFaqs(prev => prev.filter(idx => idx !== i).map(idx => idx > i ? idx - 1 : idx));
+  };
+
+  const setFaqField = (i: number, key: "question" | "answer", val: string) =>
+    setForm((f) => {
+      const faqs = [...(f.faqs || [])];
+      faqs[i] = { ...faqs[i], [key]: val };
+      return { ...f, faqs };
     });
 
   const toggleFeaturedProject = (id: string) => {
@@ -194,6 +222,14 @@ export default function ServiceEditPage() {
       </div>
     );
   }
+
+  const filteredPortfolioProjects = form.title 
+    ? portfolioProjects.filter(p => p.category === form.title) 
+    : portfolioProjects;
+
+  const filteredTestimonials = form.title 
+    ? allTestimonials.filter(t => t.projectType === form.title) 
+    : allTestimonials;
 
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-6 pb-20">
@@ -283,7 +319,26 @@ export default function ServiceEditPage() {
                       <input
                         required
                         value={form.title}
-                        onChange={(e) => setForm({ ...form, title: e.target.value })}
+                        onChange={(e) => {
+                          const newTitle = e.target.value;
+                          setForm((f) => {
+                            // Automatically un-select items if their category no longer matches the new title
+                            const validFeaturedProjects = f.featuredProjects.filter(id => {
+                              const p = portfolioProjects.find(proj => proj._id === id);
+                              return !p || !newTitle || p.category === newTitle;
+                            });
+                            const validTestimonials = f.testimonials.filter(id => {
+                              const t = allTestimonials.find(test => test._id === id);
+                              return !t || !newTitle || t.projectType === newTitle;
+                            });
+                            return { 
+                              ...f, 
+                              title: newTitle,
+                              featuredProjects: validFeaturedProjects,
+                              testimonials: validTestimonials,
+                            };
+                          });
+                        }}
                         placeholder="Web Development"
                         className="admin-input w-full"
                       />
@@ -565,6 +620,127 @@ export default function ServiceEditPage() {
                 })}
               </div>
             </DashboardGlassCard>
+
+            {/* ── FAQ Management ── */}
+            <DashboardGlassCard>
+              <DashboardSectionHeader
+                title="FAQs"
+                subtitle="Frequently asked questions shown at the bottom of the service page"
+                action={
+                  <AdminButton variant="outline" size="sm" type="button" className="text-xs gap-1" onClick={addFaq}>
+                    <HiPlus size={14} /> Add FAQ
+                  </AdminButton>
+                }
+              />
+              <div className="space-y-4 mt-4">
+                {(form.faqs || []).length === 0 && (
+                  <p className="text-xs text-muted/50 italic text-center py-4">No FAQs added yet. Click &ldquo;Add FAQ&rdquo; to get started.</p>
+                )}
+                {(form.faqs || []).map((faq, i) => {
+                  const isCollapsed = collapsedFaqs.includes(i);
+                  return (
+                    <div
+                      key={i}
+                      className="rounded-xl overflow-hidden"
+                      style={{
+                        background: "rgba(255,255,255,0.02)",
+                        border: removeFaqConfirm === i
+                          ? "1px solid rgba(239,68,68,0.25)"
+                          : "1px solid rgba(255,255,255,0.06)",
+                        transition: "border-color 0.2s",
+                      }}
+                    >
+                      {/* Card Header */}
+                      <div
+                        className="flex items-center gap-3 p-4 cursor-pointer hover:bg-white/[0.02] transition"
+                        onClick={() => toggleFaqCollapse(i)}
+                      >
+                        <HiChevronDown
+                          size={18}
+                          className={`text-muted transition-transform duration-300 ${isCollapsed ? "-rotate-90" : ""}`}
+                        />
+                        <div className="flex-1 min-w-0">
+                          {isCollapsed ? (
+                            <span className="text-sm font-semibold text-white truncate">
+                              {faq.question || "Untitled FAQ"}
+                            </span>
+                          ) : (
+                            <span className="text-xs font-semibold text-muted/80 uppercase tracking-wider">
+                              FAQ #{i + 1}
+                            </span>
+                          )}
+                        </div>
+                        <div onClick={e => e.stopPropagation()}>
+                          <button
+                            type="button"
+                            onClick={() => setRemoveFaqConfirm(removeFaqConfirm === i ? null : i)}
+                            className={`p-2 transition rounded-xl ${
+                              removeFaqConfirm === i
+                                ? "text-red-400 bg-red-500/10"
+                                : "text-muted hover:text-red-400 hover:bg-red-500/5"
+                            }`}
+                          >
+                            <HiTrash size={16} />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Card Content */}
+                      <AnimatePresence initial={false}>
+                        {!isCollapsed && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.3, ease: [0.04, 0.62, 0.23, 0.98] }}
+                          >
+                            <div className="p-4 pt-0 space-y-4 border-t border-white/[0.03]">
+                              <div className="space-y-4 mt-4">
+                                <input
+                                  required
+                                  value={faq.question}
+                                  onChange={(e) => setFaqField(i, "question", e.target.value)}
+                                  placeholder="e.g. How long does the project take?"
+                                  className="admin-input w-full text-sm font-semibold"
+                                />
+                                <textarea
+                                  required
+                                  value={faq.answer}
+                                  onChange={(e) => setFaqField(i, "answer", e.target.value)}
+                                  placeholder="Detailed answer..."
+                                  rows={3}
+                                  className="admin-input w-full text-xs text-muted resize-none"
+                                />
+                              </div>
+
+                              {removeFaqConfirm === i && (
+                                <div className="flex items-center gap-3 py-2 px-3 rounded-lg bg-red-500/[0.06] border border-red-500/10 mt-2">
+                                  <span className="text-xs text-red-300/80 flex-1 italic">Remove this FAQ?</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => removeFaq(i)}
+                                    className="text-xs font-semibold text-red-400 hover:text-red-300 transition px-2 py-0.5"
+                                  >
+                                    Remove
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setRemoveFaqConfirm(null)}
+                                    className="text-xs text-gray-500 hover:text-gray-300 transition"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                })}
+              </div>
+            </DashboardGlassCard>
           </motion.div>
         </div>
 
@@ -608,7 +784,7 @@ export default function ServiceEditPage() {
             <DashboardGlassCard>
               <DashboardSectionHeader title="Featured Projects" subtitle="Select related case studies" />
               <div className="space-y-2 mt-4 max-h-[250px] overflow-y-auto custom-scrollbar pr-2">
-                {portfolioProjects.map((proj) => (
+                {filteredPortfolioProjects.map((proj) => (
                   <button
                     key={proj._id}
                     type="button"
@@ -629,7 +805,7 @@ export default function ServiceEditPage() {
             <DashboardGlassCard>
               <DashboardSectionHeader title="Testimonials" subtitle="Link customer reviews" />
               <div className="space-y-2 mt-4 max-h-[250px] overflow-y-auto custom-scrollbar pr-2">
-                {allTestimonials.map((t) => (
+                {filteredTestimonials.map((t) => (
                   <button
                     key={t._id}
                     type="button"

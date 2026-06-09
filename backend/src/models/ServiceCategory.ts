@@ -8,6 +8,14 @@ const accordionItemSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const faqSchema = new mongoose.Schema(
+  {
+    question: { type: String, required: true },
+    answer: { type: String, required: true },
+  },
+  { _id: false }
+);
+
 const caseStudySchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
@@ -41,6 +49,7 @@ const serviceCategorySchema = new mongoose.Schema(
     focusKeyword: { type: String, trim: true },
     techStack: { type: [String], default: [] },
     items: { type: [accordionItemSchema], default: [] },
+    faqs: { type: [faqSchema], default: [] },
     caseStudy: { type: caseStudySchema, default: null },
     status: {
       type: String,

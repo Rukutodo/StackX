@@ -10,7 +10,7 @@ const SERVER_API = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_U
 async function getReference(slug: string) {
   try {
     const res = await fetch(`${SERVER_API}/api/references/slug/${slug}`, {
-      next: { revalidate: 3600 },
+      cache: "no-store",
     });
     if (!res.ok) return null;
     return res.json();
@@ -23,7 +23,7 @@ async function getReference(slug: string) {
 async function getService(slug: string) {
   try {
     const res = await fetch(`${SERVER_API}/api/services/slug/${slug}`, {
-      next: { revalidate: 3600 },
+      cache: "no-store",
     });
     if (!res.ok) return null;
     return res.json();
@@ -132,7 +132,7 @@ export default async function DynamicServicePage({ params }: { params: Promise<{
   const jsonLdDesc = referenceData?.description || targetService.description || targetService.tagline;
   const jsonLdImage = referenceData?.ogImage || targetService.ogImage;
 
-  const jsonLd = {
+  const jsonLd: any = {
     "@context": "https://schema.org",
     "@graph": [
       {
@@ -151,6 +151,20 @@ export default async function DynamicServicePage({ params }: { params: Promise<{
     ]
   };
 
+  if (targetService.faqs && targetService.faqs.length > 0) {
+    jsonLd["@graph"].push({
+      "@type": "FAQPage",
+      "mainEntity": targetService.faqs.map((faq: any) => ({
+        "@type": "Question",
+        "name": faq.question,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": faq.answer
+        }
+      }))
+    });
+  }
+
   return (
     <>
       <script
@@ -159,7 +173,11 @@ export default async function DynamicServicePage({ params }: { params: Promise<{
       />
       {isWebDev ? (
         <Suspense fallback={null}>
-          <WebDevelopmentServiceClient />
+          <WebDevelopmentServiceClient
+            overrideTitle={referenceData?.title || targetService.title}
+            overrideTagline={referenceData?.description || targetService.tagline}
+            initialFaqs={targetService.faqs || []}
+          />
         </Suspense>
       ) : (
         <Suspense fallback={null}>

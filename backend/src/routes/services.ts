@@ -53,7 +53,7 @@ router.get("/:id", async (req, res) => {
 router.post("/", protect, async (req, res) => {
   try {
     const { 
-      slug, title, tagline, pricing, techStack, items, 
+      slug, title, tagline, pricing, techStack, items, faqs,
       caseStudy, status, order, featuredProjects, testimonials,
       pageType, description, keywords, ogImage, canonical, robots, focusKeyword
     } = req.body;
@@ -72,6 +72,7 @@ router.post("/", protect, async (req, res) => {
       description, keywords, ogImage, canonical, robots, focusKeyword,
       techStack: techStack || [],
       items: items || [],
+      faqs: faqs || [],
       caseStudy: caseStudy || null,
       pageType: pageType || "auto",
       status: status || "active",
@@ -97,7 +98,7 @@ router.post("/", protect, async (req, res) => {
 router.put("/:id", protect, async (req, res) => {
   try {
     const { 
-      slug, title, tagline, pricing, techStack, items, 
+      slug, title, tagline, pricing, techStack, items, faqs,
       caseStudy, status, order, featuredProjects, testimonials,
       pageType, description, keywords, ogImage, canonical, robots, focusKeyword
     } = req.body;
@@ -117,7 +118,7 @@ router.put("/:id", protect, async (req, res) => {
     const updated = await ServiceCategory.findByIdAndUpdate(
       req.params.id,
       { 
-        slug, title, tagline, pricing, techStack, items, 
+        slug, title, tagline, pricing, techStack, items, faqs,
         caseStudy, status, order, featuredProjects, testimonials,
         pageType, description, keywords, ogImage, canonical, robots, focusKeyword
       },

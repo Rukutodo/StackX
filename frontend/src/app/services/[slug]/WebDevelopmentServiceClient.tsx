@@ -1,7 +1,8 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { 
   LuCode as Code, 
@@ -53,17 +54,69 @@ function FloatingOrb({ className }: { className?: string }) {
 export default function WebDevelopmentServiceClient({
   overrideTitle,
   overrideTagline,
-  overrideBadge = "Premium Web Development"
+  overrideBadge = "Premium Web Development",
+  initialFaqs = [],
 }: {
   overrideTitle?: string;
   overrideTagline?: string;
   overrideBadge?: string;
+  initialFaqs?: { question: string; answer: string }[];
 }) {
   const [activeFaq, setActiveFaq] = useState<number | null>(0);
   const toggleFaq = (index: number) => setActiveFaq(activeFaq === index ? null : index);
 
+  const [projects, setProjects] = useState<any[]>([]);
+  const [loadingProjects, setLoadingProjects] = useState(true);
+
+  const [testimonials, setTestimonials] = useState<any[]>([]);
+  const [loadingTestimonials, setLoadingTestimonials] = useState(true);
+
+  useEffect(() => {
+    async function fetchProjects() {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/api/portfolio?featured=true`);
+        if (res.ok) {
+          const data = await res.json();
+          // Filter strictly for Web Development projects (or related web categories)
+          const webProjects = data.filter((p: any) => {
+            const cat = (p.category || "").toLowerCase();
+            return cat.includes("web") || cat === "e-commerce" || cat === "saas platform";
+          });
+          // Limit to strictly 6 projects max
+          setProjects(webProjects.slice(0, 6));
+        }
+      } catch (err) {
+        console.error("Error fetching projects:", err);
+      } finally {
+        setLoadingProjects(false);
+      }
+    }
+
+    async function fetchTestimonials() {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/api/testimonials`);
+        if (res.ok) {
+          const data = await res.json();
+          const webTestimonials = data.filter((t: any) => {
+            const cat = (t.projectType || "").toLowerCase();
+            return cat.includes("web") || cat === "e-commerce" || cat === "saas platform";
+          });
+          const selected = webTestimonials.length >= 3 ? webTestimonials : data;
+          setTestimonials(selected.slice(0, 3));
+        }
+      } catch (err) {
+        console.error("Error fetching testimonials:", err);
+      } finally {
+        setLoadingTestimonials(false);
+      }
+    }
+
+    fetchProjects();
+    fetchTestimonials();
+  }, []);
+
   const displayTitle = overrideTitle || "Experiences That Scale";
-  const displayTagline = overrideTagline || "We engineer high-performance, visually stunning web applications tailored to elevate your brand and drive conversion. From custom marketing sites to complex SaaS platforms, we turn your vision into reality.";
+  const displayTagline = "We engineer high-performance, visually stunning web applications tailored to elevate your brand and drive conversion. From custom marketing sites to complex SaaS platforms, we turn your vision into reality.";
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-hidden">
@@ -337,27 +390,130 @@ export default function WebDevelopmentServiceClient({
               </Link>
             </motion.div>
 
-            <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer}>
-              {[
-                { tag: "Web Application", title: "Fintech Dashboard", desc: "A high-performance financial data visualization tool built with React and D3.js." },
-                { tag: "E-Commerce", title: "Luxury Fashion Store", desc: "Headless Shopify storefront with stunning product animations and 3D views." },
-                { tag: "SaaS Platform", title: "HR Management Suite", desc: "Enterprise-grade HR platform with real-time analytics and role-based access." }
-              ].map((project, idx) => (
-                <motion.div key={idx} variants={scaleIn} className="group relative rounded-2xl overflow-hidden aspect-[4/3] cursor-pointer border border-surface-border/50">
-                  <div className="absolute inset-0 bg-gradient-to-br from-surface-light via-surface to-surface-light flex items-center justify-center">
-                    <div className="text-center">
-                      <Monitor className="w-10 h-10 text-primary/20 mx-auto mb-2" />
-                      <p className="text-muted/50 text-xs uppercase tracking-widest">[Project Image {idx + 1}]</p>
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
+              {loadingProjects ? (
+                // Skeletons
+                [1, 2, 3, 4, 5, 6].map(i => (
+                  <div key={i} className="w-full h-[300px] md:h-[450px] rounded-2xl border border-surface-border/50 bg-surface animate-pulse"></div>
+                ))
+              ) : projects.length > 0 ? (
+                projects.map((project, idx) => (
+                  <motion.div 
+                    key={project._id || idx} 
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.5, delay: idx * 0.1 }}
+                    className="group glass-card rounded-2xl overflow-hidden flex flex-col hover:border-primary/40 transition-all duration-500 hover:-translate-y-2 shadow-lg hover:shadow-[0_0_30px_rgba(139,92,246,0.15)] bg-gradient-to-b from-surface-light/50 to-transparent"
+                  >
+                    
+                    {/* Image Section */}
+                    <div className="w-full relative aspect-video overflow-hidden border-b border-surface-border/50 bg-surface">
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/5 z-10 group-hover:opacity-0 transition-opacity duration-500" />
+                      {project.image ? (
+                        <Image
+                          src={`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}${project.image}`}
+                          alt={project.title}
+                          fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          className="object-cover group-hover:scale-105 transition-transform duration-700"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <Monitor className="w-10 h-10 text-primary/20 mb-2 group-hover:scale-110 transition-transform duration-500" />
+                          <p className="text-muted/50 text-[10px] uppercase tracking-widest font-medium">{project.title}</p>
+                        </div>
+                      )}
+                      {project.result && (
+                        <div className="absolute top-3 right-3 z-20 px-2 py-1 rounded bg-background/90 backdrop-blur-md border border-surface-border text-success text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-sm">
+                          <BarChart className="w-3 h-3" /> {project.result}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-8">
-                    <span className="text-accent text-xs font-bold uppercase tracking-wider mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">{project.tag}</span>
-                    <h3 className="text-2xl font-bold mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">{project.title}</h3>
-                    <p className="text-muted text-sm translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100 line-clamp-2">{project.desc}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
+
+                    {/* Content Section */}
+                    <div className="p-4 md:p-6 flex flex-col flex-1">
+                      <span className="text-primary-light text-[8px] md:text-[10px] font-bold uppercase tracking-wider mb-1 md:mb-2 line-clamp-1">
+                        {project.category || "Featured Work"}
+                      </span>
+                      
+                      <h3 className="text-sm md:text-xl font-bold font-heading mb-1 md:mb-2 group-hover:text-primary-light transition-colors duration-300 line-clamp-1">
+                        {project.title}
+                      </h3>
+                      
+                      <p className="text-muted text-xs md:text-sm leading-relaxed mb-3 md:mb-5 flex-1 line-clamp-2 md:line-clamp-3">
+                        {project.description}
+                      </p>
+
+                      {project.techStack && project.techStack.length > 0 && (
+                        <div className="mb-3 md:mb-5 flex flex-wrap gap-1 md:gap-1.5 hidden sm:flex">
+                          {project.techStack.slice(0, 3).map((tech: string, i: number) => (
+                            <span key={i} className="px-1.5 md:px-2 py-0.5 rounded bg-surface border border-white/5 text-muted-light text-[8px] md:text-[10px] font-medium transition-colors">
+                              {tech}
+                            </span>
+                          ))}
+                          {project.techStack.length > 3 && (
+                            <span className="px-1.5 md:px-2 py-0.5 rounded bg-transparent border border-white/5 text-muted/60 text-[8px] md:text-[10px] font-medium">
+                              +{project.techStack.length - 3}
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      {project.slug && project.caseStudy && (
+                        <div className="mt-auto pt-3 md:pt-4 border-t border-surface-border/50">
+                          <Link href={`/portfolio/${project.slug}`} className="inline-flex items-center gap-1 md:gap-2 text-primary-light text-xs md:text-sm font-bold hover:text-white transition-colors duration-300 group/btn">
+                            <span className="hidden sm:inline">View Case Study</span><span className="sm:hidden">View</span> <ArrowRight className="w-3 h-3 md:w-4 md:h-4 group-hover/btn:translate-x-1 transition-transform" />
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                ))
+              ) : (
+                [
+                  { category: "Web Application", title: "Fintech Dashboard", description: "A high-performance financial data visualization tool built with React and D3.js.", result: "300% Faster Load" },
+                  { category: "E-Commerce", title: "Luxury Fashion Store", description: "Headless Shopify storefront with stunning product animations and 3D views.", result: "2x Conversion" },
+                  { category: "SaaS Platform", title: "HR Management Suite", description: "Enterprise-grade HR platform with real-time analytics and role-based access.", result: "99.9% Uptime" }
+                ].map((project, idx) => (
+                  <motion.div 
+                    key={idx} 
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.5, delay: idx * 0.1 }}
+                    className="group glass-card rounded-2xl overflow-hidden flex flex-col hover:border-primary/40 transition-all duration-500 hover:-translate-y-2 shadow-lg hover:shadow-[0_0_30px_rgba(139,92,246,0.15)] bg-gradient-to-b from-surface-light/50 to-transparent"
+                  >
+                    <div className="w-full relative aspect-video overflow-hidden border-b border-surface-border/50 bg-surface">
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/5 z-10 group-hover:opacity-0 transition-opacity duration-500" />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <Monitor className="w-10 h-10 text-primary/20 mb-2 group-hover:scale-110 transition-transform duration-500" />
+                        <p className="text-muted/50 text-[10px] uppercase tracking-widest font-medium">[Project Image {idx + 1}]</p>
+                      </div>
+                      <div className="absolute top-3 right-3 z-20 px-2 py-1 rounded bg-background/90 backdrop-blur-md border border-surface-border text-success text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-sm">
+                        <BarChart className="w-3 h-3" /> {project.result}
+                      </div>
+                    </div>
+                    <div className="p-4 md:p-6 flex flex-col flex-1">
+                      <span className="text-primary-light text-[8px] md:text-[10px] font-bold uppercase tracking-wider mb-1 md:mb-2 line-clamp-1">
+                        {project.category}
+                      </span>
+                      <h3 className="text-sm md:text-xl font-bold font-heading mb-1 md:mb-2 group-hover:text-primary-light transition-colors duration-300 line-clamp-1">
+                        {project.title}
+                      </h3>
+                      <p className="text-muted text-xs md:text-sm leading-relaxed mb-3 md:mb-5 flex-1 line-clamp-2 md:line-clamp-3">
+                        {project.description}
+                      </p>
+                      <div className="mt-auto pt-3 md:pt-4 border-t border-surface-border/50">
+                        <button className="inline-flex items-center gap-1 md:gap-2 text-primary-light text-xs md:text-sm font-bold hover:text-white transition-colors duration-300 group/btn">
+                          <span className="hidden sm:inline">View Case Study</span><span className="sm:hidden">View</span> <ArrowRight className="w-3 h-3 md:w-4 md:h-4 group-hover/btn:translate-x-1 transition-transform" />
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))
+              )}
+            </div>
           </div>
         </section>
 
@@ -370,30 +526,67 @@ export default function WebDevelopmentServiceClient({
             <motion.div className="text-center mb-16" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}>
               <h2 className="text-3xl md:text-5xl font-bold font-heading mb-4">Client <span className="gradient-text-glow">Success Stories</span></h2>
             </motion.div>
-            <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-6" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer}>
-              {[
-                { name: "Sarah Jenkins", role: "CTO, TechFlow", quote: "StackX transformed our outdated monolith into a lightning-fast modern web app. Their engineering rigor is unmatched." },
-                { name: "Marcus Chen", role: "Founder, Elevate SaaS", quote: "The best development agency we've partnered with. Flawless execution and incredible communication throughout." },
-                { name: "Emma Watson", role: "Marketing Dir, Nova", quote: "Conversion rates doubled in the first month post-launch purely thanks to their UX optimizations." }
-              ].map((testimonial, idx) => (
-                <motion.div key={idx} variants={scaleIn} className="glass-card p-8 relative bg-gradient-to-br from-surface-light/50 to-transparent hover:-translate-y-2 transition-all duration-500 group">
-                  <div className="absolute top-6 right-8 text-primary/10 group-hover:text-primary/20 font-serif text-7xl leading-none transition-colors">&ldquo;</div>
-                  <div className="flex gap-1 mb-6">
-                    {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-warning text-warning" />)}
-                  </div>
-                  <p className="text-foreground mb-8 text-sm leading-relaxed relative z-10">&ldquo;{testimonial.quote}&rdquo;</p>
-                  <div className="flex items-center gap-4 mt-auto">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-accent/10 flex items-center justify-center border border-primary/20 shrink-0">
-                      <Users className="w-5 h-5 text-primary-light" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {loadingTestimonials ? (
+                // Skeletons
+                [1, 2, 3].map(i => (
+                  <div key={i} className="w-full h-[250px] rounded-2xl border border-surface-border/50 bg-surface animate-pulse"></div>
+                ))
+              ) : testimonials.length > 0 ? (
+                testimonials.map((testimonial, idx) => (
+                  <motion.div 
+                    key={testimonial._id || idx} 
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.5, delay: idx * 0.1 }}
+                    className="glass-card p-8 relative bg-gradient-to-br from-surface-light/50 to-transparent hover:-translate-y-2 transition-all duration-500 group shadow-[0_0_20px_rgba(0,0,0,0.15)] hover:shadow-[0_0_30px_rgba(139,92,246,0.15)] border-t border-white/5"
+                  >
+                    <div className="absolute top-6 right-8 text-primary/10 group-hover:text-primary/20 font-serif text-7xl leading-none transition-colors">&ldquo;</div>
+                    <div className="flex gap-1 mb-6">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className={`w-4 h-4 ${i < (testimonial.rating || 5) ? 'fill-warning text-warning' : 'fill-surface-light text-surface-light'}`} />
+                      ))}
                     </div>
-                    <div>
-                      <h4 className="font-bold text-sm text-foreground">{testimonial.name}</h4>
-                      <p className="text-xs text-muted mt-0.5">{testimonial.role}</p>
+                    <p className="text-foreground mb-8 text-sm leading-relaxed relative z-10">&ldquo;{testimonial.feedback || testimonial.quote}&rdquo;</p>
+                    <div className="flex items-center gap-4 mt-auto">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-accent/10 flex items-center justify-center border border-primary/20 shrink-0 shadow-inner group-hover:scale-105 transition-transform">
+                        <Users className="w-5 h-5 text-primary-light" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-sm text-foreground">{testimonial.name}</h4>
+                        <p className="text-xs text-muted mt-0.5">{testimonial.role}{testimonial.role && testimonial.company ? ', ' : ''}{testimonial.company}</p>
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
+                  </motion.div>
+                ))
+              ) : (
+                [
+                  { name: "Sarah Jenkins", role: "CTO, TechFlow", quote: "StackX transformed our outdated monolith into a lightning-fast modern web app. Their engineering rigor is unmatched.", rating: 5 },
+                  { name: "Marcus Chen", role: "Founder, Elevate SaaS", quote: "The best development agency we've partnered with. Flawless execution and incredible communication throughout.", rating: 5 },
+                  { name: "Emma Watson", role: "Marketing Dir, Nova", quote: "Conversion rates doubled in the first month post-launch purely thanks to their UX optimizations.", rating: 5 }
+                ].map((testimonial, idx) => (
+                  <motion.div key={idx} variants={scaleIn} className="glass-card p-8 relative bg-gradient-to-br from-surface-light/50 to-transparent hover:-translate-y-2 transition-all duration-500 group shadow-[0_0_20px_rgba(0,0,0,0.15)] border-t border-white/5">
+                    <div className="absolute top-6 right-8 text-primary/10 group-hover:text-primary/20 font-serif text-7xl leading-none transition-colors">&ldquo;</div>
+                    <div className="flex gap-1 mb-6">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className={`w-4 h-4 ${i < (testimonial.rating || 5) ? 'fill-warning text-warning' : 'fill-surface-light text-surface-light'}`} />
+                      ))}
+                    </div>
+                    <p className="text-foreground mb-8 text-sm leading-relaxed relative z-10">&ldquo;{testimonial.quote}&rdquo;</p>
+                    <div className="flex items-center gap-4 mt-auto">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-accent/10 flex items-center justify-center border border-primary/20 shrink-0 shadow-inner group-hover:scale-105 transition-transform">
+                        <Users className="w-5 h-5 text-primary-light" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-sm text-foreground">{testimonial.name}</h4>
+                        <p className="text-xs text-muted mt-0.5">{testimonial.role}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))
+              )}
+            </div>
           </div>
         </section>
 
@@ -405,30 +598,44 @@ export default function WebDevelopmentServiceClient({
               <h2 className="text-3xl md:text-4xl font-bold font-heading mb-4">Frequently Asked <span className="gradient-text">Questions</span></h2>
               <p className="text-muted">Everything you need to know about our web development services.</p>
             </motion.div>
-            <motion.div className="space-y-4" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer}>
-              {[
-                { q: "How long does a typical web development project take?", a: "Depending on complexity, a standard marketing site might take 4-6 weeks, while a custom web application can take 3-6 months. We provide detailed, realistic timelines during our discovery phase." },
-                { q: "Do you build from scratch or use pre-made templates?", a: "We build 100% custom, hand-coded solutions tailored specifically to your brand and technical requirements. We do not rely on pre-made themes." },
-                { q: "Do you provide ongoing maintenance after launch?", a: "Yes, we offer flexible retainer packages for ongoing support, security updates, feature additions, and performance monitoring." },
-                { q: "What technology stack do you specialize in?", a: "Our core frontend stack utilizes React, Next.js, and Tailwind CSS. For backend, we leverage Node.js, Python, and scalable cloud environments." }
-              ].map((faq, index) => (
-                <motion.div key={index} variants={fadeInUp} className="glass-card overflow-hidden hover:border-primary/20 transition-colors">
-                  <button onClick={() => toggleFaq(index)} className="w-full flex items-center justify-between p-6 text-left focus:outline-none group">
-                    <span className="font-semibold text-foreground group-hover:text-primary transition-colors pr-8">{faq.q}</span>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${activeFaq === index ? 'rotate-180 bg-primary/20 text-primary' : 'bg-surface-light text-muted'}`}>
-                      <ChevronDown className="w-4 h-4" />
-                    </div>
-                  </button>
-                  <AnimatePresence>
-                    {activeFaq === index && (
-                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3 }}>
-                        <div className="p-6 pt-0 text-muted text-sm leading-relaxed border-t border-surface-border/30 mt-2">{faq.a}</div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              ))}
-            </motion.div>
+
+            {(() => {
+              // Use DB FAQs if available, otherwise fall back to hardcoded defaults
+              const faqItems = initialFaqs.length > 0 ? initialFaqs : [
+                { question: "How long does a typical web development project take?", answer: "Depending on complexity, a standard marketing site might take 4-6 weeks, while a custom web application can take 3-6 months. We provide detailed, realistic timelines during our discovery phase." },
+                { question: "Do you build from scratch or use pre-made templates?", answer: "We build 100% custom, hand-coded solutions tailored specifically to your brand and technical requirements. We do not rely on pre-made themes." },
+                { question: "Do you provide ongoing maintenance after launch?", answer: "Yes, we offer flexible retainer packages for ongoing support, security updates, feature additions, and performance monitoring." },
+                { question: "What technology stack do you specialize in?", answer: "Our core frontend stack utilizes React, Next.js, and Tailwind CSS. For backend, we leverage Node.js, Python, and scalable cloud environments." }
+              ];
+              return (
+                <div className="space-y-4">
+                  {faqItems.map((faq, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-40px" }}
+                      transition={{ duration: 0.45, delay: index * 0.07 }}
+                      className="glass-card overflow-hidden hover:border-primary/20 transition-colors"
+                    >
+                      <button onClick={() => toggleFaq(index)} className="w-full flex items-center justify-between p-6 text-left focus:outline-none group">
+                        <span className="font-semibold text-foreground group-hover:text-primary transition-colors pr-8">{faq.question}</span>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${activeFaq === index ? 'rotate-180 bg-primary/20 text-primary' : 'bg-surface-light text-muted'}`}>
+                          <ChevronDown className="w-4 h-4" />
+                        </div>
+                      </button>
+                      <AnimatePresence>
+                        {activeFaq === index && (
+                          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3 }}>
+                            <div className="p-6 pt-0 text-muted text-sm leading-relaxed border-t border-surface-border/30 mt-2">{faq.answer}</div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
         </section>
 

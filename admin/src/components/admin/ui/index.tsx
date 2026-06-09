@@ -286,9 +286,10 @@ interface AdminSelectProps {
   onChange: (val: string) => void;
   className?: string;
   placeholder?: string;
+  size?: "sm" | "md";
 }
 
-export function AdminSelect({ value, options, onChange, className = "", placeholder }: AdminSelectProps) {
+export function AdminSelect({ value, options, onChange, className = "", placeholder, size = "md" }: AdminSelectProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -304,11 +305,15 @@ export function AdminSelect({ value, options, onChange, className = "", placehol
 
   const selectedOption = options.find((o) => o.value === value);
 
+  const containerClasses = size === "sm"
+    ? `flex items-center justify-between bg-white/5 border border-white/10 text-white rounded-lg px-3 py-2 focus:outline-none focus:border-primary/50 transition cursor-pointer select-none ${className}`
+    : `flex items-center justify-between bg-white/5 border border-white/10 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-primary/50 transition cursor-pointer select-none ${className}`;
+
   return (
     <div ref={ref} className="relative w-full">
       <div
         onClick={() => setOpen(!open)}
-        className={`flex items-center justify-between bg-white/5 border border-white/10 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-primary/50 transition cursor-pointer select-none ${className}`}
+        className={containerClasses}
       >
         <span className={selectedOption ? "text-white text-sm" : "text-muted text-sm"}>
           {selectedOption ? selectedOption.label : placeholder || "Select..."}
@@ -336,6 +341,83 @@ export function AdminSelect({ value, options, onChange, className = "", placehol
                     setOpen(false);
                   }}
                   className={`px-3 py-2 text-sm rounded-lg cursor-pointer transition select-none ${
+                    value === opt.value
+                      ? "bg-primary/20 text-white font-medium"
+                      : "text-muted hover:bg-white/5 hover:text-white"
+                  }`}
+                >
+                  {opt.label}
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ─── Filter Dropdown ─── */
+interface FilterDropdownProps {
+  label: string;
+  value: string;
+  options: { label: string; value: string }[];
+  onChange: (val: string) => void;
+  className?: string;
+}
+
+export function FilterDropdown({ label, value, options, onChange, className = "" }: FilterDropdownProps) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  const selected = options.find((o) => o.value === value);
+
+  return (
+    <div ref={ref} className={`relative shrink-0 select-none ${className}`}>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-sm transition-all duration-200"
+        style={{
+          background: "rgba(255,255,255,0.04)",
+          border: "1px solid rgba(255,255,255,0.08)",
+        }}
+      >
+        <span className="text-muted text-xs font-semibold uppercase tracking-wider shrink-0">{label}</span>
+        <span className="text-white text-sm font-medium">{selected?.label || value}</span>
+        <HiChevronDown
+          size={14}
+          className={`text-muted transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -5 }}
+            transition={{ duration: 0.15 }}
+            className="absolute left-0 z-50 min-w-[160px] mt-2 rounded-xl border border-white/10 bg-[#13131A] shadow-2xl overflow-hidden"
+          >
+            <div className="max-h-60 overflow-y-auto admin-scroll p-1.5 space-y-0.5">
+              {options.map((opt) => (
+                <div
+                  key={opt.value}
+                  onClick={() => {
+                    onChange(opt.value);
+                    setOpen(false);
+                  }}
+                  className={`px-3 py-2 text-xs rounded-lg cursor-pointer transition ${
                     value === opt.value
                       ? "bg-primary/20 text-white font-medium"
                       : "text-muted hover:bg-white/5 hover:text-white"

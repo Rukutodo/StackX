@@ -4,12 +4,14 @@ import { useState, useEffect, useCallback, type FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   HiPlus, HiPencil, HiTrash, HiStar, HiX,
-  HiSave, HiCheck,
+  HiSave, HiCheck, HiSearch, HiSortDescending,
 } from "react-icons/hi";
 import {
   DashboardGlassCard,
   StatusBadge,
   AdminButton,
+  AdminSelect,
+  FilterDropdown,
 } from "@/components/admin/ui";
 import { DeleteConfirmModal } from "@/components/admin/DeleteConfirmModal";
 import type { Testimonial } from "@/types/testimonials";
@@ -21,6 +23,7 @@ interface PortfolioItem {
   title: string;
   slug: string;
   status: string;
+  category?: string;
 }
 
 const EMPTY: Omit<Testimonial, "_id" | "createdAt"> = {
@@ -82,12 +85,18 @@ function EditPanel({
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
   const [projects, setProjects] = useState<PortfolioItem[]>([]);
+  const [services, setServices] = useState<{ _id: string; title: string }[]>([]);
 
   // Fetch portfolio projects for picker
   useEffect(() => {
     fetch(`${API}/api/portfolio?all=true`)
       .then((r) => r.json())
       .then((data) => setProjects(Array.isArray(data) ? data : []))
+      .catch(() => {});
+
+    fetch(`${API}/api/services`)
+      .then((r) => r.json())
+      .then((data) => setServices(Array.isArray(data) ? data : []))
       .catch(() => {});
   }, []);
 
@@ -171,8 +180,22 @@ function EditPanel({
             </div>
             <div>
               <label className="block text-xs text-muted mb-1.5">Project Type</label>
-              <input value={form.projectType} onChange={(e) => set("projectType", e.target.value)}
-                placeholder="Web Development" className="admin-input w-full" />
+              <AdminSelect
+                value={form.projectType}
+                onChange={(val) => {
+                  set("projectType", val);
+                  // Clear linked project if category mismatches
+                  if (form.portfolioProject) {
+                    const linkedProj = projects.find(p => p._id === form.portfolioProject!.id);
+                    if (linkedProj && linkedProj.category !== val) {
+                      setPortfolioProject(null);
+                    }
+                  }
+                }}
+                placeholder="Select Service"
+                size="sm"
+                options={services.map((s) => ({ label: s.title, value: s.title }))}
+              />
             </div>
           </div>
 
@@ -185,19 +208,22 @@ function EditPanel({
           {/* Linked Portfolio Project */}
           <div>
             <label className="block text-xs text-muted mb-1.5">Linked Portfolio Project</label>
-            <select
+            <AdminSelect
               value={form.portfolioProject?.id ?? ""}
-              onChange={(e) => {
-                const proj = projects.find((p) => p._id === e.target.value) ?? null;
+              onChange={(val) => {
+                const proj = projects.find((p) => p._id === val) ?? null;
                 setPortfolioProject(proj);
               }}
-              className="admin-input w-full"
-            >
-              <option value="">— Not linked —</option>
-              {projects.map((p) => (
-                <option key={p._id} value={p._id}>{p.title}</option>
-              ))}
-            </select>
+              placeholder="Not linked"
+              size="sm"
+              options={[
+                { label: "Not linked", value: "" },
+                ...(form.projectType ? projects.filter(p => p.category === form.projectType) : projects).map((p) => ({
+                  label: p.title,
+                  value: p._id,
+                })),
+              ]}
+            />
             {form.portfolioProject && (
               <p className="text-[10px] text-purple-400 mt-1 flex items-center gap-1">
                 <span>↗</span> Will link to: /portfolio/{form.portfolioProject.slug}
@@ -221,11 +247,16 @@ function EditPanel({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs text-muted mb-1.5">Status</label>
-              <select value={form.status} onChange={(e) => set("status", e.target.value)} className="admin-input w-full">
-                <option value="active">Active</option>
-                <option value="pending">Pending</option>
-                <option value="archived">Archived</option>
-              </select>
+              <AdminSelect
+                value={form.status}
+                onChange={(val) => set("status", val)}
+                size="sm"
+                options={[
+                  { label: "Active", value: "active" },
+                  { label: "Pending", value: "pending" },
+                  { label: "Archived", value: "archived" },
+                ]}
+              />
             </div>
             <div>
               <label className="block text-xs text-muted mb-1.5">Display Order</label>
@@ -266,10 +297,14 @@ function EditPanel({
   );
 }
 
-/* ── Main Page ────────────────────────────── */
 export default function TestimonialsAdminPage() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState<"all" | "active" | "pending" | "archived">("all");
+  const [filterService, setFilterService] = useState("all");
+  const [allServices, setAllServices] = useState<{ _id: string; title: string }[]>([]);
+  const [sortBy, setSortBy] = useState<"order" | "rating" | "newest">("order");
   const [panelTarget, setPanelTarget] = useState<Testimonial | null | "new">(undefined as any);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; label: string } | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -293,7 +328,13 @@ export default function TestimonialsAdminPage() {
     }
   }, []);
 
-  useEffect(() => { fetchTestimonials(); }, [fetchTestimonials]);
+  useEffect(() => {
+    fetchTestimonials();
+    fetch(`${API}/api/services`)
+      .then((r) => r.json())
+      .then((data) => setAllServices(Array.isArray(data) ? data : []))
+      .catch(() => {});
+  }, [fetchTestimonials]);
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
@@ -318,6 +359,23 @@ export default function TestimonialsAdminPage() {
   const formatDate = (iso: string) =>
     new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
+  const filteredTestimonials = testimonials
+    .filter((t) => {
+      const q = searchQuery.toLowerCase();
+      const matchesSearch = !q ||
+        t.name.toLowerCase().includes(q) ||
+        t.company.toLowerCase().includes(q) ||
+        (t.projectType || "").toLowerCase().includes(q);
+      const matchesStatus = filterStatus === "all" || t.status === filterStatus;
+      const matchesService = filterService === "all" || t.projectType === filterService;
+      return matchesSearch && matchesStatus && matchesService;
+    })
+    .sort((a, b) => {
+      if (sortBy === "rating") return b.rating - a.rating;
+      if (sortBy === "newest") return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      return (a.order || 0) - (b.order || 0);
+    });
+
   return (
     <>
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
@@ -333,6 +391,58 @@ export default function TestimonialsAdminPage() {
         <AdminButton variant="primary" className="gap-1.5" onClick={() => setPanelTarget("new")}>
           <HiPlus size={16} /> Add Testimonial
         </AdminButton>
+      </motion.div>
+
+      {/* Search & Filters — ABOVE stats */}
+      <motion.div variants={item}>
+        <div className="flex flex-col sm:flex-row gap-3 flex-wrap">
+          <div className="relative flex-1 min-w-[200px] group">
+            <div className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none">
+              <HiSearch size={16} className="text-muted group-focus-within:text-primary-light transition-colors" />
+            </div>
+            <input
+              type="text"
+              placeholder="Search by name, company or service…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm text-white placeholder-muted/50 outline-none transition-all"
+              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "inset 0 1px 2px rgba(0,0,0,0.2)" }}
+            />
+          </div>
+          {/* Filter: Status */}
+          <FilterDropdown
+            label="Status"
+            value={filterStatus}
+            onChange={(val) => setFilterStatus(val as any)}
+            options={[
+              { label: "All", value: "all" },
+              { label: "Active", value: "active" },
+              { label: "Pending", value: "pending" },
+              { label: "Archived", value: "archived" },
+            ]}
+          />
+          {/* Filter: Service */}
+          <FilterDropdown
+            label="Service"
+            value={filterService}
+            onChange={(val) => setFilterService(val)}
+            options={[
+              { label: "All", value: "all" },
+              ...allServices.map((s) => ({ label: s.title, value: s.title })),
+            ]}
+          />
+          {/* Sort: Rating / Order */}
+          <FilterDropdown
+            label="Sort By"
+            value={sortBy}
+            onChange={(val) => setSortBy(val as any)}
+            options={[
+              { label: "Display Order", value: "order" },
+              { label: "Top Rated", value: "rating" },
+              { label: "Newest First", value: "newest" },
+            ]}
+          />
+        </div>
       </motion.div>
 
       {/* Stats */}
@@ -362,19 +472,25 @@ export default function TestimonialsAdminPage() {
                 <div key={n} className="h-24 rounded-xl animate-pulse" style={{ background: "rgba(255,255,255,0.05)" }} />
               ))}
             </div>
-          ) : testimonials.length === 0 ? (
+          ) : filteredTestimonials.length === 0 ? (
             <DashboardGlassCard>
               <div className="py-12 text-center">
                 <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
                   <HiStar size={24} className="text-amber-400" />
                 </div>
-                <p className="text-white font-medium mb-1">No testimonials yet</p>
-                <p className="text-sm text-muted">Click &quot;Add Testimonial&quot; to create your first review.</p>
+                <p className="text-white font-medium mb-1">
+                  {testimonials.length === 0 ? "No testimonials yet" : "No results found"}
+                </p>
+                <p className="text-sm text-muted">
+                  {testimonials.length === 0
+                    ? "Click \"Add Testimonial\" to create your first review."
+                    : "Try a different search term or sort option."}
+                </p>
               </div>
             </DashboardGlassCard>
           ) : (
             <div className="space-y-3">
-              {testimonials.map((t) => {
+              {filteredTestimonials.map((t) => {
                 const isSelected = (panelTarget as Testimonial)?._id === t._id;
                 return (
                   <div

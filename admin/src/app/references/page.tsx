@@ -5,11 +5,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   HiPlus, HiPencil, HiTrash, HiX,
   HiSave, HiCheck, HiLink, HiCollection, HiInformationCircle,
+  HiExternalLink, HiSearch, HiSortDescending,
 } from "react-icons/hi";
 import {
   DashboardGlassCard,
   StatusBadge,
   AdminButton,
+  AdminSelect,
+  FilterDropdown,
 } from "@/components/admin/ui";
 import { DeleteConfirmModal } from "@/components/admin/DeleteConfirmModal";
 import type { Reference } from "@/types/reference";
@@ -156,10 +159,17 @@ function EditPanel({
               {/* Slug */}
               <div>
                 <label className="block text-xs text-muted mb-1.5">Route Slug *</label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted/30 text-sm">/</span>
-                  <input value={form.slug} onChange={(e) => set("slug", e.target.value)}
-                    placeholder="venu" className="admin-input w-full pl-5 font-mono text-sm" />
+                <div className="relative flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted/30 text-sm">/</span>
+                    <input value={form.slug} onChange={(e) => set("slug", e.target.value)}
+                      placeholder="venu" className="admin-input w-full pl-5 font-mono text-sm" />
+                  </div>
+                  {isEdit && form.slug && (
+                     <a href={`http://localhost:3000/services/${form.slug}`} target="_blank" rel="noreferrer" title="Open in frontend" className="p-2.5 bg-white/5 hover:bg-white/10 rounded-xl text-muted hover:text-white transition shrink-0 border border-white/5">
+                       <HiExternalLink size={16} />
+                     </a>
+                  )}
                 </div>
                 <p className="text-[10px] text-muted/50 mt-1 italic">The final URL will be stackx.co.in/{form.slug || '...'}</p>
               </div>
@@ -167,26 +177,28 @@ function EditPanel({
               {/* Associated Service */}
               <div>
                 <label className="block text-xs text-muted mb-1.5">Parent Service *</label>
-                <select
+                <AdminSelect
                   value={form.service as string}
-                  onChange={(e) => set("service", e.target.value)}
-                  className="admin-input w-full"
-                >
-                  <option value="">— Select Service —</option>
-                  {services.map((s) => (
-                    <option key={s._id} value={s._id}>{s.title}</option>
-                  ))}
-                </select>
+                  onChange={(val) => set("service", val)}
+                  placeholder="Select Service"
+                  size="sm"
+                  options={services.map((s) => ({ label: s.title, value: s._id }))}
+                />
               </div>
 
               {/* Status + Order */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs text-muted mb-1.5">Status</label>
-                  <select value={form.status} onChange={(e) => set("status", e.target.value)} className="admin-input w-full">
-                    <option value="active">Active</option>
-                    <option value="draft">Draft</option>
-                  </select>
+                  <AdminSelect
+                    value={form.status}
+                    onChange={(val) => set("status", val)}
+                    size="sm"
+                    options={[
+                      { label: "Active", value: "active" },
+                      { label: "Draft", value: "draft" },
+                    ]}
+                  />
                 </div>
                 <div>
                   <label className="block text-xs text-muted mb-1.5">Display Order</label>
@@ -244,12 +256,17 @@ function EditPanel({
                 </div>
                 <div>
                   <label className="block text-xs text-muted mb-1.5">Meta Robots</label>
-                  <select value={form.robots} onChange={(e) => set("robots", e.target.value)} className="admin-input w-full">
-                    <option value="index, follow">Index, Follow</option>
-                    <option value="noindex, nofollow">Noindex, Nofollow</option>
-                    <option value="index, nofollow">Index, Nofollow</option>
-                    <option value="noindex, follow">Noindex, Follow</option>
-                  </select>
+                  <AdminSelect
+                    value={form.robots}
+                    onChange={(val) => set("robots", val)}
+                    size="sm"
+                    options={[
+                      { label: "Index, Follow", value: "index, follow" },
+                      { label: "Noindex, Nofollow", value: "noindex, nofollow" },
+                      { label: "Index, Nofollow", value: "index, nofollow" },
+                      { label: "Noindex, Follow", value: "noindex, follow" },
+                    ]}
+                  />
                 </div>
               </div>
             </>
@@ -291,6 +308,10 @@ function EditPanel({
 export default function ReferenceAdminPage() {
   const [references, setReferences] = useState<Reference[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState<"all" | "active" | "draft">("all");
+  const [filterService, setFilterService] = useState("all");
+  const [allServices, setAllServices] = useState<{ _id: string; title: string }[]>([]);
   const [panelTarget, setPanelTarget] = useState<Reference | null | "new">(undefined as any);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; label: string } | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -314,7 +335,13 @@ export default function ReferenceAdminPage() {
     }
   }, []);
 
-  useEffect(() => { fetchReferences(); }, [fetchReferences]);
+  useEffect(() => {
+    fetchReferences();
+    fetch(`${API}/api/services`)
+      .then(r => r.json())
+      .then(d => setAllServices(Array.isArray(d) ? d : []))
+      .catch(() => {});
+  }, [fetchReferences]);
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
@@ -333,6 +360,15 @@ export default function ReferenceAdminPage() {
 
   const activeCount = references.filter((r) => r.status === "active").length;
 
+  const filteredReferences = references.filter(r => {
+    const q = searchQuery.toLowerCase();
+    const matchesSearch = !q || r.title.toLowerCase().includes(q) || r.slug.toLowerCase().includes(q);
+    const matchesStatus = filterStatus === "all" || r.status === filterStatus;
+    const serviceTitle = typeof r.service === "string" ? r.service : (r.service as any)?.title ?? "";
+    const matchesService = filterService === "all" || serviceTitle === filterService;
+    return matchesSearch && matchesStatus && matchesService;
+  });
+
   return (
     <>
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
@@ -348,6 +384,47 @@ export default function ReferenceAdminPage() {
         <AdminButton variant="primary" className="gap-1.5" onClick={() => setPanelTarget("new")}>
           <HiPlus size={16} /> Add Reference
         </AdminButton>
+      </motion.div>
+
+      {/* Search & Filters — ABOVE stats */}
+      <motion.div variants={item}>
+        <div className="flex flex-col sm:flex-row gap-3">
+          {/* Search */}
+          <div className="relative flex-1 group">
+            <div className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none">
+              <HiSearch size={16} className="text-muted group-focus-within:text-primary-light transition-colors" />
+            </div>
+            <input
+              type="text"
+              placeholder="Search by title or slug…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm text-white placeholder-muted/50 outline-none transition-all"
+              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "inset 0 1px 2px rgba(0,0,0,0.2)" }}
+            />
+          </div>
+          {/* Filter: Status */}
+          <FilterDropdown
+            label="Status"
+            value={filterStatus}
+            onChange={(val) => setFilterStatus(val as any)}
+            options={[
+              { label: "All", value: "all" },
+              { label: "Active", value: "active" },
+              { label: "Draft", value: "draft" },
+            ]}
+          />
+          {/* Filter: Parent Service */}
+          <FilterDropdown
+            label="Service"
+            value={filterService}
+            onChange={(val) => setFilterService(val)}
+            options={[
+              { label: "All", value: "all" },
+              ...allServices.map((s) => ({ label: s.title, value: s.title })),
+            ]}
+          />
+        </div>
       </motion.div>
 
       {/* Stats */}
@@ -367,13 +444,14 @@ export default function ReferenceAdminPage() {
 
         {/* References list */}
         <div className="flex-1 min-w-0 w-full">
+
           {loading ? (
             <div className="space-y-3">
               {[1, 2, 3].map((n) => (
                 <div key={n} className="h-20 rounded-xl animate-pulse" style={{ background: "rgba(255,255,255,0.05)" }} />
               ))}
             </div>
-          ) : references.length === 0 ? (
+          ) : filteredReferences.length === 0 ? (
             <DashboardGlassCard>
               <div className="py-12 text-center">
                 <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
@@ -385,7 +463,7 @@ export default function ReferenceAdminPage() {
             </DashboardGlassCard>
           ) : (
             <div className="space-y-3">
-              {references.map((r) => {
+              {filteredReferences.map((r) => {
                 const isSelected = (panelTarget as Reference)?._id === r._id;
                 const service = typeof r.service === 'string' ? { title: 'Unknown', slug: '...' } : r.service;
                 
