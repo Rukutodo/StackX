@@ -13,6 +13,29 @@ const adminUserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    name: {
+      type: String,
+      trim: true,
+    },
+    email: {
+      type: String,
+      trim: true,
+      lowercase: true,
+    },
+    // role slug referencing the Role collection (dynamic RBAC)
+    role: {
+      type: String,
+      default: "developer",
+      trim: true,
+      lowercase: true,
+    },
+    avatar: {
+      type: String,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,

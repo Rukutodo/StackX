@@ -1,6 +1,7 @@
 import express from "express";
 import jwt from "jsonwebtoken";
 import { AdminUser } from "../models/AdminUser";
+import { getRolePermissions } from "../lib/roleCache";
 
 const router = express.Router();
 
@@ -22,10 +23,22 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ message: "Invalid username or password" });
     }
 
-    // 3. Generate JWT
-    const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, {
-      expiresIn: "1d",
-    });
+    // 2b. Reject deactivated accounts
+    if ((user as any).isActive === false) {
+      return res.status(403).json({ message: "Account is deactivated" });
+    }
+
+    // 3. Generate JWT (include role + name for client-side role gating)
+    const token = jwt.sign(
+      {
+        id: user._id,
+        username: user.username,
+        role: (user as any).role || "developer",
+        name: (user as any).name || user.username,
+      },
+      JWT_SECRET,
+      { expiresIn: "1d" }
+    );
 
     // 4. Set JWT as HTTP-only cookie
     res.cookie("token", token, {
@@ -36,11 +49,19 @@ router.post("/login", async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
 
-    // 5. Respond with success (include token so frontend can store it)
+    // 5. Respond with success (include token + resolved permissions)
+    const role = (user as any).role || "developer";
     res.json({
       message: "Login successful",
       token,
-      user: { id: user._id, username: user.username },
+      user: {
+        id: user._id,
+        username: user.username,
+        role,
+        name: (user as any).name || user.username,
+        email: (user as any).email,
+        permissions: await getRolePermissions(role),
+      },
     });
   } catch (error) {
     console.error("Login error:", error);
@@ -62,8 +83,22 @@ router.get("/me", async (req, res) => {
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: string; username: string };
-    res.json({ user: { id: decoded.id, username: decoded.username } });
+    const decoded = jwt.verify(token, JWT_SECRET) as {
+      id: string;
+      username: string;
+      role?: string;
+      name?: string;
+    };
+    const role = decoded.role || "developer";
+    res.json({
+      user: {
+        id: decoded.id,
+        username: decoded.username,
+        role,
+        name: decoded.name || decoded.username,
+        permissions: await getRolePermissions(role),
+      },
+    });
   } catch {
     return res.status(401).json({ message: "Invalid or expired token" });
   }

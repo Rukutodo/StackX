@@ -14,6 +14,11 @@ import applicationsRoutes from "./routes/applications";
 import messagesRoutes from "./routes/messages";
 import testimonialsRoutes from "./routes/testimonials";
 import statsRoutes from "./routes/stats";
+import usersRoutes from "./routes/users";
+import rolesRoutes from "./routes/roles";
+import tasksRoutes from "./routes/tasks";
+import leavesRoutes from "./routes/leaves";
+import analyticsRoutes from "./routes/analytics";
 
 dotenv.config();
 
@@ -27,8 +32,10 @@ connectDB();
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
+  "http://localhost:3002",
   "http://129.159.236.176:3000",
   "http://129.159.236.176:3001",
+  "http://129.159.236.176:3002",
   "https://stackx.co.in",
   "https://www.stackx.co.in",
   "https://admin.stackx.co.in",
@@ -75,6 +82,11 @@ app.use("/api/applications", applicationsRoutes);
 app.use("/api/messages", messagesRoutes);
 app.use("/api/testimonials", testimonialsRoutes);
 app.use("/api/stats", statsRoutes);
+app.use("/api/users", usersRoutes);
+app.use("/api/roles", rolesRoutes);
+app.use("/api/tasks", tasksRoutes);
+app.use("/api/leaves", leavesRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
 // Basic health check
 app.get("/", (req, res) => {

@@ -7,6 +7,10 @@ import { JobPosting } from "./models/JobPosting";
 import { JobApplication } from "./models/JobApplication";
 import { Message } from "./models/Message";
 import { Testimonial } from "./models/Testimonial";
+import { Task } from "./models/Task";
+import { Leave } from "./models/Leave";
+import { Role } from "./models/Role";
+import { SYSTEM_ROLES } from "./lib/permissions";
 
 dotenv.config();
 
@@ -20,15 +24,44 @@ const connectDB = async () => {
   }
 };
 
+const seedRoles = async () => {
+  for (const r of SYSTEM_ROLES) {
+    const existing = await Role.findOne({ slug: r.slug });
+    if (existing) {
+      // keep system role permissions in sync with code
+      existing.name = r.name;
+      existing.description = r.description;
+      existing.permissions = r.permissions;
+      existing.isSystem = true;
+      await existing.save();
+    } else {
+      await Role.create({ ...r, isSystem: true });
+    }
+  }
+  console.log(`✅ System roles seeded (${SYSTEM_ROLES.map((r) => r.slug).join(", ")}).`);
+};
+
 const seedAdmin = async () => {
   const existingAdmin = await AdminUser.findOne({ username: "roshan" });
   if (existingAdmin) {
-    console.log("⚠️  Admin user 'roshan' already exists. Skipping.");
+    if ((existingAdmin as any).role !== "admin") {
+      (existingAdmin as any).role = "admin";
+      (existingAdmin as any).name = (existingAdmin as any).name || "Roshan";
+      await existingAdmin.save();
+      console.log("✅ Upgraded 'roshan' to admin role.");
+    } else {
+      console.log("⚠️  Admin user 'roshan' already exists. Skipping.");
+    }
     return;
   }
-  const admin = new AdminUser({ username: "roshan", password: "roshanmotion" });
+  const admin = new AdminUser({
+    username: "roshan",
+    password: "roshanmotion",
+    name: "Roshan",
+    role: "admin",
+  });
   await admin.save();
-  console.log("✅ Admin user created! (roshan / roshanmotion)");
+  console.log("✅ Admin user created! (roshan / roshanmotion) [admin]");
 };
 
 const seedServices = async () => {
@@ -429,15 +462,95 @@ const seedMessages = async () => {
   console.log("✅ Messages seeded (5 sample messages)!");
 };
 
+const daysAgo = (n: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  return d;
+};
+const daysFromNow = (n: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() + n);
+  return d;
+};
+
+const seedDevTeam = async () => {
+  // ─── Developers ───
+  const developerDefs = [
+    { username: "aisha", name: "Aisha Khan", email: "aisha@stackx.dev" },
+    { username: "diego", name: "Diego Santos", email: "diego@stackx.dev" },
+    { username: "mei", name: "Mei Lin", email: "mei@stackx.dev" },
+  ];
+
+  const developers = [];
+  for (const def of developerDefs) {
+    let dev = await AdminUser.findOne({ username: def.username });
+    if (!dev) {
+      dev = new AdminUser({ ...def, password: "password123", role: "developer" });
+      await dev.save();
+      console.log(`✅ Developer created: ${def.username} / password123`);
+    }
+    developers.push(dev);
+  }
+
+  const manager = await AdminUser.findOne({ username: "roshan" });
+  const [aisha, diego, mei] = developers;
+
+  // ─── Tasks ───
+  const taskCount = await Task.countDocuments();
+  if (taskCount === 0 && manager) {
+    const tasks = [
+      // active board work
+      { title: "Build login page", description: "JWT auth + form validation", assignee: aisha._id, status: "in_progress", priority: "high", order: 1, dueDate: daysFromNow(3) },
+      { title: "Design Kanban columns", description: "Drag and drop board layout", assignee: diego._id, status: "in_progress", priority: "medium", order: 2 },
+      { title: "Set up analytics aggregations", description: "Mongo pipelines for charts", assignee: mei._id, status: "in_review", priority: "high", order: 1 },
+      { title: "Write API docs", description: "Document all task endpoints", assignee: aisha._id, status: "todo", priority: "low", order: 1 },
+      { title: "Add leave request form", description: "Date range + reason", assignee: diego._id, status: "todo", priority: "medium", order: 2, dueDate: daysFromNow(5) },
+      { title: "Refine mobile responsiveness", description: "Sidebar + board on small screens", assignee: mei._id, status: "backlog", priority: "low", order: 1 },
+      { title: "Investigate slow dashboard query", description: "Profile the stats endpoint", assignee: aisha._id, status: "backlog", priority: "urgent", order: 2, dueDate: daysAgo(1) },
+      // completed work spread across weeks for throughput chart
+      { title: "Scaffold developer app", assignee: diego._id, status: "done", priority: "high", order: 1, completedAt: daysAgo(2) },
+      { title: "Role-based auth middleware", assignee: mei._id, status: "done", priority: "high", order: 2, completedAt: daysAgo(4) },
+      { title: "Task model + routes", assignee: aisha._id, status: "done", priority: "medium", order: 3, completedAt: daysAgo(9) },
+      { title: "Leave model + routes", assignee: diego._id, status: "done", priority: "medium", order: 4, completedAt: daysAgo(11) },
+      { title: "Seed sample data", assignee: mei._id, status: "done", priority: "low", order: 5, completedAt: daysAgo(16) },
+      { title: "CORS + env setup", assignee: aisha._id, status: "done", priority: "low", order: 6, completedAt: daysAgo(18) },
+    ];
+
+    await Task.insertMany(
+      tasks.map((t) => ({ ...t, reporter: manager._id, labels: [] }))
+    );
+    console.log(`✅ Tasks seeded (${tasks.length} across the board)!`);
+  } else {
+    console.log("⚠️  Tasks already seeded. Skipping.");
+  }
+
+  // ─── Leaves ───
+  const leaveCount = await Leave.countDocuments();
+  if (leaveCount === 0 && manager) {
+    const leaves = [
+      { user: aisha._id, type: "vacation", startDate: daysFromNow(10), endDate: daysFromNow(14), reason: "Family trip", status: "pending" },
+      { user: diego._id, type: "sick", startDate: daysAgo(3), endDate: daysAgo(2), reason: "Flu", status: "approved", reviewedBy: manager._id, reviewedAt: daysAgo(4) },
+      { user: mei._id, type: "personal", startDate: daysFromNow(2), endDate: daysFromNow(2), reason: "Appointment", status: "pending" },
+      { user: aisha._id, type: "vacation", startDate: daysAgo(30), endDate: daysAgo(26), reason: "Holiday", status: "approved", reviewedBy: manager._id, reviewedAt: daysAgo(35) },
+    ];
+    await Leave.insertMany(leaves);
+    console.log(`✅ Leaves seeded (${leaves.length} requests)!`);
+  } else {
+    console.log("⚠️  Leaves already seeded. Skipping.");
+  }
+};
+
 const runSeed = async () => {
   try {
     await connectDB();
+    await seedRoles();
     await seedAdmin();
     await seedServices();
     await seedPortfolio();
     await seedJobs();
     await seedMessages();
     await seedTestimonials();
+    await seedDevTeam();
 
     // Link some data to Web Development service for testing
     const webDev = await ServiceCategory.findOne({ slug: "web-development" });

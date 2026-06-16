@@ -14,3 +14,7 @@ Thumbs.db
 
 # Temporary files
 restored_code.txt
+_devlog.txt
+_install.log
+*.stackdump
+*.tsbuildinfo
