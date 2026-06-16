@@ -22,8 +22,13 @@ const insightsLinks = [
     description: "What our clients say",
   },
   {
+    href: "/case-studies",
+    label: "Case Studies",
+    description: "In-depth project analysis",
+  },
+  {
     href: "/blog",
-    label: "Blog",
+    label: "Blogs",
     description: "Insights & tutorials",
   },
 ];

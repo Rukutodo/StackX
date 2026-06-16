@@ -10,6 +10,7 @@ export default function CustomCursor() {
     const [isClicking, setIsClicking] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
     const [isTouchDevice, setIsTouchDevice] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
     // Smooth spring follow for the outer ring
     const springConfig = { damping: 25, stiffness: 200, mass: 0.5 };
@@ -17,6 +18,7 @@ export default function CustomCursor() {
     const ringY = useSpring(cursorY, springConfig);
 
     useEffect(() => {
+        setMounted(true);
         // Skip on touch devices
         if ("ontouchstart" in window || navigator.maxTouchPoints > 0) {
             setIsTouchDevice(true);
@@ -72,7 +74,7 @@ export default function CustomCursor() {
         };
     }, [cursorX, cursorY, isVisible]);
 
-    if (isTouchDevice) return null;
+    if (!mounted || isTouchDevice) return null;
 
     return (
         <>
