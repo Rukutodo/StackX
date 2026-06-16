@@ -38,9 +38,11 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [insightsOpen, setInsightsOpen] = useState(false);
   const [mobileInsightsOpen, setMobileInsightsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    setMounted(true);
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -56,6 +58,8 @@ export default function Navbar() {
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
+
+  if (!mounted) return <div className="h-22" />; // Placeholder to avoid layout shift
 
   return (
     <nav
