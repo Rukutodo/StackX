@@ -13,6 +13,7 @@ import jobsRoutes from "./routes/jobs";
 import applicationsRoutes from "./routes/applications";
 import messagesRoutes from "./routes/messages";
 import testimonialsRoutes from "./routes/testimonials";
+import caseStudiesRoutes from "./routes/caseStudies";
 import statsRoutes from "./routes/stats";
 
 dotenv.config();
@@ -74,6 +75,7 @@ app.use("/api/jobs", jobsRoutes);
 app.use("/api/applications", applicationsRoutes);
 app.use("/api/messages", messagesRoutes);
 app.use("/api/testimonials", testimonialsRoutes);
+app.use("/api/case-studies", caseStudiesRoutes);
 app.use("/api/stats", statsRoutes);
 
 // Basic health check

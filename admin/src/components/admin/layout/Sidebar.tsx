@@ -17,6 +17,7 @@ import {
   HiCollection,
   HiCog,
   HiX,
+  HiBookOpen,
 } from "react-icons/hi";
 
 const API = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "";
@@ -26,6 +27,7 @@ const sidebarLinks = [
   { href: "/services", label: "Services", icon: HiCube },
   { href: "/portfolio", label: "Portfolio", icon: HiPhotograph },
   { href: "/testimonials", label: "Testimonials", icon: HiStar },
+  { href: "/case-studies", label: "Case Studies", icon: HiBookOpen },
   { href: "/references", label: "References", icon: HiCollection },
   { href: "/jobs", label: "Jobs", icon: HiBriefcase },
   { href: "/messages", label: "Messages", icon: HiMail },

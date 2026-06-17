@@ -18,7 +18,7 @@ const SERVER_API = process.env.INTERNAL_API_URL || "http://localhost:4000";
 async function getServices() {
   try {
     const res = await fetch(`${SERVER_API}/api/services`, {
-      next: { revalidate: 3600 }, // revalidate every hour
+      cache: "no-store",
     });
     if (!res.ok) return [];
     return res.json();
