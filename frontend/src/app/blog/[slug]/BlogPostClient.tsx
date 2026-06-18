@@ -2,47 +2,67 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { HiArrowLeft, HiClock, HiCalendar } from "react-icons/hi";
-import type { BlogPost } from "../BlogClient";
+import { type BlogPost, coverGradientFor } from "../BlogClient";
+
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "";
+
+interface BlogPostFull extends BlogPost {
+  content: string;
+  createdAt?: string;
+}
 
 export function BlogPostClient({
   post,
   content,
 }: {
-  post: BlogPost;
+  post: BlogPostFull;
   content: string;
 }) {
+  const router = useRouter();
+
+  const displayDate =
+    post.publishedAt ||
+    (post.createdAt
+      ? new Date(post.createdAt).toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        })
+      : "");
+
   return (
     <div className="pt-28 pb-20">
-      {/* Back */}
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-        <Link
-          href="/blog"
-          className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+      {/* Back — returns to the previous page */}
+      <div className="w-[80%] mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+        <button
+          onClick={() => router.back()}
+          className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors cursor-pointer"
         >
           <HiArrowLeft className="w-4 h-4" />
-          Back to Blog
-        </Link>
+          Back
+        </button>
       </div>
 
-      {/* Cover banner */}
-      <div className={`w-full h-56 sm:h-72 ${post.coverGradient} mb-12`} />
-
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Meta */}
+      <div className="w-[80%] mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
+          {/* Category */}
           <span className="inline-block text-[11px] font-semibold uppercase tracking-widest px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20 mb-4">
             {post.category}
           </span>
-          <h1 className="text-3xl sm:text-4xl font-heading font-bold text-white leading-tight mb-4">
+
+          {/* Title */}
+          <h1 className="text-3xl sm:text-4xl font-heading font-bold text-white leading-tight mb-3">
             {post.title}
           </h1>
 
-          <div className="flex flex-wrap items-center gap-5 text-sm text-gray-500 mb-10 pb-8 border-b border-white/[0.07]">
+          {/* Created on — just under the title */}
+          <div className="flex flex-wrap items-center gap-5 text-sm text-gray-500 mb-8">
             <div className="flex items-center gap-1.5">
               <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-600/40 to-violet-600/40 flex items-center justify-center text-xs font-bold text-purple-200">
                 {post.author.charAt(0)}
@@ -51,20 +71,38 @@ export function BlogPostClient({
             </div>
             <div className="flex items-center gap-1.5">
               <HiCalendar className="w-4 h-4" />
-              {post.publishedAt}
+              Created on {displayDate}
             </div>
-            <div className="flex items-center gap-1.5">
-              <HiClock className="w-4 h-4" />
-              {post.readingTime}
-            </div>
+            {post.readingTime && (
+              <div className="flex items-center gap-1.5">
+                <HiClock className="w-4 h-4" />
+                {post.readingTime}
+              </div>
+            )}
           </div>
-
-          {/* Content */}
-          <div
-            className="prose prose-invert prose-purple max-w-none text-gray-300 leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: content }}
-          />
         </motion.div>
+      </div>
+
+      {/* Cover image — whole image, natural proportions (no crop, no distortion) */}
+      <div className="w-[80%] mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+        {post.coverImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={`${API_BASE}${post.coverImage}`}
+            alt={post.title}
+            className="w-full h-auto rounded-2xl border border-white/[0.07]"
+          />
+        ) : (
+          <div className={`w-full aspect-[16/9] rounded-2xl ${coverGradientFor(post)}`} />
+        )}
+      </div>
+
+      <div className="w-[80%] mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Content */}
+        <div
+          className="blog-content"
+          dangerouslySetInnerHTML={{ __html: content }}
+        />
 
         {/* Footer CTA */}
         <div className="mt-16 pt-10 border-t border-white/[0.07] text-center">
