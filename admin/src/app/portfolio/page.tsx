@@ -168,13 +168,29 @@ export default function PortfolioAdminPage() {
                   )}
                 </div>
 
-                {project.caseStudy && (
-                  <div className="mb-3">
+                {project.caseStudy ? (
+                  <div className="flex items-center gap-2 mb-3">
                     <button
                       onClick={() => router.push(`/portfolio/case-study/${project._id}`)}
                       className="flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-medium bg-emerald-500/10 text-emerald-400 rounded-full border border-emerald-500/20 hover:bg-emerald-500/20 transition"
                     >
                       <HiDocumentText size={11} /> Edit Case Study
+                    </button>
+                    <button
+                      onClick={() => router.push(`/case-studies/new`)}
+                      className="flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-medium bg-purple-500/10 text-purple-400 rounded-full border border-purple-500/20 hover:bg-purple-500/20 transition"
+                      title="Create a standalone case study from this project"
+                    >
+                      <HiPlus size={11} /> Standalone
+                    </button>
+                  </div>
+                ) : (
+                  <div className="mb-3">
+                    <button
+                      onClick={() => router.push(`/case-studies/new`)}
+                      className="flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-medium bg-purple-500/10 text-purple-400 rounded-full border border-purple-500/20 hover:bg-purple-500/20 transition"
+                    >
+                      <HiPlus size={11} /> Create Case Study
                     </button>
                   </div>
                 )}

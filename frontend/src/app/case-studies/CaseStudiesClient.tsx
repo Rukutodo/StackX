@@ -24,99 +24,7 @@ function StatPill({ value, label, icon: Icon }: { value: string; label: string; 
   );
 }
 
-function FeaturedCard({ cs }: { cs: CaseStudy }) {
-  const href = cs.portfolioProject ? `/portfolio/${cs.portfolioProject.slug}` : "/contact";
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.55 }}
-      className="relative rounded-3xl p-px group"
-      style={{
-        background:
-          "linear-gradient(135deg, rgba(139,92,246,0.5) 0%, rgba(109,40,217,0.3) 50%, rgba(6,182,212,0.2) 100%)",
-      }}
-    >
-      <div
-        className="rounded-3xl p-8 sm:p-10 relative overflow-hidden h-full"
-        style={{ background: "rgba(19,19,26,0.97)", backdropFilter: "blur(24px)" }}
-      >
-        {/* Ambient glow */}
-        <div className="absolute -top-24 -left-24 w-80 h-80 bg-purple-600/[0.06] rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-16 -right-16 w-64 h-64 bg-cyan-600/[0.04] rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row gap-10">
-          {/* Image */}
-          <div className="lg:w-1/2">
-            <div className="relative aspect-[16/10] rounded-2xl overflow-hidden border border-white/10 group-hover:border-purple-500/30 transition-colors">
-              {cs.images?.[0] ? (
-                <Image
-                  src={`${API_BASE}${cs.images[0]}`}
-                  alt={cs.title}
-                  fill
-                  className="object-cover transform group-hover:scale-105 transition-transform duration-700"
-                />
-              ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-surface-light to-surface flex items-center justify-center">
-                  <span className="text-6xl font-bold text-white/5">{cs.title.charAt(0)}</span>
-                </div>
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
-          </div>
-
-          {/* Content */}
-          <div className="lg:w-1/2 flex flex-col justify-center">
-            <div className="flex items-center gap-3 mb-4">
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20">
-                Featured Case Study
-              </span>
-              {cs.service && (
-                <span className="text-xs text-gray-500 font-medium tracking-wider uppercase">
-                  {cs.service}
-                </span>
-              )}
-            </div>
-
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3 leading-tight">
-              {cs.title}
-            </h2>
-
-            {cs.client && (
-              <p className="text-sm text-purple-400 mb-3 font-medium">{cs.client}</p>
-            )}
-
-            <p className="text-gray-400 text-base mb-6 leading-relaxed line-clamp-3">
-              {cs.subtitle || cs.overview}
-            </p>
-
-            {/* Metrics */}
-            {cs.results?.length > 0 && (
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                {cs.results.slice(0, 2).map((r, i) => (
-                  <div key={i} className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.05]">
-                    <p className="text-2xl font-bold text-white mb-1">{r.metric}</p>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider">{r.label}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <Link
-              href={href}
-              className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-primary to-primary-deep rounded-xl hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 hover:-translate-y-0.5 border border-white/10 w-fit"
-            >
-              Read Case Study
-              <HiArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
 
 function CaseStudyCard({ cs, index }: { cs: CaseStudy; index: number }) {
   const href = cs.portfolioProject ? `/portfolio/${cs.portfolioProject.slug}` : "/contact";
@@ -130,7 +38,7 @@ function CaseStudyCard({ cs, index }: { cs: CaseStudy; index: number }) {
       className="group flex flex-col h-full rounded-2xl border border-white/[0.07] overflow-hidden transition-all duration-300 hover:border-purple-500/30 hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-900/20 bg-surface/40 backdrop-blur-xl"
     >
       {/* Thumbnail */}
-      <div className="relative aspect-[16/9] overflow-hidden border-b border-white/[0.05]">
+      <div className="relative aspect-[4/3] sm:aspect-[16/9] overflow-hidden border-b border-white/[0.05]">
         {cs.images?.[0] ? (
           <Image
             src={`${API_BASE}${cs.images[0]}`}
@@ -152,18 +60,18 @@ function CaseStudyCard({ cs, index }: { cs: CaseStudy; index: number }) {
         )}
       </div>
 
-      <div className="p-6 flex flex-col flex-1">
+      <div className="p-3 sm:p-6 flex flex-col flex-1">
         {cs.client && (
-          <p className="text-xs text-purple-400 font-medium mb-1">{cs.client}</p>
+          <p className="text-[9px] sm:text-xs text-purple-400 font-medium mb-0.5 sm:mb-1 line-clamp-1">{cs.client}</p>
         )}
-        <h3 className="text-lg font-bold text-white mb-2 group-hover:text-purple-300 transition-colors">
+        <h3 className="text-sm sm:text-lg font-bold text-white mb-1 sm:mb-2 group-hover:text-purple-300 transition-colors line-clamp-2">
           {cs.title}
         </h3>
-        <p className="text-sm text-gray-400 leading-relaxed mb-6 line-clamp-3 flex-1">
+        <p className="hidden sm:block text-sm text-gray-400 leading-relaxed mb-6 line-clamp-3 flex-1">
           {cs.subtitle || cs.overview}
         </p>
 
-        <div className="flex items-center justify-between pt-5 border-t border-white/[0.06]">
+        <div className="hidden sm:flex items-center justify-between pt-5 border-t border-white/[0.06] mt-auto">
           {cs.results?.[0] && (
             <span className="text-sm font-bold bg-gradient-to-r from-purple-400 to-violet-300 bg-clip-text text-transparent">
               {cs.results[0].metric} {cs.results[0].label}
@@ -229,12 +137,10 @@ export function CaseStudiesPageClient({
 }) {
   const [activeFilter, setActiveFilter] = useState("All");
 
-  const featured = caseStudies.find((cs) => cs.featured) ?? caseStudies[0] ?? null;
-  const rest = caseStudies.filter((cs) => cs._id !== featured?._id);
   const filtered =
     activeFilter === "All"
-      ? rest
-      : rest.filter((cs) => cs.service === activeFilter);
+      ? caseStudies
+      : caseStudies.filter((cs) => cs.service === activeFilter);
 
   return (
     <div className="pt-24 pb-20">
@@ -287,64 +193,55 @@ export function CaseStudiesPageClient({
           </div>
         ) : (
           <>
-            {/* Featured */}
-            {featured && (
-              <section className="mb-16">
-                <FeaturedCard cs={featured} />
-              </section>
-            )}
-
             {/* All case studies */}
-            {rest.length > 0 && (
-              <section>
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-                  <div>
-                    <h2 className="text-xl font-semibold text-white">All Case Studies</h2>
-                    <p className="text-sm text-gray-500 mt-0.5">{rest.length} additional case {rest.length === 1 ? "study" : "studies"}</p>
-                  </div>
-
-                  {/* Filter pills */}
-                  {categories.length > 2 && (
-                    <div className="flex flex-wrap gap-2">
-                      {categories.map((cat) => (
-                        <button
-                          key={cat}
-                          onClick={() => setActiveFilter(cat)}
-                          className={`px-3.5 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 cursor-pointer ${
-                            activeFilter === cat
-                              ? "bg-purple-500/20 text-purple-300 border border-purple-500/40"
-                              : "bg-white/[0.04] text-gray-400 border border-white/[0.08] hover:bg-white/[0.08] hover:text-white"
-                          }`}
-                        >
-                          {cat}
-                        </button>
-                      ))}
-                    </div>
-                  )}
+            <section>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+                <div>
+                  <h2 className="text-xl font-semibold text-white">All Case Studies</h2>
+                  <p className="text-sm text-gray-500 mt-0.5">Explore {caseStudies.length} {caseStudies.length === 1 ? "project" : "projects"}</p>
                 </div>
 
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={activeFilter}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.2 }}
-                    className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5"
-                  >
-                    {filtered.length > 0 ? (
-                      filtered.map((cs, i) => (
-                        <CaseStudyCard key={cs._id} cs={cs} index={i} />
-                      ))
-                    ) : (
-                      <div className="col-span-full text-center py-20">
-                        <p className="text-white font-medium">No case studies in this category</p>
-                      </div>
-                    )}
-                  </motion.div>
-                </AnimatePresence>
-              </section>
-            )}
+                {/* Filter pills */}
+                {categories.length > 2 && (
+                  <div className="flex flex-wrap gap-2">
+                    {categories.map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => setActiveFilter(cat)}
+                        className={`px-3.5 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 cursor-pointer ${
+                          activeFilter === cat
+                            ? "bg-purple-500/20 text-purple-300 border border-purple-500/40"
+                            : "bg-white/[0.04] text-gray-400 border border-white/[0.08] hover:bg-white/[0.08] hover:text-white"
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeFilter}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.2 }}
+                  className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5"
+                >
+                  {filtered.length > 0 ? (
+                    filtered.map((cs, i) => (
+                      <CaseStudyCard key={cs._id} cs={cs} index={i} />
+                    ))
+                  ) : (
+                    <div className="col-span-full text-center py-20">
+                      <p className="text-white font-medium">No case studies in this category</p>
+                    </div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </section>
 
             <CTASection />
           </>

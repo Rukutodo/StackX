@@ -46,7 +46,7 @@ export interface ServiceCategory {
 }
 
 /* ── All available icons (name → component) ── */
-export const ICON_MAP: Record<string, ComponentType<{ className?: string }>> = {
+export const ICON_MAP: Record<string, ComponentType<{ className?: string; size?: number | string }>> = {
   HiCode, HiCog, HiChartBar, HiGlobe, HiLightningBolt, HiDatabase,
   HiShieldCheck, HiColorSwatch, HiCurrencyDollar, HiCloud, HiDesktopComputer,
   HiDeviceMobile, HiCube, HiTrendingUp, HiBriefcase, HiSparkles,

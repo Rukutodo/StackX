@@ -257,7 +257,7 @@ function EditPanel({
                 <div>
                   <label className="block text-xs text-muted mb-1.5">Meta Robots</label>
                   <AdminSelect
-                    value={form.robots}
+                    value={form.robots || ""}
                     onChange={(val) => set("robots", val)}
                     size="sm"
                     options={[
