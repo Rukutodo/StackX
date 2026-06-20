@@ -16,6 +16,7 @@ import testimonialsRoutes from "./routes/testimonials";
 import caseStudiesRoutes from "./routes/caseStudies";
 import statsRoutes from "./routes/stats";
 import blogsRoutes from "./routes/blogs";
+import seoRoutes from "./routes/seo";
 
 dotenv.config();
 
@@ -79,6 +80,7 @@ app.use("/api/testimonials", testimonialsRoutes);
 app.use("/api/case-studies", caseStudiesRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/blogs", blogsRoutes);
+app.use("/api/seo", seoRoutes);
 
 // Basic health check
 app.get("/", (req, res) => {

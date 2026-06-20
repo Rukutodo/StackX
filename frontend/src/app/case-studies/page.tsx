@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
+import PageJsonLd from "@/components/seo/PageJsonLd";
 import { CaseStudiesPageClient } from "./CaseStudiesClient";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Case Studies | StackX",
-  description:
-    "Explore our in-depth case studies and see how StackX delivers high-impact digital solutions.",
-  alternates: { canonical: "/case-studies" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata("case-studies", {
+    title: "Case Studies | StackX",
+    description: "Explore our in-depth case studies and see how StackX delivers high-impact digital solutions.",
+    canonical: "/case-studies",
+  });
+}
 
 const SERVER_API = process.env.INTERNAL_API_URL || "http://localhost:4000";
 
@@ -48,5 +51,10 @@ async function fetchServices(): Promise<{ title: string }[]> {
 export default async function CaseStudiesPage() {
   const [caseStudies, services] = await Promise.all([fetchCaseStudies(), fetchServices()]);
   const categories = ["All", ...services.map((s) => s.title)];
-  return <CaseStudiesPageClient caseStudies={caseStudies} categories={categories} />;
+  return (
+    <>
+      <PageJsonLd pageKey="case-studies" />
+      <CaseStudiesPageClient caseStudies={caseStudies} categories={categories} />
+    </>
+  );
 }

@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
+import PageJsonLd from "@/components/seo/PageJsonLd";
 import { TestimonialsPageClient } from "./TestimonialsClient";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Testimonials | StackX",
-  description:
-    "Read what our clients say about StackX — real reviews from real projects.",
-  alternates: { canonical: "/testimonials" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata("testimonials", {
+    title: "Testimonials | StackX",
+    description: "Read what our clients say about StackX — real reviews from real projects.",
+    canonical: "/testimonials",
+  });
+}
 
 const SERVER_API = process.env.INTERNAL_API_URL || "http://localhost:4000";
 
@@ -35,5 +38,10 @@ async function fetchTestimonials(): Promise<Testimonial[]> {
 
 export default async function TestimonialsPage() {
   const testimonials = await fetchTestimonials();
-  return <TestimonialsPageClient testimonials={testimonials} />;
+  return (
+    <>
+      <PageJsonLd pageKey="testimonials" />
+      <TestimonialsPageClient testimonials={testimonials} />
+    </>
+  );
 }

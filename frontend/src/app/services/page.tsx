@@ -1,15 +1,16 @@
 import { Suspense } from "react";
+import PageJsonLd from "@/components/seo/PageJsonLd";
 import ServicesClient from "./ServicesClient";
 import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Services",
-  description:
-    "Explore StackX's web development, business automation, and ad tech services. Custom solutions starting from $2,500 with modern tech stacks.",
-  alternates: {
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata("services", {
+    title: "Services",
+    description: "Explore StackX's web development, business automation, and ad tech services. Custom solutions starting from $2,500 with modern tech stacks.",
     canonical: "/services",
-  },
-};
+  });
+}
 
 // Fetch on the server so the page is SEO-friendly
 // For Server Components (SSR), use localhost to bypass NAT hairpin issues on cloud VMs
@@ -30,8 +31,11 @@ async function getServices() {
 export default async function ServicesPage() {
   const categories = await getServices();
   return (
-    <Suspense fallback={null}>
-      <ServicesClient categories={categories} />
-    </Suspense>
+    <>
+      <PageJsonLd pageKey="services" />
+      <Suspense fallback={null}>
+        <ServicesClient categories={categories} />
+      </Suspense>
+    </>
   );
 }

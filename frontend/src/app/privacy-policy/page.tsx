@@ -1,18 +1,22 @@
+import PageJsonLd from "@/components/seo/PageJsonLd";
 import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy | StackX",
-  description: "Learn how StackX collects, uses, and protects your personal information.",
-  alternates: {
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata("privacy-policy", {
+    title: "Privacy Policy | StackX",
+    description: "Learn how StackX collects, uses, and protects your personal information.",
     canonical: "/privacy-policy",
-  },
-};
+  });
+}
 
 export default function PrivacyPolicyPage() {
   const lastUpdated = "April 10, 2026";
 
   return (
-    <div className="min-h-screen" style={{ background: "var(--color-background)" }}>
+    <>
+      <PageJsonLd pageKey="privacy-policy" />
+      <div className="min-h-screen" style={{ background: "var(--color-background)" }}>
       {/* Header */}
       <div className="relative pt-32 pb-12 overflow-hidden">
         <div
@@ -42,7 +46,9 @@ export default function PrivacyPolicyPage() {
           {/* Intro */}
           <section>
             <p className="text-gray-400 text-sm leading-relaxed">
-              StackX (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;) is committed to protecting your privacy. This Privacy Policy explains
+              StackX (&quo
+    </>
+  );we&quot;, &quot;our&quot;, or &quot;us&quot;) is committed to protecting your privacy. This Privacy Policy explains
               how we collect, use, disclose, and safeguard your information when you visit our website{" "}
               <a href="https://stackx.co.in" className="text-purple-400 hover:underline">stackx.co.in</a> or use
               our services. Please read this policy carefully. If you disagree with its terms, please discontinue

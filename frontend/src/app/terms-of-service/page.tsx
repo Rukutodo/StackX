@@ -1,18 +1,22 @@
+import PageJsonLd from "@/components/seo/PageJsonLd";
 import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Terms of Service | StackX",
-  description: "Read the terms and conditions governing your use of StackX services.",
-  alternates: {
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata("terms-of-service", {
+    title: "Terms of Service | StackX",
+    description: "Read the terms and conditions governing your use of StackX services.",
     canonical: "/terms-of-service",
-  },
-};
+  });
+}
 
 export default function TermsOfServicePage() {
   const lastUpdated = "April 10, 2026";
 
   return (
-    <div className="min-h-screen" style={{ background: "var(--color-background)" }}>
+    <>
+      <PageJsonLd pageKey="terms-of-service" />
+      <div className="min-h-screen" style={{ background: "var(--color-background)" }}>
       {/* Header */}
       <div className="relative pt-32 pb-12 overflow-hidden">
         <div
@@ -42,7 +46,9 @@ export default function TermsOfServicePage() {
           {/* Intro */}
           <section>
             <p className="text-gray-400 text-sm leading-relaxed">
-              Please read these Terms of Service (&quot;Terms&quot;) carefully before using the website{" "}
+              Please read these Terms of Service (&quo
+    </>
+  );Terms&quot;) carefully before using the website{" "}
               <a href="https://stackx.co.in" className="text-cyan-400 hover:underline">stackx.co.in</a> or engaging
               any services provided by StackX. By accessing or using our website, you agree to be bound by
               these Terms. If you do not agree, please do not use our services.

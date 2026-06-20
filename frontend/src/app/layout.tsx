@@ -97,6 +97,35 @@ export default function RootLayout({
                   },
                   image: "https://stackx.co.in/og-image.png",
                   description: "Professional software development, business automation, and ad tech solutions at unbeatable costs.",
+                  slogan: "We build, validate, and scale business",
+                  foundingDate: "2025",
+                  numberOfEmployees: {
+                    "@type": "QuantitativeValue",
+                    minValue: 2,
+                    maxValue: 10,
+                  },
+                  areaServed: [
+                    {
+                      "@type": "Country",
+                      name: "India",
+                    },
+                    {
+                      "@type": "Place",
+                      name: "Global",
+                    },
+                  ],
+                  knowsAbout: [
+                    "Web Development",
+                    "Ad Tech Solutions",
+                    "Digital Marketing",
+                    "Market Research",
+                    "Business Automation",
+                    "SaaS Development",
+                    "React",
+                    "Next.js",
+                    "TypeScript",
+                    "Node.js",
+                  ],
                   telephone: "+91-93478-58844",
                   email: "hello@stackx.co.in",
                   address: {
@@ -123,6 +152,7 @@ export default function RootLayout({
                     telephone: "+91-93478-58844",
                     contactType: "customer service",
                     email: "hello@stackx.co.in",
+                    availableLanguage: ["English", "Hindi", "Telugu"],
                   },
                   sameAs: [
                     "https://www.linkedin.com/company/stackxin/",
@@ -134,7 +164,9 @@ export default function RootLayout({
                   "@id": "https://stackx.co.in/#website",
                   url: "https://stackx.co.in",
                   name: "StackX",
+                  inLanguage: "en-US",
                   publisher: { "@id": "https://stackx.co.in/#organization" },
+                  copyrightHolder: { "@id": "https://stackx.co.in/#organization" },
                   potentialAction: {
                     "@type": "SearchAction",
                     target: "https://stackx.co.in/portfolio?q={search_term_string}",

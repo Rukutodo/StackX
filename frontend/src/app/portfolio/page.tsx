@@ -1,15 +1,16 @@
 import { Suspense } from "react";
+import PageJsonLd from "@/components/seo/PageJsonLd";
 import PortfolioClient from "./PortfolioClient";
 import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Portfolio & Case Studies",
-  description:
-    "Explore StackX's portfolio of successful web development, automation, and ad tech projects. See real results from real clients.",
-  alternates: {
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata("portfolio", {
+    title: "Portfolio & Case Studies",
+    description: "Explore StackX's portfolio of successful web development, automation, and ad tech projects. See real results from real clients.",
     canonical: "/portfolio",
-  },
-};
+  });
+}
 
 // For Server Components (SSR), use localhost to bypass NAT hairpin issues on cloud VMs
 const SERVER_API = process.env.INTERNAL_API_URL || "http://localhost:4000";
@@ -43,8 +44,11 @@ export default async function PortfolioPage() {
   const categories = ["All", ...services.map((s: any) => s.title)];
 
   return (
-    <Suspense fallback={null}>
-      <PortfolioClient projects={projects} categories={categories} />
-    </Suspense>
+    <>
+      <PageJsonLd pageKey="portfolio" />
+      <Suspense fallback={null}>
+        <PortfolioClient projects={projects} categories={categories} />
+      </Suspense>
+    </>
   );
 }

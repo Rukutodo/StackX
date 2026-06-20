@@ -39,24 +39,28 @@ const services = [
   {
     icon: HiCode,
     title: "Web Development",
+    slug: "web-development",
     desc: "Custom web applications, SaaS platforms, e-commerce solutions, and progressive web apps built with modern technologies.",
     color: "from-primary to-primary-deep",
   },
   {
     icon: HiChartBar,
     title: "Ad Tech Solutions",
+    slug: "ad-tech-solutions",
     desc: "Performance driven advertising platforms, analytics dashboards, and programmatic ad tech development.",
     color: "from-accent to-accent-dark",
   },
   {
     icon: HiCog,
     title: "Digital Marketing",
+    slug: "digital-marketing",
     desc: "Digital marketing, performance campaigns, and analytics systems designed to bring real customers,not just traffic",
     color: "from-primary-light to-accent",
   },
   {
     icon: HiLightBulb,
     title: "Market Research & Insights",
+    slug: "market-research-and-insights",
     desc: "Every product starts with clarity. We research your market, validate your ideas, and shape them around real demand — helping businesses build what truly works, especially in Vizag.",
     color: "from-accent-dark to-primary",
   },
@@ -271,7 +275,7 @@ export default function HomePageClient() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.25 }}
-                className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-xl text-muted max-w-xl leading-relaxed"
+                className="hero-subheading mt-4 sm:mt-6 text-sm sm:text-base lg:text-xl text-muted max-w-xl leading-relaxed"
               >
                 From idea to growth , we combine technology, marketing, and real market insight to build what actually works.
               </motion.p>
@@ -398,8 +402,9 @@ export default function HomePageClient() {
       </section>
 
       {/* ═══ STATS ═══ */}
-      <section className="py-10 sm:py-16 lg:py-20 relative">
+      <section className="py-10 sm:py-16 lg:py-20 relative" aria-labelledby="stats-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 id="stats-heading" className="sr-only">StackX by the Numbers</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
             {stats.map((stat, i) => (
               <AnimatedCounter
@@ -414,17 +419,19 @@ export default function HomePageClient() {
       </section>
 
       {/* ═══ CLIENT LOGOS ═══ */}
-      <section className="py-12 border-y border-surface-border bg-surface/30 overflow-hidden">
+      <section className="py-12 border-y border-surface-border bg-surface/30 overflow-hidden" aria-labelledby="clients-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+          <h2 id="clients-heading" className="sr-only">Trusted by Companies</h2>
           <p className="text-center text-xs uppercase tracking-widest text-muted">
             Trusted by innovative companies
           </p>
         </div>
         <div className="relative">
-          <div className="flex animate-marquee">
+          <div className="flex animate-marquee" role="list" aria-label="Client company logos">
             {[...clientLogos, ...clientLogos].map((name, i) => (
               <div
                 key={i}
+                role="listitem"
                 className="flex-shrink-0 mx-8 px-8 py-3 rounded-lg bg-white/[0.03] border border-white/[0.05]"
               >
                 <span className="text-lg font-heading font-semibold text-muted/50 whitespace-nowrap">
@@ -472,7 +479,7 @@ export default function HomePageClient() {
                   {service.desc}
                 </p>
                 <Link
-                  href="/services"
+                  href={`/services/${service.slug}`}
                   className="inline-flex items-center gap-1 text-sm text-primary-light hover:text-accent transition-colors relative z-10"
                 >
                   Learn more <HiArrowRight className="w-4 h-4" />
