@@ -18,6 +18,7 @@ import {
   HiCog,
   HiX,
   HiBookOpen,
+  HiPencilAlt,
 } from "react-icons/hi";
 
 const API = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "";
@@ -32,6 +33,7 @@ const sidebarLinks = [
   { href: "/jobs", label: "Jobs", icon: HiBriefcase },
   { href: "/messages", label: "Messages", icon: HiMail },
   { href: "/applications", label: "Applications", icon: HiDocumentText },
+  { href: "/blogs", label: "Blogs", icon: HiPencilAlt },
 ];
 
 interface SidebarProps {

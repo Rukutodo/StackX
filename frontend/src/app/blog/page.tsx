@@ -1,81 +1,22 @@
 import { BlogClientSection, type BlogPost } from "./BlogClient";
 
-const SAMPLE_POSTS: BlogPost[] = [
-  {
-    slug: "building-scalable-web-apps-with-nextjs",
-    title: "Building Scalable Web Applications with Next.js",
-    excerpt:
-      "Learn how to architect large-scale Next.js applications that stay fast as your team and user base grow — from code splitting to ISR.",
-    category: "Engineering",
-    readingTime: "6 min read",
-    publishedAt: "May 28, 2025",
-    author: "StackX Team",
-    coverGradient:
-      "bg-gradient-to-br from-violet-900/70 via-purple-800/60 to-indigo-900/70",
-  },
-  {
-    slug: "why-business-automation-matters-in-2025",
-    title: "Why Business Automation Matters More Than Ever in 2025",
-    excerpt:
-      "From repetitive data entry to intelligent workflows — here's how modern automation is transforming the way teams operate.",
-    category: "Business",
-    readingTime: "5 min read",
-    publishedAt: "May 15, 2025",
-    author: "StackX Team",
-    coverGradient:
-      "bg-gradient-to-br from-fuchsia-900/70 via-pink-800/60 to-rose-900/70",
-  },
-  {
-    slug: "design-systems-that-scale",
-    title: "Design Systems That Scale: Lessons from Real Projects",
-    excerpt:
-      "After shipping design systems for over a dozen clients, here are the patterns that hold up and the mistakes that cost the most.",
-    category: "Design",
-    readingTime: "7 min read",
-    publishedAt: "Apr 30, 2025",
-    author: "StackX Team",
-    coverGradient:
-      "bg-gradient-to-br from-cyan-900/70 via-teal-800/60 to-emerald-900/70",
-  },
-  {
-    slug: "ad-tech-explained-for-founders",
-    title: "Ad Tech Explained for Non-Technical Founders",
-    excerpt:
-      "Pixels, bid streams, DSPs — ad tech is full of jargon. This plain-English guide breaks down what you actually need to know.",
-    category: "Ad Tech",
-    readingTime: "8 min read",
-    publishedAt: "Apr 12, 2025",
-    author: "StackX Team",
-    coverGradient:
-      "bg-gradient-to-br from-amber-900/70 via-orange-800/60 to-yellow-900/70",
-  },
-  {
-    slug: "how-we-cut-page-load-time-by-60-percent",
-    title: "How We Cut Page Load Time by 60% Without Rewriting Anything",
-    excerpt:
-      "A case study in pragmatic performance: the seven changes that made the biggest difference on a production Next.js app.",
-    category: "Performance",
-    readingTime: "5 min read",
-    publishedAt: "Mar 25, 2025",
-    author: "StackX Team",
-    coverGradient:
-      "bg-gradient-to-br from-blue-900/70 via-sky-800/60 to-indigo-900/70",
-  },
-  {
-    slug: "client-collaboration-that-actually-works",
-    title: "Client Collaboration That Actually Works",
-    excerpt:
-      "The async-first rituals, feedback frameworks, and communication norms that have made every StackX project run smoother.",
-    category: "Process",
-    readingTime: "4 min read",
-    publishedAt: "Mar 10, 2025",
-    author: "StackX Team",
-    coverGradient:
-      "bg-gradient-to-br from-green-900/70 via-emerald-800/60 to-teal-900/70",
-  },
-];
+const SERVER_API = process.env.INTERNAL_API_URL || "http://localhost:4000";
 
-export default function BlogPage() {
+async function getBlogs(): Promise<BlogPost[]> {
+  try {
+    const res = await fetch(`${SERVER_API}/api/blogs`, {
+      next: { revalidate: 300 },
+    });
+    if (!res.ok) return [];
+    return res.json();
+  } catch {
+    return [];
+  }
+}
+
+export default async function BlogPage() {
+  const posts = await getBlogs();
+
   return (
     <div className="pt-24 pb-20">
       {/* Hero */}
@@ -104,7 +45,7 @@ export default function BlogPage() {
 
       {/* Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <BlogClientSection posts={SAMPLE_POSTS} />
+        <BlogClientSection posts={posts} />
       </section>
     </div>
   );

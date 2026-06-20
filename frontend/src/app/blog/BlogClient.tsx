@@ -2,47 +2,92 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { HiClock, HiArrowRight } from "react-icons/hi";
 
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "";
+// Next.js 16 blocks its image optimizer from fetching private/loopback IPs (SSRF guard),
+// so skip optimization when the backend is local. Production (public domain) optimizes normally.
+const LOCAL_IMAGES = API_BASE.includes("localhost") || API_BASE.includes("127.0.0.1");
+
 export interface BlogPost {
+  _id?: string;
   slug: string;
   title: string;
   excerpt: string;
   category: string;
   readingTime: string;
-  publishedAt: string;
+  publishedAt?: string;
+  createdAt?: string;
   author: string;
-  coverGradient: string;
+  coverImage?: string;
+  coverGradient?: string;
+}
+
+const CATEGORY_GRADIENTS: Record<string, string> = {
+  Engineering: "bg-gradient-to-br from-violet-900/70 via-purple-800/60 to-indigo-900/70",
+  Business: "bg-gradient-to-br from-fuchsia-900/70 via-pink-800/60 to-rose-900/70",
+  Design: "bg-gradient-to-br from-cyan-900/70 via-teal-800/60 to-emerald-900/70",
+  "Ad Tech": "bg-gradient-to-br from-amber-900/70 via-orange-800/60 to-yellow-900/70",
+  Performance: "bg-gradient-to-br from-blue-900/70 via-sky-800/60 to-indigo-900/70",
+  Process: "bg-gradient-to-br from-green-900/70 via-emerald-800/60 to-teal-900/70",
+};
+
+export function coverGradientFor(post: BlogPost) {
+  return (
+    post.coverGradient ||
+    CATEGORY_GRADIENTS[post.category] ||
+    "bg-gradient-to-br from-purple-900/70 via-violet-800/60 to-indigo-900/70"
+  );
 }
 
 function BlogCard({ post, index }: { post: BlogPost; index: number }) {
+  const displayDate =
+    post.publishedAt ||
+    (post.createdAt
+      ? new Date(post.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+      : "");
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      className="min-w-0"
+      initial={{ opacity: 0, y: 14 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4, delay: index * 0.07 }}
+      viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+      transition={{ duration: 0.35, delay: Math.min(index, 5) * 0.05 }}
     >
       <Link
         href={`/blog/${post.slug}`}
-        className="group flex flex-col h-full rounded-2xl border border-white/[0.08] overflow-hidden transition-all duration-300 hover:border-purple-500/25 hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-500/5"
-        style={{ background: "rgba(19,19,26,0.7)", backdropFilter: "blur(20px)" }}
+        className="group flex flex-col h-full rounded-2xl border border-white/[0.08] overflow-hidden transition-all duration-300 hover:border-purple-500/25 [@media(hover:hover)]:hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-500/5"
+        style={{ background: "rgba(19,19,26,0.85)" }}
       >
         {/* Cover */}
-        <div
-          className={`h-44 w-full flex items-end p-5 ${post.coverGradient}`}
-        >
-          <span className="text-[11px] font-semibold uppercase tracking-widest px-2.5 py-1 rounded-full bg-black/30 text-white/80 backdrop-blur-sm border border-white/10">
-            {post.category}
-          </span>
+        <div className="h-44 w-full relative overflow-hidden">
+          {post.coverImage ? (
+            <Image
+              src={`${API_BASE}${post.coverImage}`}
+              alt={post.title}
+              fill
+              unoptimized={LOCAL_IMAGES}
+              className="object-cover transition-transform duration-500 [@media(hover:hover)]:group-hover:scale-105"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            />
+          ) : (
+            <div className={`w-full h-full ${coverGradientFor(post)}`} />
+          )}
+          <div className="absolute inset-0 flex items-end p-5">
+            <span className="text-[11px] font-semibold uppercase tracking-widest px-2.5 py-1 rounded-full bg-black/40 text-white/90 backdrop-blur-sm border border-white/10">
+              {post.category}
+            </span>
+          </div>
         </div>
 
         {/* Body */}
-        <div className="flex flex-col flex-1 p-6">
-          <h3 className="text-base font-semibold text-white leading-snug group-hover:text-purple-300 transition-colors mb-2">
+        <div className="flex flex-col flex-1 p-6 min-w-0">
+          <h3 className="text-base font-semibold text-white leading-snug group-hover:text-purple-300 transition-colors mb-2 break-words">
             {post.title}
           </h3>
-          <p className="text-sm text-gray-400 leading-relaxed flex-1 line-clamp-3">
+          <p className="text-sm text-gray-400 leading-relaxed flex-1 line-clamp-3 break-words">
             {post.excerpt}
           </p>
 
@@ -54,13 +99,15 @@ function BlogCard({ post, index }: { post: BlogPost; index: number }) {
               </div>
               <div>
                 <p className="text-xs font-medium text-white/80">{post.author}</p>
-                <p className="text-[10px] text-gray-500">{post.publishedAt}</p>
+                <p className="text-[10px] text-gray-500">{displayDate}</p>
               </div>
             </div>
-            <div className="flex items-center gap-1 text-[11px] text-gray-500">
-              <HiClock className="w-3.5 h-3.5" />
-              {post.readingTime}
-            </div>
+            {post.readingTime && (
+              <div className="flex items-center gap-1 text-[11px] text-gray-500">
+                <HiClock className="w-3.5 h-3.5" />
+                {post.readingTime}
+              </div>
+            )}
           </div>
         </div>
       </Link>
