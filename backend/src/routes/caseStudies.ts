@@ -1,18 +1,80 @@
 import express from "express";
 import { CaseStudy } from "../models/CaseStudy";
+import { PortfolioProject } from "../models/PortfolioProject";
 import { protect } from "../middlewares/authMiddleware";
 
 const router = express.Router();
 
 // ─── GET /api/case-studies ──────────────────────────
 // Public: active case studies sorted by order
+// Merges standalone CaseStudy docs + portfolio projects that have embedded case studies
 router.get("/", async (req, res) => {
   try {
     const showAll = req.query.all === "true";
     const filter = showAll ? {} : { status: "active" };
-    const caseStudies = await CaseStudy.find(filter).sort({ order: 1, createdAt: -1 });
-    res.json(caseStudies);
+
+    // 1. Standalone case studies from the CaseStudy collection
+    const standalone = await CaseStudy.find(filter).sort({ order: 1, createdAt: -1 });
+    const standaloneItems = standalone.map((cs) => ({
+      ...cs.toObject(),
+      source: "standalone" as const,
+    }));
+
+    // 2. Portfolio projects that have an embedded case study
+    const portfolioFilter: any = { caseStudy: { $ne: null } };
+    if (!showAll) {
+      portfolioFilter.status = { $in: ["active", "completed"] };
+    }
+    const portfolioProjects = await PortfolioProject.find(portfolioFilter).sort({ order: 1 });
+
+    // Check which portfolio projects are already linked to a standalone case study
+    const linkedPortfolioIds = new Set(
+      standalone
+        .filter((cs) => cs.portfolioProject?.id)
+        .map((cs) => cs.portfolioProject!.id)
+    );
+
+    const portfolioItems = portfolioProjects
+      .filter((p) => !linkedPortfolioIds.has(p._id.toString())) // avoid duplicates
+      .filter((p) => {
+        // Only include if the embedded case study has some real content
+        const cs = p.caseStudy as any;
+        return cs && (cs.overview || cs.problem || cs.solution || (cs.features && cs.features.length > 0));
+      })
+      .map((p) => {
+        const cs = p.caseStudy as any;
+        return {
+          _id: `portfolio_${p._id}`,
+          title: p.title,
+          slug: p.slug,
+          client: "",
+          service: (p as any).category || "",
+          subtitle: cs?.subtitle || "",
+          overview: cs?.overview || "",
+          problem: cs?.problem || "",
+          solution: cs?.solution || "",
+          features: cs?.features || [],
+          results: cs?.results || [],
+          images: cs?.images || [],
+          featured: p.featured || false,
+          status: p.status === "completed" ? "active" : p.status,
+          order: p.order || 0,
+          portfolioProject: { id: p._id.toString(), slug: p.slug, title: p.title },
+          createdAt: (p as any).createdAt,
+          updatedAt: (p as any).updatedAt,
+          source: "portfolio" as const,
+          portfolioProjectId: p._id.toString(),
+        };
+      });
+
+    // 3. Merge and sort
+    const merged = [...standaloneItems, ...portfolioItems].sort(
+      (a, b) => (a.order || 0) - (b.order || 0)
+    );
+
+    res.json(merged);
   } catch (error) {
+    console.error("GET /api/case-studies error:", error);
     res.status(500).json({ message: "Failed to fetch case studies" });
   }
 });

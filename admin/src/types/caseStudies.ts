@@ -16,4 +16,8 @@ export interface CaseStudy {
   order: number;
   portfolioProject: { id: string; slug: string; title: string } | null;
   createdAt: string;
+  /** Where this case study data comes from */
+  source?: "standalone" | "portfolio";
+  /** If source is "portfolio", the MongoDB _id of the PortfolioProject */
+  portfolioProjectId?: string;
 }

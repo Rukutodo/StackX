@@ -79,83 +79,7 @@ function StatPill({
   );
 }
 
-function FeaturedTestimonial({ t }: { t: Testimonial }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.55 }}
-      className="relative rounded-3xl p-px"
-      style={{
-        background:
-          "linear-gradient(135deg, rgba(139,92,246,0.5) 0%, rgba(109,40,217,0.3) 50%, rgba(6,182,212,0.2) 100%)",
-      }}
-    >
-      <div
-        className="rounded-3xl p-8 sm:p-10 relative overflow-hidden"
-        style={{
-          background: "rgba(19,19,26,0.97)",
-          backdropFilter: "blur(24px)",
-        }}
-      >
-        {/* Ambient glow */}
-        <div className="absolute -top-24 -left-24 w-80 h-80 bg-purple-600/[0.06] rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-16 -right-16 w-64 h-64 bg-cyan-600/[0.04] rounded-full blur-3xl pointer-events-none" />
 
-        {/* Large decorative quote */}
-        <svg
-          className="absolute top-6 right-8 w-24 h-24 text-purple-500/[0.08]"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-        >
-          <path d={QUOTE_PATH} />
-        </svg>
-
-        <div className="relative z-10">
-          {/* Stars + badge */}
-          <div className="flex flex-wrap items-center gap-3 mb-6">
-            <Stars rating={t.rating} size="md" />
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-400/10 text-amber-300 border border-amber-400/20">
-              Featured Review
-            </span>
-          </div>
-
-          {/* Quote */}
-          <blockquote
-            className="text-xl sm:text-2xl font-semibold text-white/90 leading-relaxed mb-8"
-            style={{ fontFamily: "var(--font-poppins), sans-serif" }}
-          >
-            &ldquo;{t.feedback}&rdquo;
-          </blockquote>
-
-          {/* Author row */}
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <Avatar name={t.name} size="lg" />
-              <div>
-                <p className="text-base font-semibold text-white">{t.name}</p>
-                <p className="text-sm text-gray-400">
-                  {t.role ? `${t.role} · ` : ""}
-                  {t.company}
-                </p>
-              </div>
-            </div>
-            {t.portfolioProject && (
-              <Link
-                href={`/portfolio/${t.portfolioProject.slug}`}
-                className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-xl bg-purple-500/10 text-purple-300 border border-purple-500/20 hover:bg-purple-500/20 transition-colors cursor-pointer"
-              >
-                View Project
-                <HiExternalLink className="w-4 h-4" />
-              </Link>
-            )}
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
 
 function TestimonialCard({ t, index }: { t: Testimonial; index: number }) {
   return (
@@ -325,14 +249,10 @@ export function TestimonialsPageClient({
   ];
   const [activeFilter, setActiveFilter] = useState("All");
 
-  // Pick featured: first 5-star, fallback to first
-  const featured =
-    testimonials.find((t) => t.rating === 5) ?? testimonials[0];
-  const rest = testimonials.filter((t) => t._id !== featured?._id);
   const filtered =
     activeFilter === "All"
-      ? rest
-      : rest.filter((t) => t.projectType === activeFilter);
+      ? testimonials
+      : testimonials.filter((t) => t.projectType === activeFilter);
 
   // ─── Hero ────────────────────────────────────────────────────────────────
   return (
@@ -408,11 +328,6 @@ export function TestimonialsPageClient({
           </div>
         ) : (
           <>
-            {/* ── Featured ──────────────────────────────────────────────── */}
-            <section className="mb-16">
-              <FeaturedTestimonial t={featured} />
-            </section>
-
             {/* ── All Reviews ───────────────────────────────────────────── */}
             <section>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
@@ -424,7 +339,7 @@ export function TestimonialsPageClient({
                     All Reviews
                   </h2>
                   <p className="text-sm text-gray-500 mt-0.5">
-                    {rest.length} client review{rest.length !== 1 ? "s" : ""}
+                    {testimonials.length} client review{testimonials.length !== 1 ? "s" : ""}
                   </p>
                 </div>
 
