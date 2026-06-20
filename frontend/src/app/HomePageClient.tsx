@@ -48,41 +48,41 @@ const services = [
     desc: "Performance driven advertising platforms, analytics dashboards, and programmatic ad tech development.",
     color: "from-accent to-accent-dark",
   },
-    {
+  {
     icon: HiCog,
     title: "Digital Marketing",
     desc: "Digital marketing, performance campaigns, and analytics systems designed to bring real customers,not just traffic",
     color: "from-primary-light to-accent",
   },
   {
-  icon: HiLightBulb,
-  title: "Market Research & Insights",
-  desc: "Every product starts with clarity. We research your market, validate your ideas, and shape them around real demand — helping businesses build what truly works, especially in Vizag.",
-  color: "from-accent-dark to-primary",
-},
+    icon: HiLightBulb,
+    title: "Market Research & Insights",
+    desc: "Every product starts with clarity. We research your market, validate your ideas, and shape them around real demand — helping businesses build what truly works, especially in Vizag.",
+    color: "from-accent-dark to-primary",
+  },
 ];
 
 const whyItems = [
   {
-  icon: HiLocationMarker,
-  title: "Built for Vizag",
-  desc: "We’re local , Which means we deeply understand the audience, behavior, and market dynamics. We build solutions that actually work for Vizag businesses.",
- },
- {
-  icon: HiLightningBolt,
-  title: "Enthusiasm",
-  desc: "A passionate team that treats your project as our own, going above and beyond to deliver excellence.",
-},
- {
-  icon: HiTrendingUp,
-  title: "We Think Beyond Launch",
-  desc: "Launch is just the start. Everything we build is designed to grow, adapt, and scale with your business.",
- },
-{
-  icon: HiCurrencyDollar,
-  title: "Spend It Right",
-  desc: "Working with us means spending smarter. We focus on clarity, execution, and long-term value  so you don’t end up paying later to fix what should’ve been done right the first time.",
-},
+    icon: HiLocationMarker,
+    title: "Built for Vizag",
+    desc: "We’re local , Which means we deeply understand the audience, behavior, and market dynamics. We build solutions that actually work for Vizag businesses.",
+  },
+  {
+    icon: HiLightningBolt,
+    title: "Enthusiasm",
+    desc: "A passionate team that treats your project as our own, going above and beyond to deliver excellence.",
+  },
+  {
+    icon: HiTrendingUp,
+    title: "We Think Beyond Launch",
+    desc: "Launch is just the start. Everything we build is designed to grow, adapt, and scale with your business.",
+  },
+  {
+    icon: HiCurrencyDollar,
+    title: "Spend It Right",
+    desc: "Working with us means spending smarter. We focus on clarity, execution, and long-term value  so you don’t end up paying later to fix what should’ve been done right the first time.",
+  },
 ];
 
 const testimonials = [

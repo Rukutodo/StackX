@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { 
@@ -11,6 +11,8 @@ import {
   LuCheck as CheckCircle, 
   LuArrowRight as ArrowRight, 
   LuChevronDown as ChevronDown, 
+  LuChevronLeft as ChevronLeft,
+  LuChevronRight as ChevronRight,
   LuStar as Star, 
   LuGlobe as Globe, 
   LuShield as Shield, 
@@ -71,6 +73,32 @@ export default function WebDevelopmentServiceClient({
   const [testimonials, setTestimonials] = useState<any[]>([]);
   const [loadingTestimonials, setLoadingTestimonials] = useState(true);
 
+  const [currentHeroSlide, setCurrentHeroSlide] = useState(0);
+  const [activeServiceSlide, setActiveServiceSlide] = useState(0);
+  const serviceScrollRef = useRef<HTMLDivElement>(null);
+
+  const handleServiceScroll = () => {
+    if (serviceScrollRef.current && serviceScrollRef.current.children[0]) {
+      const scrollLeft = serviceScrollRef.current.scrollLeft;
+      const childWidth = (serviceScrollRef.current.children[0] as HTMLElement).offsetWidth;
+      // account for gap (gap-4 is 16px)
+      const index = Math.round(scrollLeft / (childWidth + 16));
+      setActiveServiceSlide(index);
+    }
+  };
+
+  const scrollServiceTo = (index: number) => {
+    if (serviceScrollRef.current && serviceScrollRef.current.children[index]) {
+      serviceScrollRef.current.children[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  };
+
+  const heroSlides = [
+    "/illustrations/web-dev/webdevhero1.svg",
+    "/illustrations/web-dev/webdevhero2.svg",
+    "/illustrations/web-dev/webdevhero3.svg"
+  ];
+
   useEffect(() => {
     async function fetchProjects() {
       try {
@@ -113,7 +141,12 @@ export default function WebDevelopmentServiceClient({
 
     fetchProjects();
     fetchTestimonials();
-  }, []);
+
+    const heroTimer = setInterval(() => {
+      setCurrentHeroSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 4000);
+    return () => clearInterval(heroTimer);
+  }, [heroSlides.length]);
 
   const displayTitle = overrideTitle || "Experiences That Scale";
   const displayTagline = "We engineer high-performance, visually stunning web applications tailored to elevate your brand and drive conversion. From custom marketing sites to complex SaaS platforms, we turn your vision into reality.";
@@ -160,18 +193,26 @@ export default function WebDevelopmentServiceClient({
               </motion.div>
             </motion.div>
 
-            <motion.div className="flex-1 w-full" initial={{ opacity: 0, scale: 0.85, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.3 }}>
-              <div className="relative w-full aspect-square md:aspect-[4/3] lg:aspect-square rounded-2xl overflow-hidden gradient-border bg-gradient-to-br from-surface via-surface-light to-surface animate-pulse-glow">
-                {/* [Hero Illustration/GIF Placeholder] */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 flex items-center justify-center">
-                  <div className="text-center p-8">
-                    <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/20 flex items-center justify-center animate-float">
-                      <Monitor className="w-12 h-12 text-primary-light" />
-                    </div>
-                    <p className="text-primary-light/70 text-sm font-semibold tracking-widest uppercase mb-1">Tailored {overrideBadge}</p>
-                    <p className="text-muted/50 text-xs">High-performance digital solutions</p>
-                  </div>
-                </div>
+            <motion.div className="flex-1 w-full flex items-center justify-center" initial={{ opacity: 0, scale: 0.85, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.3 }}>
+              <div className="relative w-full aspect-square md:aspect-[4/3] lg:aspect-square flex items-center justify-center">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentHeroSlide}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.5 }}
+                    className="absolute inset-0 flex items-center justify-center"
+                  >
+                    <Image
+                      src={heroSlides[currentHeroSlide]}
+                      alt="Web Development Service"
+                      fill
+                      priority
+                      className="object-contain drop-shadow-2xl p-4"
+                    />
+                  </motion.div>
+                </AnimatePresence>
               </div>
             </motion.div>
           </div>
@@ -188,7 +229,15 @@ export default function WebDevelopmentServiceClient({
               <p className="text-muted max-w-2xl mx-auto text-lg">Comprehensive web solutions combining cutting-edge technology with unparalleled design aesthetics.</p>
             </motion.div>
 
-            <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer}>
+            <motion.div 
+              ref={serviceScrollRef}
+              onScroll={handleServiceScroll}
+              className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-8 -mx-4 px-4 sm:mx-0 sm:px-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 md:pb-0 md:overflow-visible [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" 
+              initial="hidden" 
+              whileInView="visible" 
+              viewport={{ once: true, margin: "-80px" }} 
+              variants={staggerContainer}
+            >
               {[
                 { icon: Layout, title: "Front-End Development", desc: "Immersive, lightning-fast user interfaces utilizing React, Next.js, and advanced modern CSS.", color: "from-primary/20 to-accent/10" },
                 { icon: Server, title: "Back-End Architecture", desc: "Scalable, secure APIs and database structures capable of handling high-volume traffic.", color: "from-accent/20 to-primary/10" },
@@ -197,7 +246,7 @@ export default function WebDevelopmentServiceClient({
                 { icon: Smartphone, title: "Progressive Web Apps", desc: "App-like experiences directly in the browser, fully offline capable and blazing fast.", color: "from-primary/20 to-accent/15" },
                 { icon: Zap, title: "Performance Optimization", desc: "Core Web Vitals auditing and deep speed optimization for higher SEO rankings.", color: "from-warning/10 to-primary/15" }
               ].map((service, idx) => (
-                <motion.div key={idx} variants={scaleIn} className="glass-card glass-card-hover p-8 group relative overflow-hidden transition-all duration-500 hover:-translate-y-2">
+                <motion.div key={idx} variants={scaleIn} className="min-w-[85vw] sm:min-w-[340px] md:min-w-0 snap-center glass-card glass-card-hover p-6 md:p-8 group relative overflow-hidden transition-all duration-500 hover:-translate-y-2">
                   {/* Background gradient on hover */}
                   <div className={`absolute inset-0 bg-gradient-to-br ${service.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
                   <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.08] transform translate-x-4 -translate-y-4 group-hover:translate-x-0 group-hover:-translate-y-0 transition-all duration-500">
@@ -212,6 +261,34 @@ export default function WebDevelopmentServiceClient({
                 </motion.div>
               ))}
             </motion.div>
+
+            {/* Mobile Carousel Controls */}
+            <div className="flex md:hidden items-center justify-center gap-4 mt-2">
+              <button 
+                onClick={() => scrollServiceTo(activeServiceSlide === 0 ? 5 : activeServiceSlide - 1)} 
+                className="w-10 h-10 rounded-full bg-surface-light border border-white/10 flex items-center justify-center text-muted hover:text-white hover:bg-surface-light/80 transition-all"
+                aria-label="Previous offering"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <div className="flex items-center gap-2">
+                {[0, 1, 2, 3, 4, 5].map((idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => scrollServiceTo(idx)}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${activeServiceSlide === idx ? "bg-primary w-6" : "bg-white/20 hover:bg-white/40"}`}
+                    aria-label={`Go to offering ${idx + 1}`}
+                  />
+                ))}
+              </div>
+              <button 
+                onClick={() => scrollServiceTo(activeServiceSlide === 5 ? 0 : activeServiceSlide + 1)} 
+                className="w-10 h-10 rounded-full bg-surface-light border border-white/10 flex items-center justify-center text-muted hover:text-white hover:bg-surface-light/80 transition-all"
+                aria-label="Next offering"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </section>
 
@@ -221,27 +298,23 @@ export default function WebDevelopmentServiceClient({
           <FloatingOrb className="w-80 h-80 bg-primary/12 blur-[120px] top-1/2 -translate-y-1/2 -left-40" />
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="flex flex-col lg:flex-row gap-16 items-center">
+            <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-center">
               <motion.div className="flex-1 w-full" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={slideInLeft}>
-                <div className="relative w-full aspect-square md:aspect-video lg:aspect-square rounded-2xl overflow-hidden gradient-border">
-                  {/* [Why Choose Us GIF Placeholder] */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-surface via-surface-light to-surface flex items-center justify-center">
-                    <div className="text-center p-8">
-                      <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-accent/20 to-primary/20 border border-accent/20 flex items-center justify-center animate-float-reverse">
-                        <Shield className="w-10 h-10 text-accent" />
-                      </div>
-                      <p className="text-accent/60 text-sm font-semibold tracking-widest uppercase mb-1">[Why Us GIF / Illustration]</p>
-                      <p className="text-muted/50 text-xs">Replace with trust-building visual</p>
-                    </div>
-                  </div>
+                <div className="relative w-full aspect-square md:aspect-video lg:aspect-square flex items-center justify-center">
+                  <Image
+                    src="/why-webdev2.svg"
+                    alt="Why Choose StackX for Web Development"
+                    fill
+                    className="object-contain drop-shadow-2xl"
+                  />
                 </div>
               </motion.div>
 
               <motion.div className="flex-1" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer}>
                 <motion.h2 variants={slideInRight} className="text-3xl md:text-5xl font-bold font-heading mb-6">Why Partner With <span className="gradient-text-glow">StackX</span></motion.h2>
-                <motion.p variants={slideInRight} className="text-muted mb-10 text-lg">We don&apos;t just write code; we build digital assets that drive real business value.</motion.p>
+                <motion.p variants={slideInRight} className="text-muted mb-8 text-lg">We don&apos;t just write code; we build digital assets that drive real business value.</motion.p>
 
-                <div className="space-y-6">
+                <div className="space-y-3">
                   {[
                     { title: "Pixel-Perfect Implementation", desc: "Exact translation of UI/UX designs into flawless, fully responsive code across all devices." },
                     { title: "Performance First Architecture", desc: "Heavily optimized codebases ensuring sub-second load times and seamless interactions." },
@@ -277,26 +350,26 @@ export default function WebDevelopmentServiceClient({
             </motion.div>
 
             <div className="relative">
-              {/* Glowing connecting line */}
+              {/* Glowing connecting line (Desktop) */}
               <div className="hidden lg:block absolute top-[48px] left-[12%] right-[12%] h-[2px] bg-gradient-to-r from-primary/40 via-accent/40 to-primary/40 z-0 shadow-[0_0_8px_rgba(139,92,246,0.3)]" />
 
-              <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10" initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer}>
+              <motion.div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8 relative z-10" initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer}>
                 {[
                   { step: "01", title: "Discovery & Strategy", desc: "Understanding your business goals, audience, and technical requirements.", icon: Globe },
                   { step: "02", title: "Prototyping & UX", desc: "Structuring the application flow, wireframes, and interactive prototypes.", icon: Layout },
                   { step: "03", title: "Development", desc: "Agile sprints building robust, scalable front-end and back-end features.", icon: Code },
                   { step: "04", title: "QA & Launch", desc: "Cross-browser testing, performance auditing, and zero-downtime deployment.", icon: Rocket }
                 ].map((process, idx) => (
-                  <motion.div key={idx} variants={fadeInUp} className="relative p-6 text-center group">
+                  <motion.div key={idx} variants={fadeInUp} className="relative p-3 sm:p-6 text-center group">
                     {/* [Process Step GIF Placeholder] */}
-                    <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-surface-light to-surface border-2 border-surface-border mx-auto flex items-center justify-center mb-6 relative group-hover:border-primary/60 group-hover:shadow-[0_0_25px_rgba(139,92,246,0.3)] transition-all duration-500">
-                      <span className="text-3xl font-bold gradient-text">{process.step}</span>
-                      <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center border border-primary/20">
-                        <process.icon className="w-4 h-4 text-primary-light" />
+                    <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-2xl bg-surface-light border-2 border-surface-border mx-auto flex items-center justify-center mb-3 sm:mb-6 relative group-hover:border-primary/60 group-hover:shadow-[0_0_25px_rgba(139,92,246,0.3)] transition-all duration-500">
+                      <span className="text-xl sm:text-3xl font-bold gradient-text">{process.step}</span>
+                      <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-primary/15 flex items-center justify-center border border-primary/20">
+                        <process.icon className="w-3 h-3 sm:w-4 sm:h-4 text-primary-light" />
                       </div>
                     </div>
-                    <h3 className="text-xl font-bold mb-3 text-foreground">{process.title}</h3>
-                    <p className="text-muted text-sm leading-relaxed">{process.desc}</p>
+                    <h3 className="text-sm sm:text-xl font-bold mb-1 sm:mb-3 text-foreground">{process.title}</h3>
+                    <p className="text-muted text-xs sm:text-sm leading-relaxed">{process.desc}</p>
                   </motion.div>
                 ))}
               </motion.div>
@@ -665,12 +738,11 @@ export default function WebDevelopmentServiceClient({
         <section className="relative pb-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.h3 className="text-xl font-bold font-heading mb-8" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}>Explore Other Services</motion.h3>
-            <motion.div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer}>
+            <motion.div className="grid grid-cols-1 sm:grid-cols-3 gap-4" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer}>
               {[
-                { title: "UI/UX Design", icon: Layers, link: "/services/ui-ux-design" },
-                { title: "Mobile App Dev", icon: Smartphone, link: "/services/mobile-development" },
-                { title: "SEO Optimization", icon: BarChart, link: "/services/seo" },
-                { title: "Cloud Hosting", icon: Server, link: "/services/cloud" }
+                { title: "Ad Tech Solutions", icon: BarChart, link: "/services/ad-tech-solutions" },
+                { title: "Digital Marketing", icon: Rocket, link: "/services/digital-marketing" },
+                { title: "Market Research & Insights", icon: Users, link: "/services/market-research" }
               ].map((srv, idx) => (
                 <motion.div key={idx} variants={fadeInUp}>
                   <Link href={srv.link} className="glass-card p-6 flex items-center justify-between group hover:border-primary/40 hover:bg-surface-light/50 transition-all duration-300 hover:-translate-y-1">
