@@ -12,30 +12,31 @@ import { SectionHeading } from "@/components/ui";
 const team = [
     {
         id: "nuraj-mani-sai",
-        name: "Kandregula Nuraj Mani Sai",
+        name: "Nuraj Mani Sai",
         role: "Co-Founder",
         photo: "/team/nuraj.png",
         shortBio:
-            "Visionary entrepreneur and full stack architect who founded StackX with a mission to deliver premium technology at accessible costs.",
+            "Co-Founder at StackX, leading product and technology with a focus on scalable, high performance digital solutions and acting as a creative force behind its innovation"
+        ,
         fullBio: [
-            "Kandregula Nuraj Mani Sai is the visionary entrepreneur and full stack architect who built StackX from the ground up. With a deep passion for building future-focused technology, Nuraj founded the company with a singular mission: to make enterprise-grade software development accessible to every business, regardless of budget.",
-            "He leads the company\u2019s strategic direction, key client relationships, and technical innovation roadmap. His hands-on approach ensures that every project delivered under the StackX banner meets the highest standards of quality, performance, and reliability.",
-            "Under his leadership, StackX has grown from a small team into a globally trusted technology partner, delivering 150+ successful projects across 8+ countries and earning the trust of 80+ clients worldwide.",
+            "Nuraj Mani Sai is the Co-Founder of StackX, leading product development, technology, and digital infrastructure with a focus on building scalable, high performance solutions. With a strong understanding of modern technologies and product architecture, he plays a key role in shaping the company’s technical vision and innovation strategy.",
+            "Driven by a singular mission to make enterprise grade software development accessible to every business, regardless of budget, he focuses on creating systems that are efficient, user centric, and built for long term scalability.",
+            "He actively contributes to StackX’s strategic direction and technical roadmap, ensuring every product meets high standards of quality, performance, and reliability through a hands-on and execution-focused approach.",
         ],
         tags: ["Strategic Leadership", "Full-Stack Architecture", "Product Vision"],
     },
     {
         id: "a-roshan",
-        name: "A. Roshan",
+        name: "P. Roshan",
         role: "Co-Founder",
         photo: "/team/arroshan.jpeg",
         isFounder: false,
         shortBio:
-            "Strategic co-founder and business development expert who builds client relationships, forges key partnerships, and drives StackX\u2019s growth engine.",
+            "Co-Founder at StackX, leading business growth, partnerships, and client strategy focused on building strong relationships and expanding opportunities.",
         fullBio: [
-            "A. Roshan co-founded StackX alongside Nuraj with a focus on business development, partnerships, and operational excellence. He plays a critical role in scaling the company\u2019s reach and ensuring clients receive consistent, high-quality service throughout their journey with StackX.",
-            "Roshan\u2019s strength lies in building long-term relationships \u2014 whether with clients, vendors, or strategic partners. He ensures that StackX\u2019s mission of accessible premium technology resonates with the right audiences across industries and geographies.",
-            "His collaborative approach and operational rigor form the backbone of StackX\u2019s growth, helping the company maintain its 98% client retention rate while continuously expanding into new markets.",
+            "P. Roshan is the Co-Founder of StackX, leading business growth, partnerships, marketing, and strategic operations with a focus on building scalable and sustainable business ecosystems. He plays a key role in driving the company’s expansion by aligning business strategy with market opportunities and long term vision.",
+            "Driven by a vision to create meaningful business impact beyond just digital presence, he focuses on strengthening client relationships, unlocking new growth channels, and building high value partnerships across industries.",
+            "He defines StackX’s growth strategy and partnership direction, ensuring strong collaborations, consistent expansion, and measurable business outcomes. Through a people first and execution driven mindset, he helps position StackX as a reliable and growth-focused partner in the digital space.",
         ],
         tags: ["Business Development", "Partnerships", "Operations"],
     },
@@ -43,14 +44,14 @@ const team = [
         id: "venu-gopal",
         name: "Venu Gopal",
         role: "Head of Technology",
-        photo: "/team/venu.png",
+        photo: "/team/venu.jpeg",
         isFounder: false,
         shortBio:
-            "Engineering leader with deep expertise in scalable system design, cloud infrastructure, and modern web technologies.",
+            "Head of Technology at StackX, leading engineering and technical execution with a focus on scalable architecture, performance, and reliable digital systems.",
         fullBio: [
-            "Venu Gopal leads StackX\u2019s engineering function as Head of Technology, bringing deep expertise in scalable system design, cloud infrastructure, and full-stack web technologies. He spearheads the company\u2019s technical roadmap to ensure every product delivered is performant, secure, and production-ready.",
-            "Venu\u2019s engineering philosophy centers on clean architecture, developer efficiency, and relentless quality assurance. He mentors the engineering team and sets the technical standards that define the StackX engineering culture.",
-            "From architecting complex SaaS platforms to leading Ad Tech infrastructure builds, Venu ensures that StackX consistently delivers solutions that rival the best in the industry \u2014 while keeping development agile and cost-effective.",
+            "Venu Gopal is the Head of Technology at StackX, leading engineering, development, and technical execution across the company’s digital ecosystem. He focuses on building scalable architectures, optimizing system performance, and ensuring reliability across all products and platforms.",
+            "Driven by a commitment to delivering robust and production-ready solutions, he works on implementing modern development practices, streamlining technical workflows, and designing efficient systems that support long-term scalability and product growth.",
+            "He defines the company’s engineering standards and execution framework, ensuring every product meets high benchmarks of performance, stability, and quality. Through a detail-oriented and execution-driven approach, he plays a critical role in transforming ideas into reliable, real-world digital solutions.",
         ],
         tags: ["Cloud Architecture", "System Design", "Engineering Leadership"],
     },

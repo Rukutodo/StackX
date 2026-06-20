@@ -504,7 +504,7 @@ export default function ContactContent() {
                           value={form.name}
                           onChange={(v) => setForm((f) => ({ ...f, name: v }))}
                           error={errors.name}
-                          placeholder="John Doe"
+                          placeholder="Please enter your full name"
                           required
                         />
                         <InputField
@@ -513,7 +513,7 @@ export default function ContactContent() {
                           value={form.email}
                           onChange={(v) => setForm((f) => ({ ...f, email: v }))}
                           error={errors.email}
-                          placeholder="john@company.com"
+                          placeholder="Please enter your email"
                           required
                         />
                         <InputField
@@ -521,13 +521,13 @@ export default function ContactContent() {
                           type="tel"
                           value={form.phone}
                           onChange={(v) => setForm((f) => ({ ...f, phone: v }))}
-                          placeholder="+91 9490973391"
+                          placeholder="Please enter your phone number"
                         />
                         <InputField
                           label="Company"
                           value={form.company}
                           onChange={(v) => setForm((f) => ({ ...f, company: v }))}
-                          placeholder="Your Company"
+                          placeholder="Please enter your company name"
                         />
                       </div>
                     </div>

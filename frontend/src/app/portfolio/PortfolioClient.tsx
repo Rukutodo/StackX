@@ -111,7 +111,7 @@ export default function PortfolioClient({ projects, categories }: { projects: Po
               transition={{ duration: 0.4, delay: i * 0.1 }}
               layout
             >
-              <GlassCard className="h-full flex flex-col group">
+              <GlassCard className="h-full flex flex-col group relative">
                 {/* Thumbnail */}
                 <div className="w-full h-44 rounded-lg bg-gradient-to-br from-surface-light to-surface mb-6 flex items-center justify-center overflow-hidden relative">
                   {project.image ? (
@@ -172,7 +172,7 @@ export default function PortfolioClient({ projects, categories }: { projects: Po
                   {project.caseStudy ? (
                     <Link
                       href={`/portfolio/${project.slug}`}
-                      className="text-sm text-primary-light hover:text-accent transition-colors inline-flex items-center gap-1"
+                      className="text-sm text-primary-light hover:text-accent transition-colors inline-flex items-center gap-1 after:absolute after:inset-0"
                     >
                       View Details <HiArrowRight className="w-4 h-4" />
                     </Link>

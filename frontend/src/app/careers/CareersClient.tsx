@@ -575,13 +575,13 @@ export default function CareersClient({ jobs }: { jobs: JobPosting[] }) {
                   <SectionLabel>Personal Information</SectionLabel>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                     <InputField label="Full Name" value={form.fullName} onChange={(v) => setForm((f) => ({ ...f, fullName: v }))}
-                      error={errors.fullName} placeholder="John Doe" required />
+                      error={errors.fullName} placeholder="Please enter your full name" required />
                     <InputField label="Email Address" type="email" value={form.email} onChange={(v) => setForm((f) => ({ ...f, email: v }))}
-                      error={errors.email} placeholder="john@example.com" required />
+                      error={errors.email} placeholder="Please enter your email" required />
                     <InputField label="Phone Number" type="tel" value={form.phone} onChange={(v) => setForm((f) => ({ ...f, phone: v }))}
-                      error={errors.phone} placeholder="+91 9490973391" required />
+                      error={errors.phone} placeholder="Please enter your phone number" required />
                     <InputField label="Years of Experience" value={form.experience} onChange={(v) => setForm((f) => ({ ...f, experience: v }))}
-                      placeholder="e.g. 3 years" />
+                      placeholder="Please enter your experience in years" />
                   </div>
                 </div>
 
@@ -625,9 +625,9 @@ export default function CareersClient({ jobs }: { jobs: JobPosting[] }) {
                   <SectionLabel>Online Presence</SectionLabel>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                     <InputField label="Portfolio / Website" value={form.portfolioLink} onChange={(v) => setForm((f) => ({ ...f, portfolioLink: v }))}
-                      placeholder="https://myportfolio.com" />
+                      placeholder="Please enter your portfolio URL" />
                     <InputField label="LinkedIn Profile" value={form.linkedIn} onChange={(v) => setForm((f) => ({ ...f, linkedIn: v }))}
-                      placeholder="https://linkedin.com/in/..." />
+                      placeholder="Please enter your LinkedIn profile URL" />
                   </div>
                 </div>
 
