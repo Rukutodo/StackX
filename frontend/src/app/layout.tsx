@@ -126,7 +126,7 @@ export default function RootLayout({
                     "TypeScript",
                     "Node.js",
                   ],
-                  telephone: "+91-93478-58844",
+                  telephone: "+91 9490973391",
                   email: "hello@stackx.co.in",
                   address: {
                     "@type": "PostalAddress",
@@ -149,7 +149,7 @@ export default function RootLayout({
                   },
                   contactPoint: {
                     "@type": "ContactPoint",
-                    telephone: "+91-93478-58844",
+                    telephone: "+91 9490973391",
                     contactType: "customer service",
                     email: "hello@stackx.co.in",
                     availableLanguage: ["English", "Hindi", "Telugu"],
