@@ -237,6 +237,7 @@ interface AdminButtonProps {
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
   title?: string;
+  loading?: boolean;
 }
 
 const adminBtnVariants: Record<string, string> = {
@@ -259,16 +260,23 @@ export function AdminButton({
   type = "button",
   disabled = false,
   title,
+  loading = false,
 }: AdminButtonProps) {
   const sizeClass = size === "sm" ? "px-3 py-1.5 text-xs" : "px-5 py-2.5 text-sm";
   return (
     <button
       type={type}
       onClick={onClick}
-      disabled={disabled}
+      disabled={disabled || loading}
       title={title}
       className={`inline-flex items-center justify-center gap-2 font-medium rounded-xl transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${sizeClass} ${adminBtnVariants[variant]} ${className}`}
     >
+      {loading && (
+        <svg className="animate-spin w-4 h-4 text-current shrink-0" viewBox="0 0 24 24" fill="none">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
+      )}
       {children}
     </button>
   );
