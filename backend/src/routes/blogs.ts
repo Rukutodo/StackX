@@ -195,7 +195,7 @@ router.put("/:id", protect, async (req, res) => {
     const updated = await Blog.findByIdAndUpdate(
       req.params.id,
       { slug, title, excerpt, category, coverImage, content, author, readingTime, status, order },
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     );
 
     if (!updated) return res.status(404).json({ message: "Blog not found" });

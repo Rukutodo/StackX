@@ -148,7 +148,7 @@ router.put("/:id", protect, async (req, res) => {
     const updated = await PortfolioProject.findByIdAndUpdate(
       req.params.id,
       { slug, title, category, description, image, techStack, result, featured, status, order, caseStudy },
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     );
 
     if (!updated) return res.status(404).json({ message: "Project not found" });

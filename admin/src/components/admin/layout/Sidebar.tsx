@@ -20,6 +20,7 @@ import {
   HiBookOpen,
   HiPencilAlt,
   HiSearch,
+  HiBadgeCheck,
 } from "react-icons/hi";
 
 const API = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "";
@@ -35,6 +36,7 @@ const sidebarLinks = [
   { href: "/messages", label: "Messages", icon: HiMail },
   { href: "/applications", label: "Applications", icon: HiDocumentText },
   { href: "/blogs", label: "Blogs", icon: HiPencilAlt },
+  { href: "/certificates", label: "Certificates", icon: HiBadgeCheck },
   { href: "/seo", label: "SEO", icon: HiSearch },
 ];
 

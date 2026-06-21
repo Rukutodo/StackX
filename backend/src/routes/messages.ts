@@ -62,7 +62,7 @@ router.put("/:id/status", protect, async (req, res) => {
     const updated = await Message.findByIdAndUpdate(
       req.params.id,
       { status },
-      { new: true }
+      { returnDocument: 'after' }
     );
     if (!updated) return res.status(404).json({ message: "Message not found" });
     res.json(updated);

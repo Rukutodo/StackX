@@ -109,7 +109,7 @@ router.put("/:id", protect, async (req, res) => {
     const updated = await Reference.findByIdAndUpdate(
       req.params.id,
       { slug, title, description, keywords, ogImage, canonical, robots, focusKeyword, service, status, order },
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     ).populate("service");
 
     res.json(updated);

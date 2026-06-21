@@ -68,7 +68,7 @@ router.put("/:id", protect, async (req, res) => {
     const updated = await Testimonial.findByIdAndUpdate(
       req.params.id,
       { name, company, role, feedback, rating, projectType, status, order, portfolioProject: portfolioProject || null },
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     );
 
     if (!updated) return res.status(404).json({ message: "Testimonial not found" });

@@ -119,7 +119,7 @@ router.put("/:id/status", protect, async (req, res) => {
     const updated = await JobApplication.findByIdAndUpdate(
       req.params.id,
       { status },
-      { new: true }
+      { returnDocument: 'after' }
     );
     if (!updated) return res.status(404).json({ message: "Application not found" });
     res.json(updated);

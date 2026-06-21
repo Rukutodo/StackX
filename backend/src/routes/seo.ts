@@ -254,7 +254,7 @@ router.put("/:pageKey", protect, async (req, res) => {
         canonical,
         jsonLdOverrides,
       },
-      { new: true, upsert: true, runValidators: true }
+      { returnDocument: 'after', upsert: true, runValidators: true }
     );
 
     res.json(settings);

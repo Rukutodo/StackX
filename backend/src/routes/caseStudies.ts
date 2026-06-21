@@ -158,7 +158,7 @@ router.put("/:id", protect, async (req, res) => {
         solution, features, results, images, status, order,
         portfolioProject: portfolioProject || null,
       },
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     );
 
     if (!updated) return res.status(404).json({ message: "Case study not found" });
@@ -179,7 +179,7 @@ router.patch("/:id/feature", protect, async (req, res) => {
     const updated = await CaseStudy.findByIdAndUpdate(
       req.params.id,
       { featured: true },
-      { new: true }
+      { returnDocument: 'after' }
     );
     if (!updated) return res.status(404).json({ message: "Case study not found" });
     res.json(updated);

@@ -122,7 +122,7 @@ router.put("/:id", protect, async (req, res) => {
         caseStudy, status, order, featuredProjects, testimonials,
         pageType, description, keywords, ogImage, canonical, robots, focusKeyword
       },
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     );
 
     if (!updated) return res.status(404).json({ message: "Service not found" });
