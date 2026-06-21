@@ -18,6 +18,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/contact",
     "/privacy-policy",
     "/terms-of-service",
+    "/blog",
+    "/case-studies",
   ].map((route) => ({
     url: `${SITE_URL}${route}`,
     lastModified: STATIC_LAST_MODIFIED,
@@ -27,10 +29,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Dynamic routes
   try {
-    const [portfolioRes, servicesRes, referencesRes] = await Promise.all([
+    const [portfolioRes, servicesRes, referencesRes, blogsRes, caseStudiesRes] = await Promise.all([
       fetch(`${SERVER_API}/api/portfolio`),
       fetch(`${SERVER_API}/api/services`),
       fetch(`${SERVER_API}/api/references`),
+      fetch(`${SERVER_API}/api/blogs`),
+      fetch(`${SERVER_API}/api/case-studies`),
     ]);
 
     if (portfolioRes.ok) {
@@ -63,6 +67,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         routes.push({
           url: `${SITE_URL}/${r.slug}`,
           lastModified: r.updatedAt ? new Date(r.updatedAt) : STATIC_LAST_MODIFIED,
+          changeFrequency: "weekly",
+          priority: 0.7,
+        });
+      });
+    }
+
+    if (blogsRes.ok) {
+      const blogs = await blogsRes.json();
+      blogs.forEach((b: any) => {
+        routes.push({
+          url: `${SITE_URL}/blog/${b.slug}`,
+          lastModified: b.updatedAt ? new Date(b.updatedAt) : STATIC_LAST_MODIFIED,
+          changeFrequency: "weekly",
+          priority: 0.6,
+        });
+      });
+    }
+
+    if (caseStudiesRes.ok) {
+      const caseStudies = await caseStudiesRes.json();
+      caseStudies.forEach((c: any) => {
+        routes.push({
+          url: `${SITE_URL}/case-studies/${c.slug}`,
+          lastModified: c.updatedAt ? new Date(c.updatedAt) : STATIC_LAST_MODIFIED,
           changeFrequency: "weekly",
           priority: 0.7,
         });
