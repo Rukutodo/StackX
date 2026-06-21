@@ -46,9 +46,7 @@ export default function TermsOfServicePage() {
           {/* Intro */}
           <section>
             <p className="text-gray-400 text-sm leading-relaxed">
-              Please read these Terms of Service (&quo
-    </>
-  );Terms&quot;) carefully before using the website{" "}
+              Please read these Terms of Service (&quot;Terms&quot;) carefully before using the website{" "}
               <a href="https://stackx.co.in" className="text-cyan-400 hover:underline">stackx.co.in</a> or engaging
               any services provided by StackX. By accessing or using our website, you agree to be bound by
               these Terms. If you do not agree, please do not use our services.
@@ -201,6 +199,7 @@ export default function TermsOfServicePage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

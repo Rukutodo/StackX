@@ -46,9 +46,7 @@ export default function PrivacyPolicyPage() {
           {/* Intro */}
           <section>
             <p className="text-gray-400 text-sm leading-relaxed">
-              StackX (&quo
-    </>
-  );we&quot;, &quot;our&quot;, or &quot;us&quot;) is committed to protecting your privacy. This Privacy Policy explains
+              StackX (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;) is committed to protecting your privacy. This Privacy Policy explains
               how we collect, use, disclose, and safeguard your information when you visit our website{" "}
               <a href="https://stackx.co.in" className="text-purple-400 hover:underline">stackx.co.in</a> or use
               our services. Please read this policy carefully. If you disagree with its terms, please discontinue
@@ -186,6 +184,7 @@ export default function PrivacyPolicyPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
