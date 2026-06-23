@@ -44,7 +44,7 @@ const team = [
         id: "venu-gopal",
         name: "Venu Gopal",
         role: "Head of Technology",
-        photo: "/team/venu.jpeg",
+        photo: "/team/venu-new.jpeg",
         isFounder: false,
         shortBio:
             "Head of Technology at StackX, leading engineering and technical execution with a focus on scalable architecture, performance, and reliable digital systems.",
