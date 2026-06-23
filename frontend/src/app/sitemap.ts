@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 
 const SERVER_API = process.env.INTERNAL_API_URL || "http://localhost:4000";
-const SITE_URL = "https://stackx.co.in";
+const SITE_URL = "https://www.stackx.co.in";
 
 // Use the date of the last major content update for static routes
 const STATIC_LAST_MODIFIED = new Date("2026-05-01");
