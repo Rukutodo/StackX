@@ -31,6 +31,10 @@ connectDB();
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
+  "http://127.0.0.1:3000",
+  "http://127.0.0.1:3001",
+  "http://[::1]:3000",
+  "http://[::1]:3001",
   "http://129.159.236.176:3000",
   "http://129.159.236.176:3001",
   "https://stackx.co.in",
