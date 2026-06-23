@@ -6,6 +6,8 @@ const SITE_URL = "https://stackx.co.in";
 // Use the date of the last major content update for static routes
 const STATIC_LAST_MODIFIED = new Date("2026-05-01");
 
+export const revalidate = 3600; // Revalidate every hour
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Static routes
   const routes: MetadataRoute.Sitemap = [
@@ -27,78 +29,70 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: route === "" ? 1 : 0.8,
   }));
 
+  // Helper to fetch data safely
+  const fetchData = async (endpoint: string) => {
+    try {
+      const res = await fetch(`${SERVER_API}${endpoint}`);
+      if (res.ok) return await res.json();
+    } catch (error) {
+      console.error(`Sitemap generation error for ${endpoint}:`, error);
+    }
+    return [];
+  };
+
   // Dynamic routes
-  try {
-    const [portfolioRes, servicesRes, referencesRes, blogsRes, caseStudiesRes] = await Promise.all([
-      fetch(`${SERVER_API}/api/portfolio`),
-      fetch(`${SERVER_API}/api/services`),
-      fetch(`${SERVER_API}/api/references`),
-      fetch(`${SERVER_API}/api/blogs`),
-      fetch(`${SERVER_API}/api/case-studies`),
-    ]);
+  const [projects, services, references, blogs, caseStudies] = await Promise.all([
+    fetchData("/api/portfolio"),
+    fetchData("/api/services"),
+    fetchData("/api/references"),
+    fetchData("/api/blogs"),
+    fetchData("/api/case-studies"),
+  ]);
 
-    if (portfolioRes.ok) {
-      const projects = await portfolioRes.json();
-      projects.forEach((p: any) => {
-        routes.push({
-          url: `${SITE_URL}/portfolio/${p.slug}`,
-          lastModified: p.updatedAt ? new Date(p.updatedAt) : STATIC_LAST_MODIFIED,
-          changeFrequency: "monthly",
-          priority: 0.6,
-        });
-      });
-    }
+  projects.forEach((p: any) => {
+    routes.push({
+      url: `${SITE_URL}/portfolio/${p.slug}`,
+      lastModified: p.updatedAt ? new Date(p.updatedAt) : STATIC_LAST_MODIFIED,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    });
+  });
 
-    if (servicesRes.ok) {
-      const services = await servicesRes.json();
-      services.forEach((s: any) => {
-        routes.push({
-          url: `${SITE_URL}/services/${s.slug}`,
-          lastModified: s.updatedAt ? new Date(s.updatedAt) : STATIC_LAST_MODIFIED,
-          changeFrequency: "weekly",
-          priority: 0.7,
-        });
-      });
-    }
+  services.forEach((s: any) => {
+    routes.push({
+      url: `${SITE_URL}/services/${s.slug}`,
+      lastModified: s.updatedAt ? new Date(s.updatedAt) : STATIC_LAST_MODIFIED,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    });
+  });
 
-    if (referencesRes.ok) {
-      const references = await referencesRes.json();
-      references.forEach((r: any) => {
-        routes.push({
-          url: `${SITE_URL}/${r.slug}`,
-          lastModified: r.updatedAt ? new Date(r.updatedAt) : STATIC_LAST_MODIFIED,
-          changeFrequency: "weekly",
-          priority: 0.7,
-        });
-      });
-    }
+  references.forEach((r: any) => {
+    routes.push({
+      url: `${SITE_URL}/${r.slug}`,
+      lastModified: r.updatedAt ? new Date(r.updatedAt) : STATIC_LAST_MODIFIED,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    });
+  });
 
-    if (blogsRes.ok) {
-      const blogs = await blogsRes.json();
-      blogs.forEach((b: any) => {
-        routes.push({
-          url: `${SITE_URL}/blog/${b.slug}`,
-          lastModified: b.updatedAt ? new Date(b.updatedAt) : STATIC_LAST_MODIFIED,
-          changeFrequency: "weekly",
-          priority: 0.6,
-        });
-      });
-    }
+  blogs.forEach((b: any) => {
+    routes.push({
+      url: `${SITE_URL}/blog/${b.slug}`,
+      lastModified: b.updatedAt ? new Date(b.updatedAt) : STATIC_LAST_MODIFIED,
+      changeFrequency: "weekly",
+      priority: 0.6,
+    });
+  });
 
-    if (caseStudiesRes.ok) {
-      const caseStudies = await caseStudiesRes.json();
-      caseStudies.forEach((c: any) => {
-        routes.push({
-          url: `${SITE_URL}/case-studies/${c.slug}`,
-          lastModified: c.updatedAt ? new Date(c.updatedAt) : STATIC_LAST_MODIFIED,
-          changeFrequency: "weekly",
-          priority: 0.7,
-        });
-      });
-    }
-  } catch (error) {
-    console.error("Sitemap generation error:", error);
-  }
+  caseStudies.forEach((c: any) => {
+    routes.push({
+      url: `${SITE_URL}/case-studies/${c.slug}`,
+      lastModified: c.updatedAt ? new Date(c.updatedAt) : STATIC_LAST_MODIFIED,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    });
+  });
 
   return routes;
 }
