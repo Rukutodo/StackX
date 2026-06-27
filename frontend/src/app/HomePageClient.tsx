@@ -444,49 +444,120 @@ export default function HomePageClient() {
       </section>
 
       {/* ═══ SERVICES OVERVIEW ═══ */}
-      <section className="py-24 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionHeading
-            badge="What We Do"
-            title="Services That Drive Growth"
-            subtitle="From concept to launch to growth, everything we do is designed to move your business forward."
-          />
+      <section className="py-28 relative overflow-hidden">
+        {/* Background effects */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(139,92,246,0.08),transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(6,182,212,0.06),transparent_60%)]" />
 
-          <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* Custom bold heading */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-20"
+          >
+            <span className="inline-flex items-center gap-2 px-5 py-2 text-xs font-semibold tracking-wider uppercase rounded-full bg-primary/10 text-primary-light border border-primary/20 mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary-light animate-pulse" />
+              What We Do
+            </span>
+            <h2
+              className="text-4xl sm:text-5xl lg:text-6xl font-heading font-bold leading-tight"
+              style={{ fontFamily: "var(--font-poppins), sans-serif" }}
+            >
+              Our{" "}
+              <span className="gradient-text">Services</span>
+            </h2>
+            <p className="mt-5 text-muted text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+              From concept to launch to growth — everything we do is designed to move your business forward.
+            </p>
+            {/* Decorative gradient line under heading */}
+            <div className="mt-6 mx-auto w-24 h-1 rounded-full bg-gradient-to-r from-primary via-accent to-primary-light" />
+          </motion.div>
+
+          {/* Bento-style service cards — 2 columns */}
+          <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
             {services.map((service, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.15 }}
-                whileHover={{ y: -8, rotateX: 2, rotateY: -2 }}
-                className="glass-card glass-card-hover p-8 group cursor-pointer relative overflow-hidden"
+                transition={{ duration: 0.5, delay: i * 0.12 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div
-                  className={`w-14 h-14 rounded-xl bg-gradient-to-br ${service.color} flex items-center justify-center mb-6 shadow-lg relative z-10`}
-                >
-                  <service.icon className="w-7 h-7 text-white" />
-                </div>
-                <h3
-                  className="text-xl font-heading font-semibold mb-3 relative z-10"
-                  style={{ fontFamily: "var(--font-poppins), sans-serif" }}
-                >
-                  {service.title}
-                </h3>
-                <p className="text-muted text-sm leading-relaxed mb-4 relative z-10">
-                  {service.desc}
-                </p>
                 <Link
                   href={`/services/${service.slug}`}
-                  className="inline-flex items-center gap-1 text-sm text-primary-light hover:text-accent transition-colors relative z-10"
+                  className="group block relative rounded-2xl overflow-hidden transition-all duration-500 hover:-translate-y-2"
+                  style={{
+                    background: "rgba(255,255,255,0.02)",
+                    border: "1px solid rgba(255,255,255,0.06)",
+                  }}
                 >
-                  Learn more <HiArrowRight className="w-4 h-4" />
+                  {/* Hover glow */}
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${service.color} opacity-0 group-hover:opacity-[0.06] transition-opacity duration-500`}
+                  />
+                  {/* Top accent bar */}
+                  <div
+                    className={`absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r ${service.color} opacity-40 group-hover:opacity-100 transition-opacity duration-500`}
+                  />
+
+                  <div className="p-8 sm:p-10 flex gap-6 items-start relative z-10">
+                    {/* Number + Icon column */}
+                    <div className="flex flex-col items-center gap-3 shrink-0">
+                      <span className="text-[10px] font-bold tracking-widest text-muted/30 uppercase">
+                        0{i + 1}
+                      </span>
+                      <div
+                        className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br ${service.color} flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-500`}
+                      >
+                        <service.icon className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+                      </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <h3
+                        className="text-xl sm:text-2xl font-heading font-bold text-white mb-3 group-hover:text-primary-light transition-colors duration-300"
+                        style={{ fontFamily: "var(--font-poppins), sans-serif" }}
+                      >
+                        {service.title}
+                      </h3>
+                      <p className="text-muted text-sm sm:text-base leading-relaxed mb-5 line-clamp-3">
+                        {service.desc}
+                      </p>
+                      <span className="inline-flex items-center gap-2 text-sm font-medium text-primary-light group-hover:text-accent transition-colors duration-300">
+                        Explore Service
+                        <HiArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-300" />
+                      </span>
+                    </div>
+                  </div>
                 </Link>
               </motion.div>
             ))}
           </div>
+
+          {/* View All Services CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="mt-16 flex justify-center"
+          >
+            <Link
+              href="/services"
+              className="group inline-flex items-center gap-3 px-10 py-4 rounded-full text-base font-semibold text-white transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5"
+              style={{
+                background: "linear-gradient(135deg, rgba(139,92,246,0.15), rgba(6,182,212,0.10))",
+                border: "1px solid rgba(139,92,246,0.25)",
+              }}
+            >
+              <span>View All Services</span>
+              <HiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+            </Link>
+          </motion.div>
         </div>
       </section>
 

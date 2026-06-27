@@ -30,8 +30,36 @@ async function getServices() {
 
 export default async function ServicesPage() {
   const categories = await getServices();
+
+  const servicesJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "StackX Services",
+    "description": "Comprehensive digital and software engineering services provided by StackX.",
+    "url": "https://stackx.co.in/services",
+    "itemListElement": categories.map((cat: any, index: number) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "Service",
+        "name": cat.title,
+        "description": cat.tagline || cat.description,
+        "url": `https://stackx.co.in/services/${cat.slug}`,
+        "provider": {
+          "@type": "Organization",
+          "name": "StackX",
+          "url": "https://stackx.co.in"
+        }
+      }
+    }))
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(servicesJsonLd) }}
+      />
       <PageJsonLd pageKey="services" />
       <Suspense fallback={null}>
         <ServicesClient categories={categories} />
