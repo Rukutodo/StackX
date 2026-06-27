@@ -29,6 +29,7 @@ export default function VerifyCertificateClient({ initialId }: { initialId?: str
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
+  const [renderKey, setRenderKey] = useState(0);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
@@ -38,18 +39,18 @@ export default function VerifyCertificateClient({ initialId }: { initialId?: str
       document.title = `${result.recipientName} - Verify Certificate | StackX`;
     }
     if (!result || !containerRef.current) return;
-    
+
     const observer = new ResizeObserver((entries) => {
       for (let entry of entries) {
         const width = entry.contentRect.width;
-        if (width < 900) {
-          setScale(width / 900);
+        if (width < 1123) {
+          setScale(width / 1123);
         } else {
           setScale(1);
         }
       }
     });
-    
+
     observer.observe(containerRef.current);
     return () => observer.disconnect();
   }, [result]);
@@ -84,7 +85,7 @@ export default function VerifyCertificateClient({ initialId }: { initialId?: str
     e.preventDefault();
     const cleanId = certId.trim().toUpperCase();
     if (!cleanId) return;
-    
+
     // Open verification details in a new browser tab
     window.open(`/verify-certificate/${cleanId}`, "_blank");
   };
@@ -101,28 +102,51 @@ export default function VerifyCertificateClient({ initialId }: { initialId?: str
     return d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
   };
 
+  const formatDateDMY = (iso?: string) => {
+    if (!iso) return "";
+    const d = new Date(iso);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   const handleDownloadPDF = async () => {
-    const element = document.getElementById("certificate-card");
-    if (!element) return;
-    
     try {
       setDownloadingPdf(true);
+
+      // Re-fetch certificate data from the backend to ensure untampered data
+      if (result?.certificateId) {
+        const res = await fetch(`${SERVER_API}/api/certificates/${result.certificateId}`);
+        if (res.ok) {
+          const freshData = await res.json();
+          setResult(freshData);
+          setRenderKey(prev => prev + 1); // Force complete re-render of the certificate card
+          
+          // Wait a short duration to ensure React has fully updated the DOM
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      }
+
+      const element = document.getElementById("certificate-card");
+      if (!element) return;
+      
       const { toPng } = await import("html-to-image");
       const jsPDFModule = await import("jspdf");
       const jsPDF = jsPDFModule.default || (jsPDFModule as any).jsPDF;
-      
-      const imgData = await toPng(element, { 
+
+      const imgData = await toPng(element, {
         pixelRatio: 3,
         backgroundColor: "#ffffff",
-        width: 900,
-        height: 636,
+        width: 1123,
+        height: 794,
       });
-      
+
       const pdf = new jsPDF("l", "mm", "a4");
       const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (636 * pdfWidth) / 900;
+      const pdfHeight = (794 * pdfWidth) / 1123;
       const yPos = pdfHeight < 210 ? (210 - pdfHeight) / 2 : 0;
-      
+
       pdf.addImage(imgData, "PNG", 0, yPos, pdfWidth, pdfHeight);
       pdf.save(`StackX-Certificate-${result?.certificateId}.pdf`);
     } catch (err: any) {
@@ -219,7 +243,7 @@ export default function VerifyCertificateClient({ initialId }: { initialId?: str
                   <h3 className="text-2xl font-bold text-white mb-2">Verification Failed</h3>
                   <p className="text-red-300 mb-6">{error}</p>
                   {initialId && (
-                    <a 
+                    <a
                       href="/verify-certificate"
                       className="inline-flex items-center justify-center px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-medium transition-colors"
                     >
@@ -242,150 +266,220 @@ export default function VerifyCertificateClient({ initialId }: { initialId?: str
                   <div className="relative group w-full max-w-[950px] mx-auto">
                     {/* Outer shadow for the paper */}
                     <div className="absolute -inset-4 bg-black/20 blur-2xl rounded-sm transition duration-1000" />
-                    
+
                     {/* Scale wrapper to keep layout identical on mobile and desktop */}
-                    <div 
+                    <div
                       ref={containerRef}
                       className="w-full overflow-hidden flex items-center justify-center"
-                      style={{ height: `${636 * scale}px` }}
+                      style={{ height: `${794 * scale}px` }}
                     >
-                      <div 
-                        style={{ 
-                          transform: `scale(${scale})`, 
+                      <div
+                        style={{
+                          transform: `scale(${scale})`,
                           transformOrigin: "center center",
-                          width: "900px",
-                          height: "636px",
+                          width: "1123px",
+                          height: "794px",
                           flexShrink: 0
                         }}
                       >
-                        {/* The Certificate Card */}
-                        <div 
-                          id="certificate-card" 
-                          className="relative bg-white text-black overflow-hidden shadow-2xl flex flex-col items-center justify-center p-12 w-full h-full"
+                        {/* ═══ THE CERTIFICATE CARD ═══ */}
+                        <div
+                          id="certificate-card"
+                          key={renderKey}
+                          className="relative text-[#1a1a2e] overflow-hidden w-full h-full select-none"
+                          style={{
+                            background: "transparent",
+                            fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif"
+                          }}
                         >
-                          {/* Classic Double Border */}
-                          <div className="absolute inset-4 border-[3px] border-black pointer-events-none" />
-                          <div className="absolute inset-[22px] border border-black pointer-events-none" />
+                          {/* ─── PREMIUM DARK THEME BORDER ─── */}
+                          <div className="absolute inset-[10px] border-[8px] border-double border-[#8b5cf6]/20 pointer-events-none z-[5]" />
+                          <div className="absolute inset-0 border border-white/5 pointer-events-none z-[5]" />
 
-                          <div className="relative z-10 w-full h-full flex flex-col justify-between p-2">
+                          {/* ─── PREMIUM DARK GEOMETRIC BACKGROUND ─── */}
+                          {/* Base dark violet -> near black gradient */}
+                          <div className="absolute inset-0 z-0" style={{ background: "radial-gradient(ellipse at center, #2e1065 0%, #170535 50%, #0a0118 100%)" }} />
+
+                          {/* Center brightness for readability */}
+                          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] pointer-events-none z-0" style={{ background: "radial-gradient(ellipse at center, rgba(139,92,246,0.12) 0%, rgba(139,92,246,0) 60%)" }} />
+                          <div className="absolute top-[10%] left-1/2 -translate-x-1/2 w-[400px] h-[300px] pointer-events-none z-0 blur-[60px]" style={{ background: "rgba(167,139,250,0.06)" }} />
+
+                          {/* Geometric / Polygonal elements in corners */}
+                          <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-60" viewBox="0 0 1123 794" preserveAspectRatio="none">
+                            {/* Top-left cluster */}
+                            <polygon points="0,0 300,0 150,150 0,250" fill="rgba(139,92,246,0.03)" stroke="rgba(167,139,250,0.08)" strokeWidth="1" />
+                            <polygon points="0,0 150,150 50,300 0,400" fill="rgba(109,40,217,0.04)" stroke="rgba(167,139,250,0.05)" strokeWidth="0.5" />
+                            <polygon points="150,150 250,80 350,180 200,280" fill="rgba(124,58,237,0.02)" stroke="rgba(167,139,250,0.06)" strokeWidth="1" />
                             
-                            {/* Header: Logo (Left) and URL/ID (Right) */}
-                            <div className="flex justify-between items-start w-full">
-                              {/* Top Left: LOGO */}
-                              <div className="flex justify-start">
-                                <img src="/stackx.svg" alt="StackX" className="h-10 filter invert grayscale" />
+                            {/* Bottom-right cluster */}
+                            <polygon points="1123,794 800,794 950,600 1123,500" fill="rgba(139,92,246,0.03)" stroke="rgba(167,139,250,0.08)" strokeWidth="1" />
+                            <polygon points="1123,794 950,600 1000,400 1123,350" fill="rgba(109,40,217,0.04)" stroke="rgba(167,139,250,0.05)" strokeWidth="0.5" />
+                            <polygon points="950,600 850,550 750,680 880,720" fill="rgba(124,58,237,0.02)" stroke="rgba(167,139,250,0.06)" strokeWidth="1" />
+
+                            {/* Top-right accent */}
+                            <polygon points="1123,0 900,0 1050,150 1123,100" fill="rgba(76,29,149,0.1)" stroke="rgba(139,92,246,0.1)" strokeWidth="1" />
+                            <polygon points="1050,150 950,220 1123,280 1123,100" fill="rgba(109,40,217,0.03)" />
+                            
+                            {/* Bottom-left accent */}
+                            <polygon points="0,794 200,794 100,600 0,650" fill="rgba(76,29,149,0.1)" stroke="rgba(139,92,246,0.1)" strokeWidth="1" />
+                            <polygon points="100,600 250,520 0,450 0,650" fill="rgba(109,40,217,0.03)" />
+
+                            {/* Floating subtle facets / mesh lines */}
+                            <path d="M 300 0 L 450 300 L 800 200 L 900 0" fill="none" stroke="rgba(139,92,246,0.04)" strokeWidth="1" />
+                            <path d="M 100 794 L 250 500 L 650 600 L 850 794" fill="none" stroke="rgba(139,92,246,0.03)" strokeWidth="1" />
+                          </svg>
+
+                          {/* Edge glows for dimension */}
+                          <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#8b5cf6]/30 to-transparent z-[2]" />
+                          <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#8b5cf6]/20 to-transparent z-[2]" />
+
+
+                          {/* ═══ CONTENT ═══ */}
+                          <div className="relative z-10 w-full h-full flex flex-col" style={{ padding: "34px 60px 28px" }}>
+
+                            {/* ── LOGO — Centered ── */}
+                            <div className="w-full flex justify-center mb-4">
+                              <img
+                                src="/stackx.svg"
+                                alt="StackX"
+                                className="h-[84px] filter invert brightness-0 invert drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+                              />
+                            </div>
+
+                            {/* ── TITLE ── */}
+                            <div className="flex flex-col items-center mt-0">
+                              <h1
+                                className="text-[60px] tracking-[0.25em] text-white uppercase leading-none font-light drop-shadow-md"
+                                style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}
+                              >
+                                CERTIFICATE
+                              </h1>
+                              {/* Accent bar */}
+                              <div className="relative mt-4">
+                                <div className="absolute inset-0 -inset-x-12 bg-gradient-to-r from-transparent via-[#8b5cf6]/30 to-transparent rounded-sm" />
+                                <p className="relative text-[21px] tracking-[0.4em] text-[#d8b4fe] uppercase font-semibold px-12 py-1.5 drop-shadow-sm" style={{ fontFamily: "'Inter', sans-serif" }}>
+                                  OF INTERNSHIP
+                                </p>
                               </div>
+                              <p className="text-[17px] text-[#a78bfa] tracking-[0.12em] mt-5 uppercase font-medium">
+                                This certificate is proudly presented to
+                              </p>
+                            </div>
+
+                            {/* ── NAME ── */}
+                            <div className="flex flex-col items-center mt-6">
+                              {/* Top line */}
+                              <div className="flex items-center gap-4 w-[650px]">
+                                <div className="flex-1 h-[2px] bg-gradient-to-r from-transparent to-[#8b5cf6]/50" />
+                                <div className="w-3 h-3 rotate-45 border-[2px] border-[#a78bfa]/60 bg-[#2e1065] shadow-[0_0_8px_rgba(139,92,246,0.6)]" />
+                                <div className="flex-1 h-[2px] bg-gradient-to-l from-transparent to-[#8b5cf6]/50" />
+                              </div>
+
+                              <h2
+                                className={`text-white font-bold tracking-[0.05em] leading-tight my-5 drop-shadow-lg ${
+                                  result.recipientName.length > 50
+                                    ? "text-[30px]"
+                                    : result.recipientName.length > 30
+                                      ? "text-[38px]"
+                                      : "text-[44px]"
+                                }`}
+                                style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}
+                              >
+                                {result.recipientName}
+                              </h2>
+
+                              {/* Bottom line */}
+                              <div className="flex items-center gap-4 w-[650px]">
+                                <div className="flex-1 h-[2px] bg-gradient-to-r from-transparent to-[#8b5cf6]/50" />
+                                <div className="w-3 h-3 rotate-45 border-[2px] border-[#a78bfa]/60 bg-[#2e1065] shadow-[0_0_8px_rgba(139,92,246,0.6)]" />
+                                <div className="flex-1 h-[2px] bg-gradient-to-l from-transparent to-[#8b5cf6]/50" />
+                              </div>
+                            </div>
+
+                            {/* ── DETAILS (Continuous Format) ── */}
+                            <div className="flex flex-col items-center mt-7 px-10">
+                              <p className="text-[18px] text-[#e5e7eb] text-center leading-[1.8] max-w-[850px] font-medium">
+                                for the successful completion of their internship program as a <span className="font-bold text-white uppercase tracking-wide text-[20px] mx-1 drop-shadow-sm">{result.courseOrRole}</span> 
+                                from <span className="font-bold text-white border-b border-[#a78bfa]/40 pb-0.5 mx-1">{formatDateDMY(result.startDate)}</span> 
+                                to <span className="font-bold text-white border-b border-[#a78bfa]/40 pb-0.5 mx-1">{formatDateDMY(result.endDate)}</span>. 
+                                During this tenure, the candidate demonstrated exceptional dedication, continuous skill development, and outstanding professional growth.
+                              </p>
                               
-                              {/* Top Right: URL and ID */}
-                              <div className="text-right flex flex-col gap-1 justify-end items-end">
-                                <a 
-                                  href={`https://stackx.co.in/verify-certificate?id=${result.certificateId}`} 
-                                  target="_blank" 
-                                  rel="noreferrer"
-                                  className="text-black text-xs font-mono hover:text-blue-600 transition-colors underline underline-offset-4 font-bold"
-                                >
-                                  stackx.co.in/verify
-                                </a>
-                                <p className="text-black text-[10px] font-bold uppercase tracking-[0.2em] mt-1">
-                                  Credential ID: {result.certificateId}
+                              {/* Issue date & ID */}
+                              <div className="flex items-center gap-6 mt-6">
+                                <p className="text-[14px] text-[#a78bfa] tracking-wider uppercase">
+                                  Issued: <span className="text-white font-semibold">{formatDateDMY(result.issueDate)}</span>
+                                </p>
+                                <div className="w-[4px] h-[4px] rounded-full bg-[#d8b4fe] shadow-[0_0_5px_#c084fc]" />
+                                <p className="text-[14px] font-mono text-[#c084fc] tracking-[0.1em] font-semibold drop-shadow-sm">
+                                  {result.certificateId}
                                 </p>
                               </div>
                             </div>
 
-                            {/* Title: CERTIFICATE OF INTERNSHIP */}
-                            <div className="text-center w-full mt-6">
-                              <h1 className="text-5xl font-serif text-black tracking-widest uppercase font-bold leading-[1.3]">
-                                CERTIFICATE OF <br /> INTERNSHIP
-                              </h1>
-                            </div>
+                            {/* ── SPACER ── */}
+                            <div className="min-h-[16px]" />
 
-                            {/* Body: Concise Paragraph */}
-                            <div className="flex flex-col items-center w-full my-8">
-                              <div className="text-black text-[15px] font-serif leading-loose text-justify w-[85%] mx-auto">
-                                This is to certify that{" "}
-                                <span 
-                                  className={`text-black font-bold tracking-wide border-b border-black pb-0.5 mx-1 uppercase ${
-                                    result.recipientName.length > 50 
-                                      ? "text-xs" 
-                                      : result.recipientName.length > 30 
-                                        ? "text-base" 
-                                        : "text-lg"
-                                  }`}
-                                >
-                                  {result.recipientName}
-                                </span>{" "}
-                                has successfully completed an intensive internship in the role of{" "}
-                                <strong 
-                                  className={`text-black font-bold uppercase ${
-                                    result.courseOrRole.length > 50 
-                                      ? "text-xs" 
-                                      : result.courseOrRole.length > 30 
-                                        ? "text-sm" 
-                                        : "text-base"
-                                  }`}
-                                >
-                                  {result.courseOrRole}
-                                </strong>{" "}
-                                at StackX Technologies. 
-                                {result.startDate && result.endDate ? ` During the period from ${formatDate(result.startDate)} to ${formatDate(result.endDate)}${result.duration ? ` (${result.duration})` : ""}, the candidate demonstrated strong dedication and professional competence.` : ` The candidate demonstrated strong dedication and professional competence.`} We appreciate their efforts and wish them continued success in their future endeavors.
-                              </div>
-                            </div>
-
-                            {/* Footer: Date/QR (Left) and Signatures (Right) */}
+                            {/* ── BOTTOM — QR + Signatures ── */}
                             <div className="w-full flex items-end justify-between mt-auto">
-                              {/* Bottom Left: QR Code and Date */}
-                              <div className="flex items-center gap-6">
-                                <div className="bg-white p-1 border-[2px] border-black shadow-sm flex-shrink-0">
-                                  <QRCode 
-                                    value={`https://stackx.co.in/verify-certificate?id=${result.certificateId}`}
-                                    size={60}
+
+                              {/* QR + Verify */}
+                              <div className="flex items-center gap-4">
+                                <div className="bg-white/95 p-2 rounded border border-white/20 shadow-[0_0_15px_rgba(139,92,246,0.15)]">
+                                  <QRCode
+                                    value={`https://stackx.co.in/verify-certificate/${result.certificateId}`}
+                                    size={64}
                                     level="L"
+                                    bgColor="transparent"
+                                    fgColor="#170535"
                                   />
                                 </div>
-                                <div className="text-left flex flex-col justify-end">
-                                  <p className="text-black text-[9px] font-bold uppercase tracking-widest mb-1">Date of Issue</p>
-                                  <p className="text-black font-bold font-serif text-base leading-none border-b border-black pb-1 min-w-[120px]">{formatDate(result.issueDate)}</p>
+                                <div className="flex flex-col">
+                                  <span className="text-[10px] text-[#a78bfa] font-semibold tracking-widest uppercase">Verify Authenticity</span>
+                                  <a
+                                    href={`https://stackx.co.in/verify-certificate/${result.certificateId}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-[11px] font-mono text-[#e5e7eb] hover:text-white transition-colors leading-tight"
+                                  >
+                                    stackx.co.in/verify-certificate/{result.certificateId}
+                                  </a>
                                 </div>
                               </div>
 
-                              {/* Bottom Right: Signatures Container */}
+                              {/* Signatures */}
                               <div className="flex items-end gap-12">
                                 {/* Signature 1 */}
-                                <div className="text-center w-40 flex flex-col justify-end">
-                                  <div className="h-12 flex items-end justify-center mb-1">
-                                    {result.signature1Url ? (
-                                      <img 
-                                        src={`${SERVER_API}${result.signature1Url}`} 
-                                        alt="Co-founder" 
-                                        crossOrigin="anonymous"
-                                        className="h-10 object-contain mix-blend-multiply filter grayscale contrast-125" 
-                                      />
-                                    ) : (
-                                      <span className="text-gray-400 italic font-serif text-sm">Signature</span>
-                                    )}
+                                <div className="flex flex-col items-center w-[210px]">
+                                  <div className="h-20 flex items-end justify-center">
+                                    <img
+                                      src={`${SERVER_API}/uploads/signatures/nurajsign.PNG`}
+                                      alt="K. Nuraj Mani Sai"
+                                      crossOrigin="anonymous"
+                                      className="max-h-[70px] w-auto object-contain filter invert brightness-200 grayscale drop-shadow-md mix-blend-screen"
+                                    />
                                   </div>
-                                  <div className="w-full h-[2px] bg-black mb-1" />
-                                  <p className="text-black text-[9px] font-bold uppercase tracking-widest">Co-founder</p>
+                                  <div className="w-full h-[1.5px] bg-gradient-to-r from-transparent via-[#a78bfa]/60 to-transparent mt-1.5" />
+                                  <p className="text-[16px] font-semibold text-white mt-2 tracking-wide drop-shadow-sm">K. Nuraj Mani Sai</p>
+                                  <p className="text-[11px] text-[#a78bfa] uppercase tracking-[0.15em] font-medium">Co-Founder</p>
                                 </div>
 
                                 {/* Signature 2 */}
-                                <div className="text-center w-40 flex flex-col justify-end">
-                                  <div className="h-12 flex items-end justify-center mb-1">
-                                    {result.signature2Url ? (
-                                      <img 
-                                        src={`${SERVER_API}${result.signature2Url}`} 
-                                        alt="Authorized Signature" 
-                                        crossOrigin="anonymous"
-                                        className="h-10 object-contain mix-blend-multiply filter grayscale contrast-125" 
-                                      />
-                                    ) : (
-                                      <span className="text-gray-400 italic font-serif text-sm">Signature</span>
-                                    )}
+                                <div className="flex flex-col items-center w-[210px]">
+                                  <div className="h-20 flex items-end justify-center">
+                                    <img
+                                      src={`${SERVER_API}/uploads/signatures/roshansign.PNG`}
+                                      alt="P. Roshan"
+                                      crossOrigin="anonymous"
+                                      className="max-h-[70px] w-auto object-contain filter invert brightness-200 grayscale drop-shadow-md mix-blend-screen"
+                                    />
                                   </div>
-                                  <div className="w-full h-[2px] bg-black mb-1" />
-                                  <p className="text-black text-[9px] font-bold uppercase tracking-widest">Authorized Signatory</p>
+                                  <div className="w-full h-[1.5px] bg-gradient-to-r from-transparent via-[#a78bfa]/60 to-transparent mt-1.5" />
+                                  <p className="text-[16px] font-semibold text-white mt-2 tracking-wide drop-shadow-sm">P. Roshan</p>
+                                  <p className="text-[11px] text-[#a78bfa] uppercase tracking-[0.15em] font-medium">Co-Founder</p>
                                 </div>
                               </div>
+
                             </div>
                           </div>
                         </div>
@@ -393,14 +487,14 @@ export default function VerifyCertificateClient({ initialId }: { initialId?: str
                     </div>
 
                     <div className="mt-12 text-center flex justify-center">
-                      <button 
+                      <button
                         onClick={handleDownloadPDF}
                         disabled={downloadingPdf}
                         className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-2xl font-bold text-lg overflow-hidden transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none shadow-[0_0_40px_-10px_rgba(16,185,129,0.5)] hover:shadow-[0_0_60px_-10px_rgba(16,185,129,0.7)]"
                       >
                         {/* Shimmer effect */}
                         <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-shimmer" />
-                        
+
                         <div className="relative flex items-center gap-3">
                           {downloadingPdf ? (
                             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

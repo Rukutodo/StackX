@@ -34,6 +34,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/admin/", "/api/"],
       },
     ],
-    sitemap: "https://www.stackx.co.in/sitemap.xml",
+    sitemap: "https://stackx.co.in/sitemap.xml",
   };
 }

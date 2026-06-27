@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 const SERVER_API = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-const SITE_URL = "https://www.stackx.co.in";
+const SITE_URL = "https://stackx.co.in";
 
 export interface SeoApiResponse {
   pageKey: string;
