@@ -94,58 +94,42 @@ function Accordion({ title, desc, index }: { title: string; desc: string; index:
 /* ── Main Client Component ───────────────────────── */
 export default function ServicesClient({ categories }: { categories: ServiceCategory[] }) {
   return (
-    <div className="pt-24 pb-0">
+    <div className="min-h-screen" style={{ background: "var(--color-background)" }}>
       {/* ═══ HERO ═══ */}
-      <section className="relative pt-16 pb-24 sm:pt-20 sm:pb-32 overflow-hidden">
-        {/* Background effects */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(139,92,246,0.12),transparent_55%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.08),transparent_55%)]" />
-        <div
-          className="absolute inset-0 opacity-[0.025]"
-          style={{
-            backgroundImage: `linear-gradient(rgba(139,92,246,1) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,1) 1px, transparent 1px)`,
-            backgroundSize: "80px 80px",
-          }}
-        />
-        {/* Floating accent blobs */}
-        <div className="absolute top-20 -left-40 w-80 h-80 rounded-full bg-primary/10 blur-[120px]" />
-        <div className="absolute bottom-10 -right-40 w-96 h-96 rounded-full bg-accent/8 blur-[120px]" />
+      <section className="relative pt-32 pb-20 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full opacity-20"
+            style={{ background: "radial-gradient(ellipse, #8B5CF6 0%, transparent 70%)", filter: "blur(80px)" }} />
+          <div className="absolute top-20 right-[10%] w-64 h-64 rounded-full opacity-10"
+            style={{ background: "radial-gradient(ellipse, #06B6D4 0%, transparent 70%)", filter: "blur(60px)" }} />
+          <div className="absolute inset-0 opacity-[0.03]"
+            style={{ backgroundImage: `linear-gradient(rgba(139,92,246,1) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,1) 1px, transparent 1px)`, backgroundSize: "60px 60px" }} />
+        </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="text-center"
-          >
-            {/* Badge */}
-            <motion.span
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 px-5 py-2 text-xs font-semibold tracking-wider uppercase rounded-full bg-primary/10 text-primary-light border border-primary/20 mb-8"
-            >
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              What We Offer
-            </motion.span>
-
-            {/* Main title */}
-            <h1
-              className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-heading font-bold leading-[1.05] tracking-tight"
-              style={{ fontFamily: "var(--font-poppins), sans-serif" }}
-            >
-              Our{" "}
-              <span className="gradient-text">Services</span>
-            </h1>
-
-            {/* Subtitle */}
-            <p className="mt-6 sm:mt-8 text-muted text-base sm:text-lg lg:text-xl max-w-2xl mx-auto leading-relaxed">
-              End-to-end technology solutions — from web development to marketing and ad tech — at costs that actually make sense.
-            </p>
-
-            {/* Decorative accent */}
-            <div className="mt-8 mx-auto w-28 h-1 rounded-full bg-gradient-to-r from-primary via-accent to-primary-light" />
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 text-xs font-semibold tracking-widest uppercase rounded-full border border-purple-500/30 bg-purple-500/10 text-purple-300 mb-6">
+              <HiSparkles className="w-3.5 h-3.5" /> What We Offer
+            </span>
           </motion.div>
+
+          {/* Main title */}
+          <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight text-white mb-6"
+            style={{ fontFamily: "var(--font-poppins), sans-serif" }}
+          >
+            Our{" "}
+            <span style={{ background: "linear-gradient(135deg, #A78BFA, #06B6D4)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+              Services
+            </span>
+          </motion.h1>
+
+          {/* Subtitle */}
+          <motion.p initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed mb-10"
+          >
+            End-to-end technology solutions — from web development to marketing and ad tech — at costs that actually make sense.
+          </motion.p>
 
           {/* Quick stats row */}
           <motion.div

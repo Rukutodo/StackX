@@ -40,7 +40,7 @@ async function fetchCaseStudies(): Promise<CaseStudy[]> {
 
 async function fetchServices(): Promise<{ title: string }[]> {
   try {
-    const res = await fetch(`${SERVER_API}/api/services`, { next: { revalidate: 3600 } });
+    const res = await fetch(`${SERVER_API}/api/services`, { next: { revalidate: 60 } });
     if (!res.ok) return [];
     return res.json();
   } catch {

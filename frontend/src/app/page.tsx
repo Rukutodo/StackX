@@ -5,13 +5,13 @@ import type { Metadata } from "next";
 const SERVER_API = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 // ─── ISR: Revalidate every 1 hour ──────────────────
-export const revalidate = 3600;
+export const revalidate = 60;
 
 // ─── Fetch SEO settings from the backend ───────────
 async function getSeoSettings() {
   try {
     const res = await fetch(`${SERVER_API}/api/seo/home`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 60 },
     });
     if (!res.ok) return null;
     return res.json();

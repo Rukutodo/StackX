@@ -62,8 +62,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   });
 
   references.forEach((r: any) => {
+    if (r.noIndex) return; // Skip if noIndex is true
+    
+    // If there's a custom canonical URL, use it, else use the generated one
+    const url = r.canonical || `${SITE_URL}/services/${r.slug}`;
+    
     routes.push({
-      url: `${SITE_URL}/services/${r.slug}`,
+      url,
       lastModified: r.updatedAt ? new Date(r.updatedAt) : STATIC_LAST_MODIFIED,
       changeFrequency: "weekly",
       priority: 0.8,

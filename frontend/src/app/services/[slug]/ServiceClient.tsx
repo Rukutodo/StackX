@@ -21,7 +21,9 @@ import {
   LuArrowUpRight as ArrowUpRight, 
   LuServer as Server, 
   LuSmartphone as Smartphone,
-  LuRocket as Rocket
+  LuRocket as Rocket,
+  LuChevronRight as ChevronRight,
+  LuMapPin as MapPin,
 } from "react-icons/lu";
 import { ICON_MAP } from "../ServicesClient";
 import FeaturedWorkSection from "@/components/sections/FeaturedWorkSection";
@@ -66,21 +68,26 @@ function FloatingOrb({ className }: { className?: string }) {
 export default function ServiceClient({ 
   service,
   overrideTitle,
-  overrideTagline
+  overrideTagline,
+  referenceContent = "",
+  breadcrumbs = [],
+  city = "",
 }: { 
   service: ServiceCategory;
   overrideTitle?: string;
   overrideTagline?: string;
+  referenceContent?: string;
+  breadcrumbs?: { label: string; href: string }[];
+  city?: string;
 }) {
-  const [activeFaq, setActiveFaq] = useState<number | null>(0);
-  const toggleFaq = (index: number) => setActiveFaq(activeFaq === index ? null : index);
 
   const Icon = (service.icon && ICON_MAP[service.icon]) ? ICON_MAP[service.icon] : Code;
   const displayTitle = overrideTitle || service.title;
   const displayTagline = overrideTagline || service.tagline;
 
-  // Use DB items if they exist, otherwise fallback to defaults based on slug
+  // Use DB items if they exist
   const hasItems = service.items && service.items.length > 0;
+  const hasContent = referenceContent.trim().length > 0;
   
   return (
     <div className="min-h-screen bg-background text-foreground overflow-hidden">
@@ -93,6 +100,25 @@ export default function ServiceClient({
       </div>
 
       <div className="relative z-10 pt-24">
+
+        {/* ═══════════ BREADCRUMB ═══════════ */}
+        {breadcrumbs.length > 0 && (
+          <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-0" aria-label="Breadcrumb">
+            <ol className="flex items-center gap-1.5 text-xs text-muted flex-wrap">
+              {breadcrumbs.map((crumb, i) => (
+                <li key={i} className="flex items-center gap-1.5">
+                  {i > 0 && <ChevronRight className="w-3 h-3 text-muted/40" />}
+                  {i === breadcrumbs.length - 1 ? (
+                    <span className="text-white/70 font-medium">{crumb.label}</span>
+                  ) : (
+                    <Link href={crumb.href} className="hover:text-primary-light transition">{crumb.label}</Link>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )}
+
         {/* ═══════════ HERO SECTION ═══════════ */}
         <section className="relative py-20 lg:py-32 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none" />
@@ -191,6 +217,19 @@ export default function ServiceClient({
         {/* ═══════════ TESTIMONIALS ═══════════ */}
         {service.testimonials && service.testimonials.length > 0 && (
           <SuccessStoriesSection testimonials={service.testimonials} />
+        )}
+
+        {/* ═══════════ RICH CONTENT (from Reference) ═══════════ */}
+        {hasContent && (
+          <section className="py-20 relative border-t border-white/5">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="space-y-6 text-muted leading-relaxed text-lg text-justify">
+                {referenceContent.split('\n').filter(p => p.trim() !== '').map((p, i) => (
+                  <p key={i}>{p}</p>
+                ))}
+              </div>
+            </div>
+          </section>
         )}
 
         {/* ═══════════ FINAL CTA ═══════════ */}

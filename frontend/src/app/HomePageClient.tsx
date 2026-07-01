@@ -198,23 +198,16 @@ export default function HomePageClient() {
             {/* ═══ TEXT CONTENT ═══ */}
             <div className="text-left lg:flex-1 lg:max-w-[55%]">
               {/* Shimmer Badge */}
-              <motion.div
-                initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.5, ease: 'easeOut' }}
-              >
+              <div className="animate-stagger-1">
                 <span className="inline-flex items-center gap-2 px-5 py-2 text-xs font-semibold tracking-wider uppercase rounded-full hero-badge-shimmer text-primary-light border border-primary/25 mb-5">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                   Powering Digital Growth in Vizag
                 </span>
-              </motion.div>
+              </div>
 
               {/* ★ MOBILE ORBITAL — floats right beside headline on < lg ★ */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
-                className="float-right lg:hidden w-[150px] h-[150px] sm:w-[170px] sm:h-[170px] ml-3 sm:ml-5 -mt-1 mb-2 relative"
+              <div
+                className="animate-stagger-5 float-right lg:hidden w-[150px] h-[150px] sm:w-[170px] sm:h-[170px] ml-3 sm:ml-5 -mt-1 mb-2 relative"
               >
                 <div className="relative w-full h-full">
                   {/* Outer ring */}
@@ -247,14 +240,11 @@ export default function HomePageClient() {
                   <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-primary-light/60" />
                   <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-accent/60" />
                 </div>
-              </motion.div>
+              </div>
 
               {/* Headline with rotating words */}
-              <motion.h1
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.1, ease: 'easeOut' }}
-                className="text-[2.2rem] sm:text-5xl md:text-6xl lg:text-[3.75rem] xl:text-[4.25rem] font-heading font-bold leading-none lg:leading-[1.08] tracking-tight"
+              <h1
+                className="animate-stagger-2 text-[2.2rem] sm:text-5xl md:text-6xl lg:text-[3.75rem] xl:text-[4.25rem] font-heading font-bold leading-none lg:leading-[1.08] tracking-tight"
                 style={{ fontFamily: "var(--font-poppins), sans-serif" }}
               >
                 We Build, Validate &{" "}
@@ -268,24 +258,18 @@ export default function HomePageClient() {
                     {/* 5th span duplicates 1st for seamless loop */}
                   </span>
                 </span>
-              </motion.h1>
+              </h1>
 
               {/* Subheading */}
-              <motion.p
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.25 }}
-                className="hero-subheading mt-4 sm:mt-6 text-sm sm:text-base lg:text-xl text-muted max-w-xl leading-relaxed"
+              <p
+                className="animate-stagger-3 hero-subheading mt-4 sm:mt-6 text-sm sm:text-base lg:text-xl text-muted max-w-xl leading-relaxed"
               >
                 From idea to growth , we combine technology, marketing, and real market insight to build what actually works.
-              </motion.p>
+              </p>
 
               {/* CTA Buttons */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="mt-6 sm:mt-8 flex flex-row items-start gap-3 sm:gap-4"
+              <div
+                className="animate-stagger-4 mt-6 sm:mt-8 flex flex-row items-start gap-3 sm:gap-4"
               >
                 <Button href="/contact" variant="primary" className="text-sm sm:text-base px-5 sm:px-8 py-3 sm:py-4 animate-pulse-glow">
                   Get Free Consultation
@@ -294,15 +278,12 @@ export default function HomePageClient() {
                 <Button href="/portfolio" variant="secondary" className="text-sm sm:text-base px-5 sm:px-8 py-3 sm:py-4">
                   View Our Work
                 </Button>
-              </motion.div>
+              </div>
             </div>
 
             {/* ═══ DESKTOP ORBITAL — shown lg+ in flex column ═══ */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.9, delay: 0.3, ease: 'easeOut' }}
-              className="hidden lg:flex items-center justify-center lg:flex-1"
+            <div
+              className="animate-stagger-5 hidden lg:flex items-center justify-center lg:flex-1"
             >
               <div className="relative w-[400px] h-[400px] xl:w-[440px] xl:h-[440px]">
                 {/* Outer ring */}
@@ -393,7 +374,7 @@ export default function HomePageClient() {
                   <span className="text-xs font-medium text-accent">Research</span>
                 </motion.div>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
 

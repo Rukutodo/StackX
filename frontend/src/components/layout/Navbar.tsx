@@ -135,11 +135,9 @@ export default function Navbar() {
     };
   }, []);
 
-  if (!mounted) return <div className="h-22" />; // Placeholder to avoid layout shift
-
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      className={`animate-nav-drop fixed top-0 left-0 right-0 z-50 transition-colors duration-500 ${
         scrolled
           ? "bg-surface/85 backdrop-blur-2xl border-b border-surface-border shadow-lg shadow-primary/5 py-1"
           : "bg-transparent py-2"
@@ -261,13 +259,37 @@ export default function Navbar() {
           </div>
 
           {/* Desktop CTA */}
-          <div className="hidden lg:flex items-center gap-4 shrink-0">
+          <div className="hidden lg:flex items-center gap-4 shrink-0 relative group">
+            {/* Peeking Mascot (Right Side) */}
+            <motion.div
+              className="absolute top-1 right-2 z-0 select-none pointer-events-none drop-shadow-md"
+              animate={{
+                x: [-40, 36, 36, -40, -40] // Smoothly slides out further to the right and back
+              }}
+              transition={{
+                duration: 5,
+                repeat: Infinity,
+                times: [0, 0.15, 0.3, 0.45, 1], // Slides out, pauses, slides back, and waits
+                ease: "easeInOut"
+              }}
+            >
+              <Image 
+                src="/StackXhero.svg" 
+                alt="StackX" 
+                width={28} 
+                height={28} 
+                className="opacity-95"
+              />
+            </motion.div>
+
+            {/* Animated glowing background */}
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-accent rounded-xl blur opacity-40 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse z-0" />
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-primary to-primary-deep rounded-xl hover:shadow-lg hover:shadow-primary/25 transition-all duration-300 hover:-translate-y-0.5 border border-white/10"
+              className="relative z-10 inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-primary to-primary-deep rounded-xl hover:shadow-lg hover:shadow-primary/25 transition-all duration-300 hover:-translate-y-0.5 border border-white/10"
             >
               Get Free Consultation
-              <span className="text-xs">→</span>
+              <span className="text-xs group-hover:translate-x-1 transition-transform">→</span>
             </Link>
           </div>
 
@@ -360,13 +382,16 @@ export default function Navbar() {
                 </AnimatePresence>
               </div>
 
-              <Link
-                href="/contact"
-                onClick={() => setMobileOpen(false)}
-                className="block mt-3 px-4 py-3 text-center text-sm font-medium text-white bg-gradient-to-r from-primary to-primary-deep rounded-lg"
-              >
-                Get Free Consultation
-              </Link>
+              <div className="relative mt-3 group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-accent rounded-lg blur opacity-40 animate-pulse" />
+                <Link
+                  href="/contact"
+                  onClick={() => setMobileOpen(false)}
+                  className="relative block px-4 py-3 text-center text-sm font-medium text-white bg-gradient-to-r from-primary to-primary-deep rounded-lg border border-white/10"
+                >
+                  Get Free Consultation
+                </Link>
+              </div>
             </div>
           </motion.div>
         )}

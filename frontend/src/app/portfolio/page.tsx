@@ -18,7 +18,7 @@ const SERVER_API = process.env.INTERNAL_API_URL || "http://localhost:4000";
 async function getProjects() {
   try {
     const res = await fetch(`${SERVER_API}/api/portfolio`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 60 },
     });
     if (!res.ok) return [];
     return res.json();
@@ -30,7 +30,7 @@ async function getProjects() {
 async function getServices() {
   try {
     const res = await fetch(`${SERVER_API}/api/services`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 60 },
     });
     if (!res.ok) return [];
     return res.json();

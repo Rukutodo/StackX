@@ -1,323 +1,38 @@
 "use client";
 
-import { useState, useEffect, useCallback, type FormEvent } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import {
-  HiPlus, HiPencil, HiTrash, HiX,
-  HiSave, HiCheck, HiLink, HiCollection, HiInformationCircle,
-  HiExternalLink, HiSearch, HiSortDescending,
+  HiPlus, HiPencil, HiTrash,
+  HiLink, HiCollection,
+  HiSearch,
+  HiLocationMarker,
 } from "react-icons/hi";
 import {
   DashboardGlassCard,
   StatusBadge,
   AdminButton,
-  AdminSelect,
   FilterDropdown,
 } from "@/components/admin/ui";
 import { DeleteConfirmModal } from "@/components/admin/DeleteConfirmModal";
 import type { Reference } from "@/types/reference";
-import type { ServiceCategory } from "@/types/services";
 
 const API = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "";
-
-const EMPTY: Omit<Reference, "_id"> = {
-  slug: "",
-  title: "",
-  description: "",
-  keywords: "",
-  ogImage: "",
-  canonical: "",
-  robots: "index, follow",
-  focusKeyword: "",
-  service: "",
-  status: "active",
-  order: 0,
-};
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.06 } } };
 const item = { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } };
 
-/* ── Edit / Add Panel ─────────────────────── */
-function EditPanel({
-  editing,
-  onClose,
-  onSaved,
-}: {
-  editing: Reference | null;
-  onClose: () => void;
-  onSaved: () => void;
-}) {
-  const isEdit = !!editing;
-  const [form, setForm] = useState({ 
-    ...EMPTY, 
-    ...editing,
-    service: editing ? (typeof editing.service === 'string' ? editing.service : editing.service._id) : ""
-  });
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [saved, setSaved] = useState(false);
-  const [services, setServices] = useState<ServiceCategory[]>([]);
-  const [activeTab, setActiveTab] = useState<"general" | "seo">("general");
-
-  // Fetch services for picker
-  useEffect(() => {
-    fetch(`${API}/api/services?all=true`)
-      .then((r) => r.json())
-      .then((data) => setServices(Array.isArray(data) ? data : []))
-      .catch(() => {});
-  }, []);
-
-  const set = (k: string, v: unknown) => {
-    setForm((f) => {
-      const updated = { ...f, [k]: v };
-      // Auto-slug generation for NEW items only
-      if (k === "title" && !isEdit) {
-        updated.slug = (v as string).toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-      }
-      return updated;
-    });
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!form.title || !form.slug || !form.service) {
-      setError("Title, slug, and service are required.");
-      return;
-    }
-    setSaving(true); setError("");
-    try {
-      const url = isEdit ? `${API}/api/references/${editing!._id}` : `${API}/api/references`;
-      const res = await fetch(url, {
-        method: isEdit ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("stackx_token") || ""}`,
-        },
-        credentials: "include",
-        body: JSON.stringify(form),
-      });
-      if (!res.ok) { const d = await res.json(); throw new Error(d.message || "Failed"); }
-      setSaved(true);
-      setTimeout(() => { onSaved(); onClose(); }, 700);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: 40 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 40 }}
-      transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-      className="w-full lg:w-[480px] shrink-0"
-    >
-      <DashboardGlassCard className="sticky top-6 h-fit max-h-[calc(100vh-100px)] overflow-y-auto custom-scrollbar">
-        {/* Panel header */}
-        <div className="flex items-center justify-between mb-2 pb-2 border-b border-surface-border">
-          <div>
-            <h3 className="text-base font-semibold text-white" style={{ fontFamily: "var(--font-poppins)" }}>
-              {isEdit ? "Edit Reference" : "Add Reference"}
-            </h3>
-            {isEdit && <p className="text-xs text-muted mt-0.5 truncate max-w-[200px]">{editing!.title}</p>}
-          </div>
-          <button onClick={onClose} className="p-1.5 text-muted hover:text-white hover:bg-white/5 rounded-lg transition">
-            <HiX size={16} />
-          </button>
-        </div>
-
-        {/* Tab Switcher */}
-        <div className="flex gap-1 p-1 bg-white/[0.03] rounded-xl mb-6">
-          <button
-            type="button"
-            onClick={() => setActiveTab("general")}
-            className={`flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition ${activeTab === 'general' ? 'bg-primary/20 text-primary-light shadow-sm' : 'text-muted hover:text-white'}`}
-          >
-            General
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("seo")}
-            className={`flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition ${activeTab === 'seo' ? 'bg-primary/20 text-primary-light shadow-sm' : 'text-muted hover:text-white'}`}
-          >
-            Technical SEO
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {activeTab === "general" ? (
-            <>
-              {/* Title */}
-              <div>
-                <label className="block text-xs text-muted mb-1.5">Reference Title *</label>
-                <input value={form.title} onChange={(e) => set("title", e.target.value)}
-                  placeholder="Venu Web Services" className="admin-input w-full" />
-              </div>
-
-              {/* Slug */}
-              <div>
-                <label className="block text-xs text-muted mb-1.5">Route Slug *</label>
-                <div className="relative flex items-center gap-2">
-                  <div className="relative flex-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted/30 text-sm">/</span>
-                    <input value={form.slug} onChange={(e) => set("slug", e.target.value)}
-                      placeholder="venu" className="admin-input w-full pl-5 font-mono text-sm" />
-                  </div>
-                  {isEdit && form.slug && (
-                     <a href={`http://localhost:3000/services/${form.slug}`} target="_blank" rel="noreferrer" title="Open in frontend" className="p-2.5 bg-white/5 hover:bg-white/10 rounded-xl text-muted hover:text-white transition shrink-0 border border-white/5">
-                       <HiExternalLink size={16} />
-                     </a>
-                  )}
-                </div>
-                <p className="text-[10px] text-muted/50 mt-1 italic">The final URL will be stackx.co.in/{form.slug || '...'}</p>
-              </div>
-
-              {/* Associated Service */}
-              <div>
-                <label className="block text-xs text-muted mb-1.5">Parent Service *</label>
-                <AdminSelect
-                  value={form.service as string}
-                  onChange={(val) => set("service", val)}
-                  placeholder="Select Service"
-                  size="sm"
-                  options={services.map((s) => ({ label: s.title, value: s._id }))}
-                />
-              </div>
-
-              {/* Status + Order */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs text-muted mb-1.5">Status</label>
-                  <AdminSelect
-                    value={form.status}
-                    onChange={(val) => set("status", val)}
-                    size="sm"
-                    options={[
-                      { label: "Active", value: "active" },
-                      { label: "Draft", value: "draft" },
-                    ]}
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-muted mb-1.5">Display Order</label>
-                  <input type="number" value={form.order} onChange={(e) => set("order", Number(e.target.value))}
-                    className="admin-input w-full" />
-                </div>
-              </div>
-            </>
-          ) : (
-            <>
-              {/* Focus Keyword */}
-              <div>
-                <label className="block text-xs text-muted mb-1.5">Focus Keyword</label>
-                <input value={form.focusKeyword} onChange={(e) => set("focusKeyword", e.target.value)}
-                  placeholder="web design agency" className="admin-input w-full" />
-              </div>
-
-              {/* SEO Description */}
-              <div>
-                <label className="block text-xs text-muted mb-1.5">Meta Description</label>
-                <textarea
-                  value={form.description}
-                  onChange={(e) => set("description", e.target.value)}
-                  placeholder="Optimized description for search engines..."
-                  rows={3}
-                  className="admin-input w-full resize-none text-sm"
-                />
-              </div>
-
-              {/* Keywords */}
-              <div>
-                <label className="block text-xs text-muted mb-1.5">Meta Keywords (comma-separated)</label>
-                <textarea
-                  value={form.keywords}
-                  onChange={(e) => set("keywords", e.target.value)}
-                  placeholder="agency, web design, pune, stackx"
-                  rows={2}
-                  className="admin-input w-full resize-none text-sm"
-                />
-              </div>
-
-              {/* OG Image */}
-              <div>
-                <label className="block text-xs text-muted mb-1.5">OG Image URL</label>
-                <input value={form.ogImage} onChange={(e) => set("ogImage", e.target.value)}
-                  placeholder="https://example.com/image.jpg" className="admin-input w-full font-mono text-[10px]" />
-              </div>
-
-              {/* Canonical + Robots */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs text-muted mb-1.5">Canonical URL Override</label>
-                  <input value={form.canonical} onChange={(e) => set("canonical", e.target.value)}
-                    placeholder="https://..." className="admin-input w-full text-[10px]" />
-                </div>
-                <div>
-                  <label className="block text-xs text-muted mb-1.5">Meta Robots</label>
-                  <AdminSelect
-                    value={form.robots || ""}
-                    onChange={(val) => set("robots", val)}
-                    size="sm"
-                    options={[
-                      { label: "Index, Follow", value: "index, follow" },
-                      { label: "Noindex, Nofollow", value: "noindex, nofollow" },
-                      { label: "Index, Nofollow", value: "index, nofollow" },
-                      { label: "Noindex, Follow", value: "noindex, follow" },
-                    ]}
-                  />
-                </div>
-              </div>
-            </>
-          )}
-
-          {/* Error */}
-          {error && (
-            <p className="text-red-400 text-xs flex items-center gap-1.5">
-              <HiX className="w-3.5 h-3.5 shrink-0" /> {error}
-            </p>
-          )}
-
-          {/* Actions */}
-          <div className="flex items-center justify-between gap-3 pt-4 border-t border-surface-border">
-            <button type="button" onClick={onClose}
-              className="text-sm text-muted hover:text-white transition px-3 py-2 rounded-lg hover:bg-white/5">
-              Cancel
-            </button>
-            <button type="submit" disabled={saving || saved}
-              className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white rounded-xl transition-all duration-200 disabled:opacity-60"
-              style={{
-                background: saved ? "linear-gradient(135deg,#10b981,#059669)" : "linear-gradient(135deg,#8B5CF6,#6D28D9)",
-                boxShadow: "0 4px 16px rgba(139,92,246,0.25)",
-              }}>
-              {saved
-                ? <><HiCheck size={14} /> Saved!</>
-                : saving
-                ? "Saving..."
-                : <><HiSave size={14} />{isEdit ? "Save Changes" : "Add Reference"}</>}
-            </button>
-          </div>
-        </form>
-      </DashboardGlassCard>
-    </motion.div>
-  );
-}
-
-/* ── Main Page ────────────────────────────── */
 export default function ReferenceAdminPage() {
+  const router = useRouter();
   const [references, setReferences] = useState<Reference[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<"all" | "active" | "draft">("all");
   const [filterService, setFilterService] = useState("all");
   const [allServices, setAllServices] = useState<{ _id: string; title: string }[]>([]);
-  const [panelTarget, setPanelTarget] = useState<Reference | null | "new">(undefined as any);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; label: string } | null>(null);
   const [deleting, setDeleting] = useState(false);
-
-  const panelOpen = panelTarget !== undefined && panelTarget !== (undefined as any);
-  const editingItem = panelTarget === "new" ? null : (panelTarget as Reference | null);
 
   const fetchReferences = useCallback(async () => {
     setLoading(true);
@@ -338,8 +53,8 @@ export default function ReferenceAdminPage() {
   useEffect(() => {
     fetchReferences();
     fetch(`${API}/api/services`)
-      .then(r => r.json())
-      .then(d => setAllServices(Array.isArray(d) ? d : []))
+      .then((r) => r.json())
+      .then((d) => setAllServices(Array.isArray(d) ? d : []))
       .catch(() => {});
   }, [fetchReferences]);
 
@@ -353,16 +68,20 @@ export default function ReferenceAdminPage() {
         headers: { Authorization: `Bearer ${localStorage.getItem("stackx_token") || ""}` },
       });
       setDeleteTarget(null);
-      if ((panelTarget as Reference)?._id === deleteTarget.id) setPanelTarget(undefined as any);
       fetchReferences();
-    } catch (err) { console.error("Delete failed:", err); } finally { setDeleting(false); }
+    } catch (err) {
+      console.error("Delete failed:", err);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const activeCount = references.filter((r) => r.status === "active").length;
+  const citiesCount = new Set(references.map((r) => r.city).filter(Boolean)).size;
 
-  const filteredReferences = references.filter(r => {
+  const filteredReferences = references.filter((r) => {
     const q = searchQuery.toLowerCase();
-    const matchesSearch = !q || r.title.toLowerCase().includes(q) || r.slug.toLowerCase().includes(q);
+    const matchesSearch = !q || r.title.toLowerCase().includes(q) || r.slug.toLowerCase().includes(q) || (r.city || "").toLowerCase().includes(q);
     const matchesStatus = filterStatus === "all" || r.status === filterStatus;
     const serviceTitle = typeof r.service === "string" ? r.service : (r.service as any)?.title ?? "";
     const matchesService = filterService === "all" || serviceTitle === filterService;
@@ -371,80 +90,76 @@ export default function ReferenceAdminPage() {
 
   return (
     <>
-    <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
+      <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
+        {/* Header */}
+        <motion.div variants={item} className="flex items-center justify-between flex-wrap gap-4">
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-bold text-white" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
+              Reference Pages
+            </h1>
+            <p className="text-muted text-sm mt-1">Location-based SEO pages with rich content & schema</p>
+          </div>
+          <AdminButton variant="primary" className="gap-1.5" onClick={() => router.push("/references/new")}>
+            <HiPlus size={16} /> Add Reference
+          </AdminButton>
+        </motion.div>
 
-      {/* Header */}
-      <motion.div variants={item} className="flex items-center justify-between flex-wrap gap-4">
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-white" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
-            Reference Pages
-          </h1>
-          <p className="text-muted text-sm mt-1">Manage unique SEO route mappings for services</p>
-        </div>
-        <AdminButton variant="primary" className="gap-1.5" onClick={() => setPanelTarget("new")}>
-          <HiPlus size={16} /> Add Reference
-        </AdminButton>
-      </motion.div>
-
-      {/* Search & Filters — ABOVE stats */}
-      <motion.div variants={item}>
-        <div className="flex flex-col sm:flex-row gap-3">
-          {/* Search */}
-          <div className="relative flex-1 group">
-            <div className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none">
-              <HiSearch size={16} className="text-muted group-focus-within:text-primary-light transition-colors" />
+        {/* Search & Filters */}
+        <motion.div variants={item}>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1 group">
+              <div className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none">
+                <HiSearch size={16} className="text-muted group-focus-within:text-primary-light transition-colors" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search by title, slug, or city…"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm text-white placeholder-muted/50 outline-none transition-all"
+                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "inset 0 1px 2px rgba(0,0,0,0.2)" }}
+              />
             </div>
-            <input
-              type="text"
-              placeholder="Search by title or slug…"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm text-white placeholder-muted/50 outline-none transition-all"
-              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "inset 0 1px 2px rgba(0,0,0,0.2)" }}
+            <FilterDropdown
+              label="Status"
+              value={filterStatus}
+              onChange={(val) => setFilterStatus(val as any)}
+              options={[
+                { label: "All", value: "all" },
+                { label: "Active", value: "active" },
+                { label: "Draft", value: "draft" },
+              ]}
+            />
+            <FilterDropdown
+              label="Service"
+              value={filterService}
+              onChange={(val) => setFilterService(val)}
+              options={[
+                { label: "All", value: "all" },
+                ...allServices.map((s) => ({ label: s.title, value: s.title })),
+              ]}
             />
           </div>
-          {/* Filter: Status */}
-          <FilterDropdown
-            label="Status"
-            value={filterStatus}
-            onChange={(val) => setFilterStatus(val as any)}
-            options={[
-              { label: "All", value: "all" },
-              { label: "Active", value: "active" },
-              { label: "Draft", value: "draft" },
-            ]}
-          />
-          {/* Filter: Parent Service */}
-          <FilterDropdown
-            label="Service"
-            value={filterService}
-            onChange={(val) => setFilterService(val)}
-            options={[
-              { label: "All", value: "all" },
-              ...allServices.map((s) => ({ label: s.title, value: s.title })),
-            ]}
-          />
-        </div>
-      </motion.div>
+        </motion.div>
 
-      {/* Stats */}
-      <motion.div variants={item} className="grid grid-cols-2 gap-3 sm:gap-4">
-        <DashboardGlassCard className="text-center py-5">
-          <p className="text-3xl font-bold gradient-text" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>{references.length}</p>
-          <p className="text-sm text-muted mt-1">Total Mappings</p>
-        </DashboardGlassCard>
-        <DashboardGlassCard className="text-center py-5">
-          <p className="text-3xl font-bold gradient-text" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>{activeCount}</p>
-          <p className="text-sm text-muted mt-1">Active Routes</p>
-        </DashboardGlassCard>
-      </motion.div>
+        {/* Stats */}
+        <motion.div variants={item} className="grid grid-cols-3 gap-3 sm:gap-4">
+          <DashboardGlassCard className="text-center py-5">
+            <p className="text-3xl font-bold gradient-text" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>{references.length}</p>
+            <p className="text-sm text-muted mt-1">Total Pages</p>
+          </DashboardGlassCard>
+          <DashboardGlassCard className="text-center py-5">
+            <p className="text-3xl font-bold gradient-text" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>{activeCount}</p>
+            <p className="text-sm text-muted mt-1">Active</p>
+          </DashboardGlassCard>
+          <DashboardGlassCard className="text-center py-5">
+            <p className="text-3xl font-bold gradient-text" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>{citiesCount}</p>
+            <p className="text-sm text-muted mt-1">Cities</p>
+          </DashboardGlassCard>
+        </motion.div>
 
-      {/* Content area — list + panel side by side on desktop */}
-      <motion.div variants={item} className="flex flex-col lg:flex-row gap-5 items-start">
-
-        {/* References list */}
-        <div className="flex-1 min-w-0 w-full">
-
+        {/* Content area */}
+        <motion.div variants={item}>
           {loading ? (
             <div className="space-y-3">
               {[1, 2, 3].map((n) => (
@@ -458,65 +173,76 @@ export default function ReferenceAdminPage() {
                   <HiCollection size={24} className="text-primary-light" />
                 </div>
                 <p className="text-white font-medium mb-1">No reference pages yet</p>
-                <p className="text-sm text-muted">Create a reference to map a custom URL to a service.</p>
+                <p className="text-sm text-muted">Create a reference to map a location-specific URL to a service.</p>
+                <AdminButton variant="primary" className="mt-6 gap-1.5 mx-auto" onClick={() => router.push("/references/new")}>
+                  <HiPlus size={16} /> Add First Reference
+                </AdminButton>
               </div>
             </DashboardGlassCard>
           ) : (
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredReferences.map((r) => {
-                const isSelected = (panelTarget as Reference)?._id === r._id;
-                const service = typeof r.service === 'string' ? { title: 'Unknown', slug: '...' } : r.service;
-                
+                const service = typeof r.service === "string" ? { title: "Unknown", slug: "..." } : r.service;
+
                 return (
                   <div
                     key={r._id}
-                    onClick={() => setPanelTarget(isSelected ? (undefined as any) : r)}
-                    className={`rounded-xl border transition-all duration-200 cursor-pointer group ${
-                      isSelected
-                        ? "border-primary/40 bg-primary/[0.06] shadow-lg shadow-primary/10"
-                        : "border-white/[0.08] hover:border-primary/20 hover:bg-white/[0.02]"
-                    }`}
-                    style={{ background: isSelected ? undefined : "rgba(19,19,26,0.6)", backdropFilter: "blur(12px)" }}
+                    onClick={() => router.push(`/references/${r._id}`)}
+                    className="rounded-xl border border-white/[0.08] hover:border-primary/30 hover:bg-white/[0.03] transition-all duration-300 cursor-pointer group shadow-lg"
+                    style={{ background: "rgba(19,19,26,0.6)", backdropFilter: "blur(12px)" }}
                   >
-                    <div className="flex items-center gap-4 p-4 sm:p-5">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white ${
-                        isSelected ? "bg-primary" : "bg-primary/20 group-hover:bg-primary/30"
-                      } transition-colors`}>
-                        <HiLink size={20} />
+                    <div className="p-5">
+                      <div className="flex items-start justify-between gap-3 mb-4">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white font-semibold truncate group-hover:text-primary-light transition-colors">{r.title}</p>
+                          <p className="text-xs font-mono text-muted/60 mt-1 truncate">/services/{r.slug}</p>
+                        </div>
+                        <StatusBadge status={r.status} />
                       </div>
 
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-3">
-                          <div>
-                            <p className="text-white font-medium text-sm">{r.title}</p>
-                            <p className="text-[10px] font-mono text-muted/60 mt-0.5">/{r.slug}</p>
-                          </div>
-                          <div className="flex items-center gap-2 shrink-0">
-                            <StatusBadge status={r.status} />
-                          </div>
-                        </div>
+                      <div className="flex items-center gap-2 mb-4">
+                        {r.city && (
+                          <span className="text-xs px-2.5 py-1 bg-accent/10 text-accent rounded-lg border border-accent/15 flex items-center gap-1.5">
+                            <HiLocationMarker size={12} /> {r.city}
+                          </span>
+                        )}
+                        <span className="text-xs px-2.5 py-1 bg-white/5 text-muted rounded-lg border border-white/10 flex items-center gap-1.5">
+                          <HiLink size={12} /> {service.title}
+                        </span>
+                      </div>
 
-                        <div className="flex items-center justify-between mt-3 flex-wrap gap-2">
-                          <div className="flex items-center gap-2">
-                            <span className="text-[10px] px-2 py-0.5 bg-white/5 text-muted rounded-full border border-white/10 flex items-center gap-1">
-                              Parent: {service.title}
+                      <div className="flex items-center justify-between pt-4 border-t border-white/[0.06]">
+                        <div className="flex items-center gap-2">
+                          {r.faqs && r.faqs.length > 0 && (
+                            <span className="text-[10px] px-2 py-0.5 bg-emerald-500/10 text-emerald-400 rounded-full border border-emerald-500/15">
+                              {r.faqs.length} FAQs
                             </span>
-                            <span className="text-[10px] text-muted/40 italic">Order: {r.order}</span>
-                          </div>
-                          <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                            <button
-                              onClick={() => setPanelTarget(isSelected ? (undefined as any) : r)}
-                              className="p-1.5 text-muted hover:text-primary-light hover:bg-primary/5 rounded-lg transition"
-                            >
-                              <HiPencil size={13} />
-                            </button>
-                            <button
-                              onClick={() => setDeleteTarget({ id: r._id, label: r.title })}
-                              className="p-1.5 rounded-lg transition text-muted hover:text-red-400 hover:bg-red-500/5"
-                            >
-                              <HiTrash size={13} />
-                            </button>
-                          </div>
+                          )}
+                          {r.noIndex && (
+                            <span className="text-[10px] px-2 py-0.5 bg-red-500/10 text-red-400 rounded-full border border-red-500/15">
+                              noindex
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              router.push(`/references/${r._id}`);
+                            }}
+                            className="p-1.5 text-muted hover:text-primary-light hover:bg-primary/10 rounded-lg transition"
+                          >
+                            <HiPencil size={14} />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteTarget({ id: r._id, label: r.title });
+                            }}
+                            className="p-1.5 rounded-lg transition text-muted hover:text-red-400 hover:bg-red-500/10"
+                          >
+                            <HiTrash size={14} />
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -525,31 +251,18 @@ export default function ReferenceAdminPage() {
               })}
             </div>
           )}
-        </div>
-
-        {/* Edit / Add panel */}
-        <AnimatePresence mode="wait">
-          {panelOpen && (
-            <EditPanel
-              key={panelTarget === "new" ? "new" : (panelTarget as Reference)?._id}
-              editing={editingItem}
-              onClose={() => setPanelTarget(undefined as any)}
-              onSaved={fetchReferences}
-            />
-          )}
-        </AnimatePresence>
+        </motion.div>
       </motion.div>
-    </motion.div>
 
-    <DeleteConfirmModal
-      open={!!deleteTarget}
-      title="Delete Reference Page?"
-      itemLabel={deleteTarget?.label}
-      description="This will permanently remove this URL mapping and its physical folder. This cannot be undone."
-      onConfirm={handleDelete}
-      onCancel={() => setDeleteTarget(null)}
-      loading={deleting}
-    />
+      <DeleteConfirmModal
+        open={!!deleteTarget}
+        title="Delete Reference Page?"
+        itemLabel={deleteTarget?.label}
+        description="This will permanently remove this reference page and its SEO data. This cannot be undone."
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+        loading={deleting}
+      />
     </>
   );
 }

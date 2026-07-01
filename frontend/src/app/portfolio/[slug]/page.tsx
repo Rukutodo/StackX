@@ -61,7 +61,7 @@ const SERVER_API = process.env.INTERNAL_API_URL || "http://localhost:4000";
 async function getProject(slug: string): Promise<PortfolioProject | null> {
   try {
     const res = await fetch(`${SERVER_API}/api/portfolio/${slug}`, {
-      next: { revalidate: 3600 }, // ISR: revalidate every hour
+      next: { revalidate: 60 }, // ISR: revalidate every minute
     });
     
     if (!res.ok) return null;

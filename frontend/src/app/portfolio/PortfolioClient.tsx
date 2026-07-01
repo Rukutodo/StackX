@@ -1,8 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { SectionHeading, GlassCard, Button } from "@/components/ui";
-import { HiArrowRight } from "react-icons/hi";
+import { GlassCard, Button } from "@/components/ui";
+import { HiArrowRight, HiSparkles } from "react-icons/hi";
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -60,29 +60,49 @@ export default function PortfolioClient({ projects, categories }: { projects: Po
       : projects.filter((p) => p.category === activeFilter);
 
   return (
-    <div className="pt-24 pb-20">
+    <div className="min-h-screen" style={{ background: "var(--color-background)" }}>
       {/* Hero */}
-      <section className="py-16 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(139,92,246,0.08),transparent_60%)]">
-          <div
-            className="absolute inset-0 opacity-[0.03]"
-            style={{
-              backgroundImage: `linear-gradient(rgba(139,92,246,1) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,1) 1px, transparent 1px)`,
-              backgroundSize: "60px 60px",
-            }}
-          />
+      <section className="relative pt-32 pb-20 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full opacity-20"
+            style={{ background: "radial-gradient(ellipse, #8B5CF6 0%, transparent 70%)", filter: "blur(80px)" }} />
+          <div className="absolute top-20 right-[10%] w-64 h-64 rounded-full opacity-10"
+            style={{ background: "radial-gradient(ellipse, #06B6D4 0%, transparent 70%)", filter: "blur(60px)" }} />
+          <div className="absolute inset-0 opacity-[0.03]"
+            style={{ backgroundImage: `linear-gradient(rgba(139,92,246,1) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,1) 1px, transparent 1px)`, backgroundSize: "60px 60px" }} />
         </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <SectionHeading
-            badge="Portfolio"
-            title="Our Work Speaks for Itself"
-            subtitle="Explore our case studies and see how we've helped businesses transform with technology."
-          />
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 text-xs font-semibold tracking-widest uppercase rounded-full border border-purple-500/30 bg-purple-500/10 text-purple-300 mb-6">
+              <HiSparkles className="w-3.5 h-3.5" /> Portfolio
+            </span>
+          </motion.div>
+          <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight text-white mb-6"
+            style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
+            Our Work Speaks{" "}
+            <span className="block" style={{ background: "linear-gradient(135deg, #A78BFA, #06B6D4)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+              for Itself
+            </span>
+          </motion.h1>
+          <motion.p initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed mb-10">
+            Explore our case studies and see how we&apos;ve helped businesses transform with technology.
+          </motion.p>
+          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}
+            className="flex flex-wrap justify-center gap-3">
+            <a href="#projects" className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-xl bg-gradient-to-r from-purple-600 to-violet-600 text-white hover:from-purple-500 hover:to-violet-500 hover:shadow-lg hover:shadow-purple-500/30 hover:-translate-y-0.5 transition-all duration-200">
+              View Projects <HiArrowRight className="w-4 h-4" />
+            </a>
+            <a href="/contact" className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-xl border border-white/10 text-gray-300 hover:bg-white/5 hover:border-white/20 transition-all duration-200">
+              Start a Project
+            </a>
+          </motion.div>
         </div>
       </section>
 
       {/* Filters */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+      <section id="projects" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 scroll-mt-24">
         <div className="flex flex-wrap items-center justify-center gap-3">
           {categories.map((f) => (
             <button

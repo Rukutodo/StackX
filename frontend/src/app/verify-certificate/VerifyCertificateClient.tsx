@@ -297,53 +297,40 @@ export default function VerifyCertificateClient({ initialId }: { initialId?: str
                           <div className="absolute inset-0 border border-white/5 pointer-events-none z-[5]" />
 
                           {/* ─── PREMIUM DARK GEOMETRIC BACKGROUND ─── */}
-                          {/* Base dark violet -> near black gradient */}
-                          <div className="absolute inset-0 z-0" style={{ background: "radial-gradient(ellipse at center, #2e1065 0%, #170535 50%, #0a0118 100%)" }} />
-
-                          {/* Center brightness for readability */}
-                          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] pointer-events-none z-0" style={{ background: "radial-gradient(ellipse at center, rgba(139,92,246,0.12) 0%, rgba(139,92,246,0) 60%)" }} />
-                          <div className="absolute top-[10%] left-1/2 -translate-x-1/2 w-[400px] h-[300px] pointer-events-none z-0 blur-[60px]" style={{ background: "rgba(167,139,250,0.06)" }} />
-
-                          {/* Geometric / Polygonal elements in corners */}
-                          <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-60" viewBox="0 0 1123 794" preserveAspectRatio="none">
-                            {/* Top-left cluster */}
-                            <polygon points="0,0 300,0 150,150 0,250" fill="rgba(139,92,246,0.03)" stroke="rgba(167,139,250,0.08)" strokeWidth="1" />
-                            <polygon points="0,0 150,150 50,300 0,400" fill="rgba(109,40,217,0.04)" stroke="rgba(167,139,250,0.05)" strokeWidth="0.5" />
-                            <polygon points="150,150 250,80 350,180 200,280" fill="rgba(124,58,237,0.02)" stroke="rgba(167,139,250,0.06)" strokeWidth="1" />
-                            
-                            {/* Bottom-right cluster */}
-                            <polygon points="1123,794 800,794 950,600 1123,500" fill="rgba(139,92,246,0.03)" stroke="rgba(167,139,250,0.08)" strokeWidth="1" />
-                            <polygon points="1123,794 950,600 1000,400 1123,350" fill="rgba(109,40,217,0.04)" stroke="rgba(167,139,250,0.05)" strokeWidth="0.5" />
-                            <polygon points="950,600 850,550 750,680 880,720" fill="rgba(124,58,237,0.02)" stroke="rgba(167,139,250,0.06)" strokeWidth="1" />
-
-                            {/* Top-right accent */}
-                            <polygon points="1123,0 900,0 1050,150 1123,100" fill="rgba(76,29,149,0.1)" stroke="rgba(139,92,246,0.1)" strokeWidth="1" />
-                            <polygon points="1050,150 950,220 1123,280 1123,100" fill="rgba(109,40,217,0.03)" />
-                            
-                            {/* Bottom-left accent */}
-                            <polygon points="0,794 200,794 100,600 0,650" fill="rgba(76,29,149,0.1)" stroke="rgba(139,92,246,0.1)" strokeWidth="1" />
-                            <polygon points="100,600 250,520 0,450 0,650" fill="rgba(109,40,217,0.03)" />
-
-                            {/* Floating subtle facets / mesh lines */}
-                            <path d="M 300 0 L 450 300 L 800 200 L 900 0" fill="none" stroke="rgba(139,92,246,0.04)" strokeWidth="1" />
-                            <path d="M 100 794 L 250 500 L 650 600 L 850 794" fill="none" stroke="rgba(139,92,246,0.03)" strokeWidth="1" />
-                          </svg>
-
-                          {/* Edge glows for dimension */}
-                          <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#8b5cf6]/30 to-transparent z-[2]" />
-                          <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#8b5cf6]/20 to-transparent z-[2]" />
+                          <img
+                            src="/premium-bg.png?v=4"
+                            alt="Certificate Background"
+                            className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0"
+                          />
+                          {/* Dark overlay to ensure text visibility */}
+                          <div className="absolute inset-0 bg-black/50 pointer-events-none z-0" />
 
 
                           {/* ═══ CONTENT ═══ */}
                           <div className="relative z-10 w-full h-full flex flex-col" style={{ padding: "34px 60px 28px" }}>
 
-                            {/* ── LOGO — Centered ── */}
-                            <div className="w-full flex justify-center mb-4">
+                            {/* ── HEADER (Logo + Badges) ── */}
+                            <div className="relative w-full flex justify-center items-start mb-4 h-[84px]">
+                              {/* LOGO — Centered */}
                               <img
                                 src="/stackx.svg"
                                 alt="StackX"
                                 className="h-[84px] filter invert brightness-0 invert drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
                               />
+
+                              {/* Government Badges — Top Right */}
+                              <div className="absolute right-0 top-1 flex flex-col items-end gap-2">
+                                <span className="text-[8px] text-[#a78bfa] font-semibold tracking-[0.25em] uppercase opacity-80">Recognized By</span>
+                                <div className="flex items-center gap-4">
+                                  {/* MSME - Sized up */}
+                                  <img src="/msme.png" alt="MSME" className="h-[46px] w-auto object-contain filter invert grayscale contrast-200 mix-blend-screen opacity-90" />
+                                  <div className="w-[1px] h-[30px] bg-white/20 mx-1" />
+                                  {/* Startup India - Restored original colors */}
+                                  <div className="bg-white px-3 py-1.5 rounded-md shadow-sm">
+                                    <img src="/startupindia.png" alt="Startup India" className="h-[34px] w-auto object-contain mix-blend-multiply" />
+                                  </div>
+                                </div>
+                              </div>
                             </div>
 
                             {/* ── TITLE ── */}
@@ -376,14 +363,19 @@ export default function VerifyCertificateClient({ initialId }: { initialId?: str
                               </div>
 
                               <h2
-                                className={`text-white font-bold tracking-[0.05em] leading-tight my-5 drop-shadow-lg ${
+                                className={`text-white leading-tight my-4 drop-shadow-lg ${
                                   result.recipientName.length > 50
-                                    ? "text-[30px]"
+                                    ? "text-[24px]"
                                     : result.recipientName.length > 30
-                                      ? "text-[38px]"
-                                      : "text-[44px]"
+                                      ? "text-[28px]"
+                                      : "text-[35px]"
                                 }`}
-                                style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}
+                                style={{ 
+                                  fontFamily: "'Playfair Display', 'Didot', 'Bodoni MT', 'Baskerville', 'Times New Roman', serif",
+                                  fontStyle: "italic",
+                                  fontWeight: 600,
+                                  letterSpacing: "0.02em"
+                                }}
                               >
                                 {result.recipientName}
                               </h2>
@@ -446,6 +438,8 @@ export default function VerifyCertificateClient({ initialId }: { initialId?: str
                                   </a>
                                 </div>
                               </div>
+
+
 
                               {/* Signatures */}
                               <div className="flex items-end gap-12">

@@ -54,10 +54,10 @@ function FloatingOrb({ className }: { className?: string }) {
   return <div className={`absolute rounded-full pointer-events-none ${className}`} />;
 }
 
-export default function WebDevelopmentServiceClient({
+export default function MarketResearchAndInsightsServiceClient({
   overrideTitle,
   overrideTagline,
-  overrideBadge = "Premium Web Development",
+  overrideBadge = "Data & Insights",
   initialFaqs = [],
   referenceContent = "",
   breadcrumbs = [],
@@ -113,15 +113,16 @@ export default function WebDevelopmentServiceClient({
         if (res.ok) {
           const data = await res.json();
           // Filter strictly for Web Development projects (or related web categories)
-          const webProjects = data.filter((p: any) => {
-            const cat = (p.category || "").toLowerCase();
-            return cat.includes("web") || cat === "e-commerce" || cat === "saas platform";
-          });
-          // Limit to strictly 6 projects max
-          setProjects(webProjects.slice(0, 6));
+          const webProjects = data.filter((p: any) => 
+            p.category === "Web Development" || p.category === "SaaS" || p.category === "E-commerce"
+          );
+          setProjects(webProjects.slice(0, 3));
+        } else {
+          setProjects([]);
         }
       } catch (err) {
-        console.error("Error fetching projects:", err);
+        console.error("Failed to fetch projects:", err);
+        setProjects([]);
       } finally {
         setLoadingProjects(false);
       }
@@ -133,14 +134,16 @@ export default function WebDevelopmentServiceClient({
         if (res.ok) {
           const data = await res.json();
           const webTestimonials = data.filter((t: any) => {
-            const cat = (t.projectType || "").toLowerCase();
-            return cat.includes("web") || cat === "e-commerce" || cat === "saas platform";
+            const pt = (t.projectType || "").toLowerCase();
+            return pt.includes("web") || pt.includes("saas") || pt.includes("e-commerce") || pt.includes("platform");
           });
-          const selected = webTestimonials.length >= 3 ? webTestimonials : data;
-          setTestimonials(selected.slice(0, 3));
+          setTestimonials(webTestimonials.slice(0, 3));
+        } else {
+          setTestimonials([]);
         }
       } catch (err) {
-        console.error("Error fetching testimonials:", err);
+        console.error("Failed to fetch testimonials:", err);
+        setTestimonials([]);
       } finally {
         setLoadingTestimonials(false);
       }
@@ -155,7 +158,7 @@ export default function WebDevelopmentServiceClient({
     return () => clearInterval(heroTimer);
   }, [heroSlides.length]);
 
-  const displayTitle = overrideTitle || "Experiences That Scale";
+  const displayTitle = overrideTitle || "Market Research & Insights";
   const displayTagline = overrideTagline || "We engineer high-performance, visually stunning web applications tailored to elevate your brand and drive conversion. From custom marketing sites to complex SaaS platforms, we turn your vision into reality.";
 
   const hasFaqs = initialFaqs.length > 0;
@@ -774,8 +777,6 @@ export default function WebDevelopmentServiceClient({
             </div>
           </section>
         )}
-
-
 
         {/* ═══════════ OTHER SERVICES ═══════════ */}
         <section className="relative pb-20">

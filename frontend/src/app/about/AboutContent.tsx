@@ -83,29 +83,49 @@ const teamStats = [
 
 export default function AboutContent() {
     return (
-        <div className="pt-24 pb-20">
-            {/* Hero */}
-            <section className="py-16 relative overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(6,182,212,0.08),transparent_60%)]">
-                  <div
-                    className="absolute inset-0 opacity-[0.03]"
-                    style={{
-                      backgroundImage: `linear-gradient(rgba(139,92,246,1) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,1) 1px, transparent 1px)`,
-                      backgroundSize: "60px 60px",
-                    }}
-                  />
-                </div>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                    <SectionHeading
-                        badge="About Us"
-                        title="Building the Future, One Line at a Time"
-                        subtitle="We're a team of passionate technologists dedicated to delivering premium software solutions at costs that make enterprise-quality accessible to everyone."
-                    />
+    <div className="min-h-screen" style={{ background: "var(--color-background)" }}>
+      {/* Hero */}
+      <section className="relative pt-32 pb-20 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full opacity-20"
+            style={{ background: "radial-gradient(ellipse, #06B6D4 0%, transparent 70%)", filter: "blur(80px)" }} />
+          <div className="absolute top-20 left-[10%] w-64 h-64 rounded-full opacity-10"
+            style={{ background: "radial-gradient(ellipse, #8B5CF6 0%, transparent 70%)", filter: "blur(60px)" }} />
+          <div className="absolute inset-0 opacity-[0.03]"
+            style={{ backgroundImage: `linear-gradient(rgba(139,92,246,1) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,1) 1px, transparent 1px)`, backgroundSize: "60px 60px" }} />
+        </div>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 text-xs font-semibold tracking-widest uppercase rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 mb-6">
+              <HiGlobe className="w-3.5 h-3.5" /> About Us
+            </span>
+          </motion.div>
+          <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight text-white mb-6"
+            style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
+            Building the Future,{" "}
+            <span className="block" style={{ background: "linear-gradient(135deg, #06B6D4, #A78BFA)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+              One Line at a Time
+            </span>
+          </motion.h1>
+          <motion.p initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed mb-10">
+            We&apos;re a team of passionate technologists dedicated to delivering premium software solutions at costs that make enterprise-quality accessible to everyone.
+          </motion.p>
+          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}
+                        className="flex flex-wrap justify-center gap-3">
+                        <a href="#our-story" className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 text-white hover:from-cyan-500 hover:to-blue-500 hover:shadow-lg hover:shadow-cyan-500/30 hover:-translate-y-0.5 transition-all duration-200">
+                            Our Story <HiArrowRight className="w-4 h-4" />
+                        </a>
+                        <a href="/contact" className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-xl border border-white/10 text-gray-300 hover:bg-white/5 hover:border-white/20 transition-all duration-200">
+                            Get in Touch
+                        </a>
+                    </motion.div>
                 </div>
             </section>
 
             {/* Our Story */}
-            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <section id="our-story" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 scroll-mt-24">
                 <div className="grid lg:grid-cols-2 gap-12 items-center">
                     <motion.div
                         initial={{ opacity: 0, x: -30 }}
