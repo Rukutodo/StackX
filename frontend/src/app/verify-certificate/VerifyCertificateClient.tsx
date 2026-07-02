@@ -371,9 +371,8 @@ export default function VerifyCertificateClient({ initialId }: { initialId?: str
                                       : "text-[35px]"
                                 }`}
                                 style={{ 
-                                  fontFamily: "'Playfair Display', 'Didot', 'Bodoni MT', 'Baskerville', 'Times New Roman', serif",
-                                  fontStyle: "italic",
-                                  fontWeight: 600,
+                                  fontFamily: "'Montserrat', 'Inter', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif",
+                                  fontWeight: 700,
                                   letterSpacing: "0.02em"
                                 }}
                               >
