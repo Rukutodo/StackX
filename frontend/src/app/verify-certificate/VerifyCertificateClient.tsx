@@ -363,7 +363,7 @@ export default function VerifyCertificateClient({ initialId }: { initialId?: str
                               </div>
 
                               <h2
-                                className={`text-white leading-tight my-4 drop-shadow-lg ${
+                                className={`capitalize text-white leading-tight my-4 drop-shadow-lg ${
                                   result.recipientName.length > 50
                                     ? "text-[24px]"
                                     : result.recipientName.length > 30
@@ -371,8 +371,9 @@ export default function VerifyCertificateClient({ initialId }: { initialId?: str
                                       : "text-[35px]"
                                 }`}
                                 style={{ 
-                                  fontFamily: "'Montserrat', 'Inter', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif",
-                                  fontWeight: 700,
+                                  fontFamily: "'Playfair Display', 'Didot', 'Bodoni MT', 'Baskerville', 'Times New Roman', serif",
+                                  fontStyle: "italic",
+                                  fontWeight: 600,
                                   letterSpacing: "0.02em"
                                 }}
                               >
@@ -390,7 +391,7 @@ export default function VerifyCertificateClient({ initialId }: { initialId?: str
                             {/* ── DETAILS (Continuous Format) ── */}
                             <div className="flex flex-col items-center mt-7 px-10">
                               <p className="text-[18px] text-[#e5e7eb] text-center leading-[1.8] max-w-[850px] font-medium">
-                                for the successful completion of their internship program as a <span className="font-bold text-white uppercase tracking-wide text-[20px] mx-1 drop-shadow-sm">{result.courseOrRole}</span> 
+                                for the successful completion of their internship program as a <span className="font-bold text-white capitalize tracking-wide text-[20px] mx-1 drop-shadow-sm">{result.courseOrRole}</span> 
                                 from <span className="font-bold text-white border-b border-[#a78bfa]/40 pb-0.5 mx-1">{formatDateDMY(result.startDate)}</span> 
                                 to <span className="font-bold text-white border-b border-[#a78bfa]/40 pb-0.5 mx-1">{formatDateDMY(result.endDate)}</span>. 
                                 During this tenure, the candidate demonstrated exceptional dedication, continuous skill development, and outstanding professional growth.
