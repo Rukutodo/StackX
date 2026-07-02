@@ -233,7 +233,7 @@ export default function VerifyCertificateClient({ initialId }: { initialId?: str
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -20 }}
               transition={{ duration: 0.4, type: "spring", bounce: 0.3 }}
-              className="max-w-3xl mx-auto"
+              className="max-w-6xl mx-auto"
             >
               {error ? (
                 <div className="bg-red-500/10 border border-red-500/20 rounded-3xl p-8 text-center backdrop-blur-md">
@@ -263,35 +263,84 @@ export default function VerifyCertificateClient({ initialId }: { initialId?: str
                     </p>
                   </div>
                 ) : (
-                  <div className="relative group w-full max-w-[950px] mx-auto">
-                    {/* Outer shadow for the paper */}
-                    <div className="absolute -inset-4 bg-black/20 blur-2xl rounded-sm transition duration-1000" />
-
-                    {/* Scale wrapper to keep layout identical on mobile and desktop */}
-                    <div
-                      ref={containerRef}
-                      className="w-full overflow-hidden flex items-center justify-center"
-                      style={{ height: `${794 * scale}px` }}
-                    >
-                      <div
-                        style={{
-                          transform: `scale(${scale})`,
-                          transformOrigin: "center center",
-                          width: "1123px",
-                          height: "794px",
-                          flexShrink: 0
-                        }}
+                  <div className="w-full max-w-[1100px] mx-auto">
+                    
+                    {/* ── Verified Badge + Context Header ── */}
+                    <div className="text-center mb-10">
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", bounce: 0.4, delay: 0.1 }}
+                        className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/25 mb-6"
                       >
-                        {/* ═══ THE CERTIFICATE CARD ═══ */}
+                        <HiBadgeCheck className="text-emerald-400 w-5 h-5" />
+                        <span className="text-emerald-300 text-sm font-semibold tracking-wide">Verified &amp; Authentic</span>
+                      </motion.div>
+
+                      <h2 className="text-3xl md:text-4xl font-bold text-white mb-3" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+                        Certificate of Internship
+                      </h2>
+                      <p className="text-gray-400 text-lg leading-relaxed max-w-2xl mx-auto">
+                        This is to certify that <span className="text-white font-semibold capitalize">{result.recipientName}</span> has 
+                        successfully completed the <span className="text-purple-300 font-semibold capitalize">{result.courseOrRole}</span> internship 
+                        program at <span className="text-white font-semibold">StackX</span>.
+                      </p>
+                    </div>
+
+                    {/* ── Certificate Details Grid ── */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10 max-w-3xl mx-auto">
+                      <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-4 text-center backdrop-blur-sm">
+                        <p className="text-[11px] text-gray-500 uppercase tracking-widest mb-1.5">Recipient</p>
+                        <p className="text-white font-semibold text-sm capitalize truncate">{result.recipientName}</p>
+                      </div>
+                      <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-4 text-center backdrop-blur-sm">
+                        <p className="text-[11px] text-gray-500 uppercase tracking-widest mb-1.5">Program</p>
+                        <p className="text-purple-300 font-semibold text-sm capitalize truncate">{result.courseOrRole}</p>
+                      </div>
+                      <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-4 text-center backdrop-blur-sm">
+                        <p className="text-[11px] text-gray-500 uppercase tracking-widest mb-1.5">Issued On</p>
+                        <p className="text-white font-semibold text-sm">{formatDateDMY(result.issueDate)}</p>
+                      </div>
+                      <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-4 text-center backdrop-blur-sm">
+                        <p className="text-[11px] text-gray-500 uppercase tracking-widest mb-1.5">Certificate ID</p>
+                        <p className="text-cyan-300 font-mono font-semibold text-sm truncate">{result.certificateId}</p>
+                      </div>
+                    </div>
+
+                    {/* ── Framed Certificate Preview ── */}
+                    <div className="relative group w-full max-w-[950px] mx-auto">
+                      {/* Glowing frame effect */}
+                      <div className="absolute -inset-3 bg-gradient-to-br from-purple-500/20 via-transparent to-cyan-500/20 rounded-xl blur-xl opacity-60 group-hover:opacity-80 transition-opacity duration-700" />
+                      <div className="absolute -inset-[1px] bg-gradient-to-br from-purple-500/30 via-white/5 to-cyan-500/30 rounded-xl" />
+                      
+                      {/* Certificate container with inner padding */}
+                      <div className="relative bg-[#0a0a0f] rounded-xl p-3">
+
+                        {/* Scale wrapper to keep layout identical on mobile and desktop */}
                         <div
-                          id="certificate-card"
-                          key={renderKey}
-                          className="relative text-[#1a1a2e] overflow-hidden w-full h-full select-none"
-                          style={{
-                            background: "transparent",
-                            fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif"
-                          }}
+                          ref={containerRef}
+                          className="w-full overflow-hidden flex items-center justify-center rounded-lg"
+                          style={{ height: `${794 * scale}px` }}
                         >
+                          <div
+                            style={{
+                              transform: `scale(${scale})`,
+                              transformOrigin: "center center",
+                              width: "1123px",
+                              height: "794px",
+                              flexShrink: 0
+                            }}
+                          >
+                            {/* ═══ THE CERTIFICATE CARD ═══ */}
+                            <div
+                              id="certificate-card"
+                              key={renderKey}
+                              className="relative text-[#1a1a2e] overflow-hidden w-full h-full select-none"
+                              style={{
+                                background: "transparent",
+                                fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif"
+                              }}
+                            >
                           {/* ─── PREMIUM DARK THEME BORDER ─── */}
                           <div className="absolute inset-[10px] border-[8px] border-double border-[#8b5cf6]/20 pointer-events-none z-[5]" />
                           <div className="absolute inset-0 border border-white/5 pointer-events-none z-[5]" />
@@ -307,7 +356,7 @@ export default function VerifyCertificateClient({ initialId }: { initialId?: str
 
 
                           {/* ═══ CONTENT ═══ */}
-                          <div className="relative z-10 w-full h-full flex flex-col" style={{ padding: "34px 60px 28px" }}>
+                          <div className="relative z-10 w-full h-full flex flex-col" style={{ padding: "34px 60px 52px" }}>
 
                             {/* ── HEADER (Logo + Badges) ── */}
                             <div className="relative w-full flex justify-center items-start mb-4 h-[84px]">
@@ -320,7 +369,7 @@ export default function VerifyCertificateClient({ initialId }: { initialId?: str
 
                               {/* Government Badges — Top Right */}
                               <div className="absolute right-0 top-1 flex flex-col items-end gap-2">
-                                <span className="text-[8px] text-[#a78bfa] font-semibold tracking-[0.25em] uppercase opacity-80">Recognized By</span>
+                                <span className="text-[8px] text-white font-semibold tracking-[0.25em] uppercase opacity-80">Recognized By</span>
                                 <div className="flex items-center gap-4">
                                   {/* MSME - Sized up */}
                                   <img src="/msme.png" alt="MSME" className="h-[46px] w-auto object-contain filter invert grayscale contrast-200 mix-blend-screen opacity-90" />
@@ -479,12 +528,22 @@ export default function VerifyCertificateClient({ initialId }: { initialId?: str
                         </div>
                       </div>
                     </div>
+                    </div>
+                    </div>
 
-                    <div className="mt-12 text-center flex justify-center">
+                    {/* ── Download Section ── */}
+                    <div className="mt-12 text-center max-w-2xl mx-auto">
+                      <p className="text-gray-400 text-sm mb-2">
+                        Your certificate has been verified successfully. You can download an official copy below.
+                      </p>
+                      <p className="text-gray-500 text-xs mb-6">
+                        The PDF will be generated in A4 landscape format, ready for printing or digital use.
+                      </p>
+
                       <button
                         onClick={handleDownloadPDF}
                         disabled={downloadingPdf}
-                        className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-2xl font-bold text-lg overflow-hidden transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none shadow-[0_0_40px_-10px_rgba(16,185,129,0.5)] hover:shadow-[0_0_60px_-10px_rgba(16,185,129,0.7)]"
+                        className="group relative inline-flex items-center justify-center gap-3 px-10 py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-2xl font-bold text-lg overflow-hidden transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none shadow-[0_0_40px_-10px_rgba(16,185,129,0.5)] hover:shadow-[0_0_60px_-10px_rgba(16,185,129,0.7)]"
                       >
                         {/* Shimmer effect */}
                         <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-shimmer" />
@@ -498,6 +557,12 @@ export default function VerifyCertificateClient({ initialId }: { initialId?: str
                           <span>{downloadingPdf ? "Generating Premium PDF..." : "Download Official PDF"}</span>
                         </div>
                       </button>
+
+                      {/* Footer note */}
+                      <div className="mt-10 flex items-center justify-center gap-3 text-gray-600 text-xs">
+                        <HiOutlineOfficeBuilding size={14} />
+                        <span>Issued by StackX · MSME & Startup India Recognized</span>
+                      </div>
                     </div>
                   </div>
                 )
