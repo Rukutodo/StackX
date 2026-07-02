@@ -1,9 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { GlassCard, Button } from "@/components/ui";
-import { HiArrowRight, HiSparkles } from "react-icons/hi";
-import { useState } from "react";
+import { HiArrowRight, HiSparkles, HiSearch, HiFilter, HiX, HiCheck } from "react-icons/hi";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -52,12 +52,90 @@ export interface PortfolioProject {
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "";
 
 export default function PortfolioClient({ projects, categories }: { projects: PortfolioProject[]; categories: string[] }) {
-  const [activeFilter, setActiveFilter] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [showRecommendations, setShowRecommendations] = useState(false);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+  
+  const filterRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLDivElement>(null);
 
-  const filtered =
-    activeFilter === "All"
-      ? projects
-      : projects.filter((p) => p.category === activeFilter);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
+        setIsFilterOpen(false);
+      }
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowRecommendations(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const toggleCategory = (cat: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
+    );
+  };
+
+  const clearFilters = () => {
+    setSelectedCategories([]);
+    setSearchQuery("");
+  };
+
+  const filtered = projects.filter((p) => {
+    const matchesSearch =
+      !searchQuery.trim() ||
+      p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.techStack.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesCategory =
+      selectedCategories.length === 0 || selectedCategories.includes(p.category);
+    return matchesSearch && matchesCategory;
+  });
+
+  const recommendations: { type: "category" | "project"; text: string }[] = [];
+  if (searchQuery.trim().length > 0) {
+    const query = searchQuery.toLowerCase();
+    categories.filter(c => c !== "All").forEach(cat => {
+      if (cat.toLowerCase().includes(query)) {
+        recommendations.push({ type: "category", text: cat });
+      }
+    });
+    projects.forEach(p => {
+      if (p.title.toLowerCase().includes(query)) {
+        if (!recommendations.some(r => r.type === "project" && r.text === p.title)) {
+          recommendations.push({ type: "project", text: p.title });
+        }
+      }
+    });
+  }
+
+  const handleSelectRecommendation = (rec: { type: "category" | "project"; text: string }) => {
+    setSearchQuery(rec.text);
+    setShowRecommendations(false);
+    setFocusedIndex(-1);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showRecommendations || recommendations.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setFocusedIndex(prev => (prev < recommendations.length - 1 ? prev + 1 : prev));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setFocusedIndex(prev => (prev > 0 ? prev - 1 : 0));
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (focusedIndex >= 0 && focusedIndex < recommendations.length) {
+        handleSelectRecommendation(recommendations[focusedIndex]);
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen" style={{ background: "var(--color-background)" }}>
@@ -101,29 +179,210 @@ export default function PortfolioClient({ projects, categories }: { projects: Po
         </div>
       </section>
 
-      {/* Filters */}
-      <section id="projects" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 scroll-mt-24">
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          {categories.map((f) => (
+      {/* Search & Filter Bar */}
+      <section id="projects" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 scroll-mt-32">
+        <div className="flex items-center gap-3">
+          {/* Search Input */}
+          <div className="relative flex-1 group" ref={searchRef}>
+            <HiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-purple-400 transition-colors w-5 h-5" />
+            <input
+              type="text"
+              value={searchQuery}
+              onFocus={() => setShowRecommendations(true)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setShowRecommendations(true);
+                setFocusedIndex(-1);
+              }}
+              onKeyDown={handleKeyDown}
+              placeholder="Search projects, tech stack..."
+              className="w-full pl-12 pr-4 py-3.5 bg-white/[0.04] border border-white/10 rounded-2xl text-white text-sm placeholder:text-gray-500 focus:outline-none focus:border-purple-500/40 focus:bg-white/[0.06] focus:shadow-[0_0_20px_rgba(139,92,246,0.08)] transition-all duration-300"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/10"
+              >
+                <HiX className="w-4 h-4" />
+              </button>
+            )}
+
+            {/* Recommendations Dropdown */}
+            <AnimatePresence>
+              {showRecommendations && recommendations.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute left-0 right-0 top-full mt-2 bg-[#0f0a1a]/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden z-50 max-h-[300px] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full"
+                >
+                  <div className="py-2">
+                    {recommendations.map((rec, idx) => (
+                      <button
+                        key={`${rec.type}-${idx}`}
+                        onClick={() => handleSelectRecommendation(rec)}
+                        onMouseEnter={() => setFocusedIndex(idx)}
+                        className={`w-full flex items-center justify-between px-4 py-3 text-sm transition-all text-left ${
+                          idx === focusedIndex ? "bg-white/[0.06]" : "hover:bg-white/[0.06]"
+                        }`}
+                      >
+                        <span className="text-gray-200">{rec.text}</span>
+                        <span
+                          className={`text-[10px] font-bold tracking-widest uppercase px-2 py-1 rounded-md ${
+                            rec.type === "category"
+                              ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
+                              : "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                          }`}
+                        >
+                          {rec.type === "category" ? "Service" : "Project"}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Filter Button */}
+          <div className="relative" ref={filterRef}>
             <button
-              key={f}
-              onClick={() => setActiveFilter(f)}
-              className={`px-5 py-2 text-sm font-medium rounded-full border transition-all cursor-pointer ${
-                activeFilter === f
-                  ? "bg-primary text-white border-primary"
-                  : "bg-white/5 text-muted border-white/10 hover:border-primary/30 hover:text-white"
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              className={`flex items-center gap-2 px-5 py-3.5 rounded-2xl border text-sm font-medium transition-all duration-300 ${
+                selectedCategories.length > 0
+                  ? "bg-purple-600/15 border-purple-500/40 text-purple-300 shadow-[0_0_15px_rgba(139,92,246,0.1)]"
+                  : "bg-white/[0.04] border-white/10 text-gray-400 hover:text-white hover:border-white/20 hover:bg-white/[0.06]"
               }`}
             >
-              {f}
+              <HiFilter className="w-4 h-4" />
+              <span className="hidden sm:inline">Filters</span>
+              {selectedCategories.length > 0 && (
+                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-purple-500 text-white text-[10px] font-bold">
+                  {selectedCategories.length}
+                </span>
+              )}
             </button>
-          ))}
+
+            {/* Dropdown */}
+            <AnimatePresence>
+              {isFilterOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute right-0 top-full mt-3 w-[260px] bg-[#0f0a1a]/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden z-50"
+                >
+                  {/* Header */}
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+                    <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Categories</span>
+                    {selectedCategories.length > 0 && (
+                      <button
+                        onClick={clearFilters}
+                        className="text-[11px] text-purple-400 hover:text-purple-300 font-medium transition-colors"
+                      >
+                        Clear all
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Options */}
+                  <div className="py-1.5 max-h-[280px] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full">
+                    {categories
+                      .filter((c) => c !== "All")
+                      .sort((a, b) => {
+                        const countA = projects.filter((p) => p.category === a).length;
+                        const countB = projects.filter((p) => p.category === b).length;
+                        return countB - countA;
+                      })
+                      .map((cat) => {
+                      const isChecked = selectedCategories.includes(cat);
+                      const count = projects.filter((p) => p.category === cat).length;
+                      return (
+                        <button
+                          key={cat}
+                          onClick={() => toggleCategory(cat)}
+                          className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-all hover:bg-white/[0.04] ${
+                            isChecked ? "text-white" : "text-gray-400"
+                          }`}
+                        >
+                          {/* Checkbox */}
+                          <div
+                            className={`flex items-center justify-center w-[18px] h-[18px] rounded-md border-2 transition-all duration-200 flex-shrink-0 ${
+                              isChecked
+                                ? "bg-purple-600 border-purple-500 shadow-[0_0_8px_rgba(139,92,246,0.3)]"
+                                : "border-white/20 hover:border-white/40"
+                            }`}
+                          >
+                            {isChecked && <HiCheck className="w-3 h-3 text-white" />}
+                          </div>
+                          <span className="flex-1 text-left">{cat}</span>
+                          <span className="text-[11px] text-gray-600 font-mono">{count}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
+
+        {/* Active Filter Tags */}
+        {selectedCategories.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-wrap items-center gap-2 mt-4"
+          >
+            <span className="text-xs text-gray-500 mr-1">Showing:</span>
+            {selectedCategories.map((cat) => (
+              <span
+                key={cat}
+                className="inline-flex items-center gap-1.5 px-3 py-1 bg-purple-600/15 border border-purple-500/30 rounded-lg text-xs text-purple-300 font-medium"
+              >
+                {cat}
+                <button onClick={() => toggleCategory(cat)} className="hover:text-white transition-colors">
+                  <HiX className="w-3 h-3" />
+                </button>
+              </span>
+            ))}
+            <button
+              onClick={clearFilters}
+              className="text-xs text-gray-500 hover:text-white transition-colors underline underline-offset-2"
+            >
+              Clear all
+            </button>
+          </motion.div>
+        )}
       </section>
 
       {/* Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((project, i) => (
+        {filtered.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex flex-col items-center justify-center py-24 px-4 text-center border border-white/5 rounded-3xl bg-white/[0.02]"
+          >
+            <div className="w-16 h-16 rounded-2xl bg-purple-500/10 flex items-center justify-center mb-6">
+              <HiSearch className="w-8 h-8 text-purple-400" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>No projects found</h3>
+            <p className="text-gray-400 max-w-sm mb-6 text-sm">
+              We couldn't find any projects matching your current search or category filters.
+            </p>
+            <button
+              onClick={clearFilters}
+              className="px-6 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl text-sm font-medium transition-colors"
+            >
+              Clear Filters & Search
+            </button>
+          </motion.div>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filtered.map((project, i) => (
             <motion.div
               key={project._id}
               initial={{ opacity: 0, y: 30 }}
@@ -204,6 +463,7 @@ export default function PortfolioClient({ projects, categories }: { projects: Po
             </motion.div>
           ))}
         </div>
+        )}
       </section>
 
       {/* CTA */}

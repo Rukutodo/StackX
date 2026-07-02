@@ -61,6 +61,15 @@ export default function ServiceEditPage() {
   const [removeConfirm, setRemoveConfirm] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<"general" | "seo">("general");
 
+  const [existingServices, setExistingServices] = useState<any[]>([]);
+  const [conflictDialog, setConflictDialog] = useState<{
+    isOpen: boolean;
+    conflictedOrder: number;
+    nextAvailable: number;
+    conflictedServiceId: string;
+    conflictedServiceTitle: string;
+  } | null>(null);
+
   // FAQ remove confirm tracks separately
   const [removeFaqConfirm, setRemoveFaqConfirm] = useState<number | null>(null);
   const [collapsedFaqs, setCollapsedFaqs] = useState<number[]>([]);
@@ -121,6 +130,7 @@ export default function ServiceEditPage() {
     if (!isNew) fetchService();
     fetch(`${API}/api/portfolio`).then(r => r.json()).then(setPortfolioProjects);
     fetch(`${API}/api/testimonials`).then(r => r.json()).then(setAllTestimonials);
+    fetch(`${API}/api/services?all=true`).then(r => r.json()).then(setExistingServices);
   }, [id, isNew, fetchService]);
 
   const addSubService = () => {
@@ -176,8 +186,28 @@ export default function ServiceEditPage() {
     });
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: FormEvent) => {
+    if (e) e.preventDefault();
+
+    // Check for order conflicts
+    const conflict = existingServices.find(s => s.order === form.order && s._id !== id);
+    if (conflict && !conflictDialog) {
+       const maxOrder = Math.max(0, ...existingServices.map(s => s.order || 0));
+       const nextAvailable = maxOrder + 1;
+       setConflictDialog({
+         isOpen: true,
+         conflictedOrder: form.order,
+         nextAvailable,
+         conflictedServiceId: conflict._id,
+         conflictedServiceTitle: conflict.title,
+       });
+       return; // Pause save
+    }
+
+    await performSave(form.order);
+  };
+
+  const performSave = async (finalOrder: number) => {
     setSaving(true);
     setError("");
     setSuccess("");
@@ -195,7 +225,7 @@ export default function ServiceEditPage() {
           Authorization: `Bearer ${localStorage.getItem("stackx_token") || ""}`
         },
         credentials: "include",
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, order: finalOrder }),
       });
 
       if (!res.ok) {
@@ -212,6 +242,41 @@ export default function ServiceEditPage() {
       setError(err.message);
     } finally {
       setSaving(false);
+      setConflictDialog(null);
+    }
+  };
+
+  const resolveConflict = async (resolution: "shiftExisting" | "changeCurrent") => {
+    if (!conflictDialog) return;
+    
+    if (resolution === "shiftExisting") {
+      // Shift the existing one to nextAvailable
+      try {
+        setSaving(true);
+        // We need to update the existing service first
+        // We will fetch it, change its order, and put it back
+        const existingRes = await fetch(`${API}/api/services/${conflictDialog.conflictedServiceId}`);
+        if (existingRes.ok) {
+          const existingData = await existingRes.json();
+          await fetch(`${API}/api/services/${conflictDialog.conflictedServiceId}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("stackx_token") || ""}`
+            },
+            body: JSON.stringify({ ...existingData, order: conflictDialog.nextAvailable })
+          });
+        }
+      } catch (err) {
+        console.error("Failed to shift existing service", err);
+      }
+      
+      // Save current with its desired order
+      await performSave(conflictDialog.conflictedOrder);
+    } else {
+      // Keep existing, change current to nextAvailable
+      setForm(f => ({ ...f, order: conflictDialog.nextAvailable }));
+      await performSave(conflictDialog.nextAvailable);
     }
   };
 
@@ -232,6 +297,7 @@ export default function ServiceEditPage() {
     : allTestimonials;
 
   return (
+    <>
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-6 pb-20">
       <motion.div variants={item} className="flex items-center gap-4">
         <button
@@ -383,6 +449,16 @@ export default function ServiceEditPage() {
                         <option value="active">Active</option>
                         <option value="draft">Draft</option>
                       </select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-muted/80 uppercase tracking-wider">Display Order</label>
+                      <input
+                        type="number"
+                        value={form.order}
+                        onChange={(e) => setForm({ ...form, order: Number(e.target.value) })}
+                        placeholder="0"
+                        className="admin-input w-full"
+                      />
                     </div>
                   </div>
 
@@ -826,5 +902,64 @@ export default function ServiceEditPage() {
         </div>
       </form>
     </motion.div>
+
+    {/* Order Conflict Dialog */}
+    <AnimatePresence>
+      {conflictDialog && conflictDialog.isOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setConflictDialog(null)}
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className="relative w-full max-w-md bg-[#0f0a1a] border border-white/10 rounded-2xl shadow-2xl p-6"
+          >
+            <div className="flex items-center gap-3 mb-4 text-amber-400">
+              <HiExclamationCircle size={24} />
+              <h2 className="text-lg font-bold">Display Order Conflict</h2>
+            </div>
+            
+            <p className="text-sm text-gray-300 mb-6 leading-relaxed">
+              Order <strong>{conflictDialog.conflictedOrder}</strong> already exists for the service "{conflictDialog.conflictedServiceTitle}".<br /><br />
+              Do you want to force this service to <strong>{conflictDialog.conflictedOrder}</strong> (and move "{conflictDialog.conflictedServiceTitle}" to <strong>{conflictDialog.nextAvailable}</strong>), or keep the existing one as {conflictDialog.conflictedOrder} and make this service <strong>{conflictDialog.nextAvailable}</strong>?
+            </p>
+
+            <div className="flex flex-col gap-3">
+              <button
+                type="button"
+                onClick={() => resolveConflict("shiftExisting")}
+                disabled={saving}
+                className="w-full px-4 py-3 bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30 rounded-xl text-sm font-semibold transition"
+              >
+                Make this {conflictDialog.conflictedOrder} (Move other to {conflictDialog.nextAvailable})
+              </button>
+              <button
+                type="button"
+                onClick={() => resolveConflict("changeCurrent")}
+                disabled={saving}
+                className="w-full px-4 py-3 bg-primary/20 text-primary-light hover:bg-primary/30 border border-primary/30 rounded-xl text-sm font-semibold transition"
+              >
+                Make this {conflictDialog.nextAvailable} (Keep existing as {conflictDialog.conflictedOrder})
+              </button>
+              <button
+                type="button"
+                onClick={() => setConflictDialog(null)}
+                disabled={saving}
+                className="w-full px-4 py-3 bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white rounded-xl text-sm font-medium transition mt-2"
+              >
+                Cancel Save
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+    </>
   );
 }
