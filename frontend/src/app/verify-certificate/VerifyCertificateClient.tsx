@@ -412,18 +412,18 @@ export default function VerifyCertificateClient({ initialId }: { initialId?: str
                               </div>
 
                               <h2
-                                className={`capitalize text-white leading-tight my-4 drop-shadow-lg ${
+                                className={`capitalize text-white text-center max-w-[900px] leading-tight my-4 drop-shadow-lg ${
                                   result.recipientName.length > 50
                                     ? "text-[24px]"
                                     : result.recipientName.length > 30
                                       ? "text-[28px]"
                                       : "text-[35px]"
                                 }`}
-                                style={{ 
-                                  fontFamily: "'Playfair Display', 'Didot', 'Bodoni MT', 'Baskerville', 'Times New Roman', serif",
-                                  fontStyle: "italic",
-                                  fontWeight: 600,
-                                  letterSpacing: "0.02em"
+                                style={{
+                                  fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif",
+                                  fontStyle: "normal",
+                                  fontWeight: 700,
+                                  letterSpacing: "0.01em"
                                 }}
                               >
                                 {result.recipientName}
