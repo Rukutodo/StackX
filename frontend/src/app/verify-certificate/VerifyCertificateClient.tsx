@@ -86,7 +86,7 @@ export default function VerifyCertificateClient({ initialId }: { initialId?: str
     const cleanId = certId.trim().toUpperCase();
     if (!cleanId) return;
 
-    // Open verification details in a new browser tab
+    // Open verification details in a new browser taBB
     window.open(`/verify-certificate/${cleanId}`, "_blank");
   };
 
